@@ -137,7 +137,11 @@ function EvidenceBadge(evidence) {
   ]);
 }
 
-function EvidenceList(diagnosis, evidenceIds) {
+/** @param ctx opcional — quando fornecido, cada evidência ganha um bloco
+ * de comentário próprio (relatedObjectType "evidence"), permitindo ao
+ * tutor perguntar/comentar diretamente sobre uma evidência específica
+ * (seção 75: comentários devem poder apontar para "evidence"). */
+function EvidenceList(diagnosis, evidenceIds, ctx) {
   const ids = evidenceIds || [];
   if (ids.length === 0) {
     return el("p", { class: "muted" }, "Nenhuma evidência vinculada.");
@@ -145,7 +149,14 @@ function EvidenceList(diagnosis, evidenceIds) {
   const wrap = el("div", { class: "evidence-list" });
   ids.forEach((id) => {
     const ev = (diagnosis.evidence || []).find((e) => e.evidenceId === id);
-    wrap.appendChild(EvidenceBadge(ev));
+    if (!ctx) {
+      wrap.appendChild(EvidenceBadge(ev));
+      return;
+    }
+    const item = el("span", { class: "evidence-list__item" }, [EvidenceBadge(ev)]);
+    const commentBlock = ItemCommentBlock(ctx, "evidence", id, { compact: true });
+    if (commentBlock) item.appendChild(commentBlock);
+    wrap.appendChild(item);
   });
   return wrap;
 }
@@ -406,8 +417,10 @@ function ItemCommentBlock(ctx, relatedObjectType, itemId, opts = {}) {
   const comments = ctx.commentsFor(itemId);
   const questions = ctx.questionsFor(itemId);
   if (ctx.locked && comments.length === 0 && questions.length === 0) return null;
-  const details = el("details", { class: "item-comment-block" });
-  details.appendChild(el("summary", {}, `Comentários e perguntas deste item${comments.length || questions.length ? ` (${comments.length + questions.length})` : ""}`));
+  const details = el("details", { class: "item-comment-block" + (opts.compact ? " item-comment-block--compact" : "") });
+  const count = comments.length + questions.length;
+  const label = opts.label || (opts.compact ? "Comentar" : "Comentários e perguntas deste item");
+  details.appendChild(el("summary", {}, count ? `${label} (${count})` : label));
   details.appendChild(CommentThread({
     comments,
     questions,

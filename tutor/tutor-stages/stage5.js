@@ -38,7 +38,7 @@ function TutorSwotCard(item, ctx) {
   card.appendChild(el("div", { class: "tutor-item-card__source" }, [
     item.description ? el("p", {}, item.description) : null,
     el("p", { class: "muted" }, `Origem: ${item.originDimension || "não informada"}${item.systemSuggested ? " — sugestão do sistema" : ""}${item.userConfirmed ? " — confirmado pela escola" : ""}`),
-    EvidenceList(ctx.diagnosis, item.evidenceIds),
+    EvidenceList(ctx.diagnosis, item.evidenceIds, ctx),
   ]));
   const evalWrap = el("div", { class: "tutor-item-card__evaluation" });
   evalWrap.appendChild(TutorRatingField(
@@ -69,7 +69,7 @@ function TutorPriorityCard(priority, problem, ctx) {
     el("p", {}, `Justificativa da escola: ${priority.justification || "(não informada)"}`),
     el("p", {}, `Mudança esperada: ${priority.expectedChange || "(não informada)"}`),
     el("p", { class: "ro-field__label" }, "Evidências do problema de origem"),
-    EvidenceList(ctx.diagnosis, problem?.evidenceIds),
+    EvidenceList(ctx.diagnosis, problem?.evidenceIds, ctx),
   ]));
   const evalWrap = el("div", { class: "tutor-item-card__evaluation" });
   evalWrap.appendChild(TutorRatingField(
@@ -89,8 +89,12 @@ function TutorPriorityCard(priority, problem, ctx) {
     review.TUT_PRIORITY_COMMENT, (v) => ctx.setItemField(priority.priorityId, "TUT_PRIORITY_COMMENT", v)
   ));
   card.appendChild(evalWrap);
-  const itemComments = window.TutorComponents.ItemCommentBlock(ctx, "priority", priority.priorityId);
+  const itemComments = window.TutorComponents.ItemCommentBlock(ctx, "priority", priority.priorityId, { label: "Comentar sobre esta prioridade" });
   if (itemComments) card.appendChild(itemComments);
+  if (problem) {
+    const problemComments = window.TutorComponents.ItemCommentBlock(ctx, "problem", problem.problemId, { compact: true, label: "Comentar sobre o problema de origem" });
+    if (problemComments) card.appendChild(problemComments);
+  }
   return card;
 }
 

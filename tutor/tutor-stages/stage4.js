@@ -74,7 +74,7 @@ function TutorRiskCard(risk, ctx) {
     el("p", {}, `Nível de atenção da comunidade: ${risk.communityAttentionLevel || "não informado"}`),
     risk.knowledgeGap ? el("p", { class: "tag" }, "Registrado como lacuna de conhecimento (\"não sabemos\")") : null,
     el("p", { class: "ro-field__label" }, "Evidências vinculadas"),
-    EvidenceList(ctx.diagnosis, risk.evidenceIds),
+    EvidenceList(ctx.diagnosis, risk.evidenceIds, ctx),
   ]);
   card.appendChild(readonly);
 

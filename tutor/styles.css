@@ -192,6 +192,9 @@ h1, h2, h3, h4, h5 { font-family: var(--font-serif); color: var(--color-primary-
 .item-comment-block { margin-top: 0.6rem; border-top: 1px dashed var(--color-border); padding-top: 0.5rem; }
 .item-comment-block summary { cursor: pointer; font-size: 0.82rem; font-weight: 600; color: var(--color-tutor); }
 .item-comment-block[open] summary { margin-bottom: 0.5rem; }
+.evidence-list__item { display: inline-block; vertical-align: top; margin: 0 0.4rem 0.4rem 0; }
+.item-comment-block--compact { display: block; border-top: none; margin-top: 0.2rem; }
+.item-comment-block--compact summary { font-size: 0.72rem; font-weight: 400; text-decoration: underline; }
 
 /* ---------------------------------------------------------------------- */
 /* Rubrica transversal — nunca uma nota                                    */
