@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caderno de Diagnóstico Escolar e Territorial para Tutores</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#tutor-main">Pular para o conteúdo principal</a>
+
+  <header id="tutor-header" class="header" role="banner"></header>
+
+  <div class="layout">
+    <nav id="tutor-nav" class="nav" aria-label="Etapas do Caderno do Tutor"></nav>
+    <main id="tutor-main" class="main" tabindex="-1" aria-live="polite"></main>
+    <aside id="tutor-side" class="side-panel" aria-label="Camada do tutor"></aside>
+  </div>
+
+  <footer class="footer no-print">
+    <p>Caderno de Diagnóstico Escolar e Territorial para Tutores — SECADI-UFPEL — protótipo V1 (localStorage, sem backend). O diagnóstico do cursista é sempre somente leitura.</p>
+  </footer>
+
+  <!-- Reaproveitado do sistema do cursista, somente para leitura (getAnswer,
+       domainForField, uid, nowIso). Este arquivo NUNCA é usado para gravar
+       no diagnóstico importado. -->
+  <script src="../data-model.js"></script>
+
+  <script src="tutor-data-model.js"></script>
+  <script src="diagnosis-importer.js"></script>
+  <script src="tutor-rules.js"></script>
+  <script src="tutor-storage.js"></script>
+  <script src="tutor-components.js"></script>
+
+  <script src="tutor-stages/stage0.js"></script>
+  <script src="tutor-stages/stage1.js"></script>
+  <script src="tutor-stages/stage2.js"></script>
+  <script src="tutor-stages/stage3.js"></script>
+  <script src="tutor-stages/stage4.js"></script>
+  <script src="tutor-stages/stage5.js"></script>
+  <script src="tutor-stages/stage6.js"></script>
+  <script src="tutor-stages/stage7.js"></script>
+
+  <script src="tutor-report.js"></script>
+  <script src="tutor-app.js"></script>
+</body>
+</html>
