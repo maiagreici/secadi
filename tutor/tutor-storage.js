@@ -96,8 +96,28 @@ async function importDiagnosisFile(file) {
 /* Exportação — Caderno do Tutor (nunca o arquivo do cursista)            */
 /* ---------------------------------------------------------------------- */
 
-function triggerDownload(payload, filename) {
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+/** Quando o Caderno roda hospedado como Artifact, o download direto via
+ * <a download> é bloqueado pelo sandbox do visualizador. Se a capability
+ * "downloads" estiver disponível (window.claude.use), usamos-a; caso
+ * contrário (execução local via arquivo/servidor, uso normal da V1),
+ * caímos no método padrão de blob + link. Nunca lança erro — apenas
+ * informa se conseguiu entregar o arquivo por essa via. */
+async function saveViaDownloadsCapability(filename, data) {
+  if (typeof window === "undefined" || !window.claude || typeof window.claude.use !== "function") return false;
+  try {
+    const downloads = await window.claude.use("downloads");
+    if (!downloads) return false;
+    await downloads.save({ filename, data });
+    return true;
+  } catch (err) {
+    return false; // recusado/limitado/indisponível — segue para o fallback
+  }
+}
+
+async function triggerDownload(payload, filename) {
+  const json = JSON.stringify(payload, null, 2);
+  if (await saveViaDownloadsCapability(filename, json)) return;
+  const blob = new Blob([json], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -108,7 +128,7 @@ function triggerDownload(payload, filename) {
   URL.revokeObjectURL(url);
 }
 
-function exportTutorNotebookToFile(notebook, diagnosesStore) {
+async function exportTutorNotebookToFile(notebook, diagnosesStore) {
   const payload = {
     exportedAt: window.TutorDataModel.tutorNowIso(),
     instrumentVersion: window.TutorDataModel.TUTOR_INSTRUMENT_VERSION,
@@ -119,10 +139,10 @@ function exportTutorNotebookToFile(notebook, diagnosesStore) {
     sourceDiagnoses: diagnosesStore,
   };
   const safeName = (notebook.tutor.TUT_NAME || "tutor").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-  triggerDownload(payload, `caderno-do-tutor-${safeName || "secadi"}.json`);
+  await triggerDownload(payload, `caderno-do-tutor-${safeName || "secadi"}.json`);
 }
 
-function exportFinalAssessmentToFile(finalAssessment, schoolEntry) {
+async function exportFinalAssessmentToFile(finalAssessment, schoolEntry) {
   const payload = {
     exportedAt: window.TutorDataModel.tutorNowIso(),
     instrumentVersion: window.TutorDataModel.TUTOR_INSTRUMENT_VERSION,
@@ -131,7 +151,7 @@ function exportFinalAssessmentToFile(finalAssessment, schoolEntry) {
     finalAssessment,
   };
   const safeName = (schoolEntry.schoolName || "escola").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-  triggerDownload(payload, `parecer-formativo-${safeName || "escola"}-v${finalAssessment.diagnosisVersion}.json`);
+  await triggerDownload(payload, `parecer-formativo-${safeName || "escola"}-v${finalAssessment.diagnosisVersion}.json`);
 }
 
 async function importTutorNotebookFromFile(file) {

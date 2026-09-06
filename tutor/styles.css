@@ -20,17 +20,72 @@
   --color-accent: #4d7c5f;
   --color-tutor: #3f5f78;
   --color-focus: #1a5cff;
+  --color-heading: #1f3441;
 
   --color-information-bg: #eaf1fb; --color-information-border: #7fa8d6; --color-information-text: #1c3f66;
   --color-reflection-bg: #f4efe0; --color-reflection-border: #c9a45c; --color-reflection-text: #5a4520;
   --color-attention-bg: #fbeee0; --color-attention-border: #d98d4c; --color-attention-text: #6b3a10;
   --color-revision-bg: #f0e9f7; --color-revision-border: #a486c9; --color-revision-text: #442a63;
   --color-critical-bg: #fbeaea; --color-critical-border: #c65b5b; --color-critical-text: #6b1a1a;
+  --color-success-bg: #e4efe6; --color-success-text: #1f3441;
 
   --radius: 10px;
   --shadow: 0 1px 3px rgba(43, 42, 38, 0.08), 0 1px 2px rgba(43, 42, 38, 0.06);
   --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Tema escuro: mesma identidade (terroso/verde + azul do tutor), tons
+   invertidos para um fundo escuro sóbrio em vez de inversão automática. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #1b201d;
+    --color-surface: #232a26;
+    --color-surface-alt: #2b332e;
+    --color-border: #3d453e;
+    --color-text: #e9e6dd;
+    --color-text-muted: #a8a89b;
+    --color-primary: #35566a;
+    --color-primary-dark: #1f3441;
+    --color-primary-contrast: #f5f3ec;
+    --color-accent: #3f7a57;
+    --color-tutor: #7ea3c4;
+    --color-focus: #6fa1ff;
+    --color-heading: #eef2ec;
+
+    --color-information-bg: #1c2a38; --color-information-border: #4f7ea8; --color-information-text: #bcd6ec;
+    --color-reflection-bg: #332b18; --color-reflection-border: #a8823f; --color-reflection-text: #e8d19f;
+    --color-attention-bg: #3a2416; --color-attention-border: #b06a35; --color-attention-text: #f0c39a;
+    --color-revision-bg: #2c2236; --color-revision-border: #8f6fb3; --color-revision-text: #ddc9ef;
+    --color-critical-bg: #3a1f1f; --color-critical-border: #b05a5a; --color-critical-text: #f2bcbc;
+    --color-success-bg: #24382b; --color-success-text: #cfe8d6;
+
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+}
+:root[data-theme="dark"] {
+  --color-bg: #1b201d;
+  --color-surface: #232a26;
+  --color-surface-alt: #2b332e;
+  --color-border: #3d453e;
+  --color-text: #e9e6dd;
+  --color-text-muted: #a8a89b;
+  --color-primary: #35566a;
+  --color-primary-dark: #1f3441;
+  --color-primary-contrast: #f5f3ec;
+  --color-accent: #3f7a57;
+  --color-tutor: #7ea3c4;
+  --color-focus: #6fa1ff;
+  --color-heading: #eef2ec;
+
+  --color-information-bg: #1c2a38; --color-information-border: #4f7ea8; --color-information-text: #bcd6ec;
+  --color-reflection-bg: #332b18; --color-reflection-border: #a8823f; --color-reflection-text: #e8d19f;
+  --color-attention-bg: #3a2416; --color-attention-border: #b06a35; --color-attention-text: #f0c39a;
+  --color-revision-bg: #2c2236; --color-revision-border: #8f6fb3; --color-revision-text: #ddc9ef;
+  --color-critical-bg: #3a1f1f; --color-critical-border: #b05a5a; --color-critical-text: #f2bcbc;
+  --color-success-bg: #24382b; --color-success-text: #cfe8d6;
+
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 * { box-sizing: border-box; }
@@ -50,7 +105,7 @@ body {
 .skip-link:focus { left: 0; }
 :focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 
-h1, h2, h3, h4, h5 { font-family: var(--font-serif); color: var(--color-primary-dark); line-height: 1.25; }
+h1, h2, h3, h4, h5 { font-family: var(--font-serif); color: var(--color-heading); line-height: 1.25; }
 .muted { color: var(--color-text-muted); }
 .tag { display: inline-block; background: var(--color-surface-alt); border-radius: 99px; padding: 0.1rem 0.6rem; font-size: 0.75rem; }
 
@@ -215,7 +270,7 @@ h1, h2, h3, h4, h5 { font-family: var(--font-serif); color: var(--color-primary-
 .status-badge--ready_for_review { background: var(--color-reflection-bg); color: var(--color-reflection-text); }
 .status-badge--under_review { background: var(--color-attention-bg); color: var(--color-attention-text); }
 .status-badge--revision_requested { background: var(--color-revision-bg); color: var(--color-revision-text); }
-.status-badge--reviewed, .status-badge--completed { background: #e4efe6; color: var(--color-primary-dark); }
+.status-badge--reviewed, .status-badge--completed { background: var(--color-success-bg); color: var(--color-success-text); }
 
 /* ---------------------------------------------------------------------- */
 /* Dashboard                                                               */
