@@ -1,91 +1,102 @@
 /* ------------------------------------------------------------------------
    Caderno de Diagnóstico Escolar e Territorial para Tutores — SECADI-UFPEL
-   Identidade visual: acompanhamento + território + cuidado + reflexão +
-   formação. Acadêmica e acolhedora — não infantil, não gamificada.
-   Reaproveita a paleta terrosa/verde do sistema do cursista e acrescenta
-   um tom azulado sóbrio para identificar visualmente a "camada do tutor"
-   sem nunca convertê-la em pontuação/cor de aprovação-reprovação.
+
+   Identidade: um caderno de formação de verdade. A coluna central é a
+   página "datilografada" — o diagnóstico do cursista, limpo, tipográfico,
+   intocado. As colunas da esquerda (índice de etapas) e da direita
+   (camada do tutor) são a margem do caderno: pauta horizontal fina,
+   margem vermelha à esquerda, títulos em letra cursiva — porque é ali,
+   e só ali, que o tutor escreve. Paleta kraft/creme quente com tinta
+   verde-azulada (carimbo) e vermelho-terracota (caneta de correção),
+   nunca convertida em nota, índice ou aprovação/reprovação.
 ------------------------------------------------------------------------ */
 
 :root {
-  --color-bg: #f7f6f2;
-  --color-surface: #ffffff;
-  --color-surface-alt: #eef0ec;
-  --color-border: #d9d4c6;
-  --color-text: #2b2a26;
-  --color-text-muted: #6a675d;
+  --color-bg: #ede2c9;
+  --color-surface: #fdf9ee;
+  --color-surface-alt: #f2e6c7;
+  --color-border: #cdb98c;
+  --color-text: #3a2e1f;
+  --color-text-muted: #8a7654;
   --color-primary: #2f4d5e;
   --color-primary-dark: #1f3441;
-  --color-primary-contrast: #ffffff;
+  --color-primary-contrast: #fdf9ee;
   --color-accent: #4d7c5f;
   --color-tutor: #3f5f78;
   --color-focus: #1a5cff;
   --color-heading: #1f3441;
+  --color-margin-rule: #b6483f;
+  --color-page-rule: rgba(47, 77, 94, 0.14);
 
-  --color-information-bg: #eaf1fb; --color-information-border: #7fa8d6; --color-information-text: #1c3f66;
-  --color-reflection-bg: #f4efe0; --color-reflection-border: #c9a45c; --color-reflection-text: #5a4520;
-  --color-attention-bg: #fbeee0; --color-attention-border: #d98d4c; --color-attention-text: #6b3a10;
-  --color-revision-bg: #f0e9f7; --color-revision-border: #a486c9; --color-revision-text: #442a63;
-  --color-critical-bg: #fbeaea; --color-critical-border: #c65b5b; --color-critical-text: #6b1a1a;
-  --color-success-bg: #e4efe6; --color-success-text: #1f3441;
+  --color-information-bg: #e9eff6; --color-information-border: #7fa8d6; --color-information-text: #1c3f66;
+  --color-reflection-bg: #f3ecd6; --color-reflection-border: #c9a45c; --color-reflection-text: #5a4520;
+  --color-attention-bg: #f7e9d6; --color-attention-border: #d98d4c; --color-attention-text: #6b3a10;
+  --color-revision-bg: #ece3ee; --color-revision-border: #a486c9; --color-revision-text: #442a63;
+  --color-critical-bg: #f6e2df; --color-critical-border: #c65b5b; --color-critical-text: #6b1a1a;
+  --color-success-bg: #e4ecdf; --color-success-text: #1f3441;
 
-  --radius: 10px;
-  --shadow: 0 1px 3px rgba(43, 42, 38, 0.08), 0 1px 2px rgba(43, 42, 38, 0.06);
-  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(58, 46, 31, 0.1), 0 1px 2px rgba(58, 46, 31, 0.07);
+  --font-serif: "Lora", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-hand: "Caveat", "Segoe Script", cursive;
 }
 
-/* Tema escuro: mesma identidade (terroso/verde + azul do tutor), tons
-   invertidos para um fundo escuro sóbrio em vez de inversão automática. */
+/* Tema escuro: o mesmo caderno, lido à noite — capa e tinta escurecem,
+   a pauta e a margem continuam visíveis, nunca invertidas ao acaso. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --color-bg: #1b201d;
-    --color-surface: #232a26;
-    --color-surface-alt: #2b332e;
-    --color-border: #3d453e;
-    --color-text: #e9e6dd;
-    --color-text-muted: #a8a89b;
-    --color-primary: #35566a;
+    --color-bg: #201a12;
+    --color-surface: #2a2318;
+    --color-surface-alt: #332a1c;
+    --color-border: #4a3f2a;
+    --color-text: #ece3d2;
+    --color-text-muted: #b0a488;
+    --color-primary: #3c6178;
     --color-primary-dark: #1f3441;
-    --color-primary-contrast: #f5f3ec;
-    --color-accent: #3f7a57;
-    --color-tutor: #7ea3c4;
+    --color-primary-contrast: #f5f1e6;
+    --color-accent: #5c9873;
+    --color-tutor: #8bb0d0;
     --color-focus: #6fa1ff;
-    --color-heading: #eef2ec;
+    --color-heading: #f1ead9;
+    --color-margin-rule: #c9695f;
+    --color-page-rule: rgba(139, 176, 208, 0.14);
 
     --color-information-bg: #1c2a38; --color-information-border: #4f7ea8; --color-information-text: #bcd6ec;
     --color-reflection-bg: #332b18; --color-reflection-border: #a8823f; --color-reflection-text: #e8d19f;
     --color-attention-bg: #3a2416; --color-attention-border: #b06a35; --color-attention-text: #f0c39a;
     --color-revision-bg: #2c2236; --color-revision-border: #8f6fb3; --color-revision-text: #ddc9ef;
     --color-critical-bg: #3a1f1f; --color-critical-border: #b05a5a; --color-critical-text: #f2bcbc;
-    --color-success-bg: #24382b; --color-success-text: #cfe8d6;
+    --color-success-bg: #253524; --color-success-text: #cfe8d6;
 
-    --shadow: 0 1px 3px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.32);
   }
 }
 :root[data-theme="dark"] {
-  --color-bg: #1b201d;
-  --color-surface: #232a26;
-  --color-surface-alt: #2b332e;
-  --color-border: #3d453e;
-  --color-text: #e9e6dd;
-  --color-text-muted: #a8a89b;
-  --color-primary: #35566a;
+  --color-bg: #201a12;
+  --color-surface: #2a2318;
+  --color-surface-alt: #332a1c;
+  --color-border: #4a3f2a;
+  --color-text: #ece3d2;
+  --color-text-muted: #b0a488;
+  --color-primary: #3c6178;
   --color-primary-dark: #1f3441;
-  --color-primary-contrast: #f5f3ec;
-  --color-accent: #3f7a57;
-  --color-tutor: #7ea3c4;
+  --color-primary-contrast: #f5f1e6;
+  --color-accent: #5c9873;
+  --color-tutor: #8bb0d0;
   --color-focus: #6fa1ff;
-  --color-heading: #eef2ec;
+  --color-heading: #f1ead9;
+  --color-margin-rule: #c9695f;
+  --color-page-rule: rgba(139, 176, 208, 0.14);
 
   --color-information-bg: #1c2a38; --color-information-border: #4f7ea8; --color-information-text: #bcd6ec;
   --color-reflection-bg: #332b18; --color-reflection-border: #a8823f; --color-reflection-text: #e8d19f;
   --color-attention-bg: #3a2416; --color-attention-border: #b06a35; --color-attention-text: #f0c39a;
   --color-revision-bg: #2c2236; --color-revision-border: #8f6fb3; --color-revision-text: #ddc9ef;
   --color-critical-bg: #3a1f1f; --color-critical-border: #b05a5a; --color-critical-text: #f2bcbc;
-  --color-success-bg: #24382b; --color-success-text: #cfe8d6;
+  --color-success-bg: #253524; --color-success-text: #cfe8d6;
 
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.32);
 }
 
 * { box-sizing: border-box; }
@@ -99,49 +110,67 @@ body {
 }
 
 .skip-link {
-  position: absolute; left: -999px; top: 0; background: var(--color-primary); color: #fff;
+  position: absolute; left: -999px; top: 0; background: var(--color-primary); color: var(--color-primary-contrast);
   padding: 0.75rem 1rem; z-index: 100; border-radius: 0 0 var(--radius) 0;
 }
 .skip-link:focus { left: 0; }
 :focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 
-h1, h2, h3, h4, h5 { font-family: var(--font-serif); color: var(--color-heading); line-height: 1.25; }
+h1, h2, h3, h4, h5 { font-family: var(--font-serif); font-weight: 600; color: var(--color-heading); line-height: 1.25; text-wrap: balance; }
 .muted { color: var(--color-text-muted); }
 .tag { display: inline-block; background: var(--color-surface-alt); border-radius: 99px; padding: 0.1rem 0.6rem; font-size: 0.75rem; }
 
 /* ---------------------------------------------------------------------- */
-/* Cabeçalho                                                              */
+/* Cabeçalho — a capa do caderno                                          */
 /* ---------------------------------------------------------------------- */
 
 .header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 1.5rem; background: var(--color-primary); color: var(--color-primary-contrast); flex-wrap: wrap; }
 .header__brand { display: flex; align-items: center; gap: 0.75rem; }
 .header__mark { font-size: 1.6rem; }
-.header__title { margin: 0; font-family: var(--font-serif); font-size: 1.05rem; font-weight: 600; }
-.header__subtitle { margin: 0; font-size: 0.82rem; opacity: 0.85; }
+.header__title { margin: 0; font-family: var(--font-serif); font-size: 1.1rem; font-weight: 600; }
+.header__subtitle { margin: 0; font-family: var(--font-hand); font-size: 1.05rem; opacity: 0.9; letter-spacing: 0.01em; }
 .header__actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 .header__saved { font-size: 0.8rem; opacity: 0.85; margin-right: 0.5rem; }
 .file-label { position: relative; overflow: hidden; cursor: pointer; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
 /* ---------------------------------------------------------------------- */
-/* Layout — três colunas (seção 65), colapsa em blocos verticais          */
+/* Layout — três colunas (seção 65). Centro = a página datilografada do   */
+/* cursista, sem pauta. Esquerda e direita = a margem do tutor: pautadas, */
+/* com fio vermelho, onde só ele escreve. Colapsa em blocos verticais.    */
 /* ---------------------------------------------------------------------- */
 
 .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr) 320px; gap: 1.5rem; max-width: 1500px; margin: 0 auto; padding: 1.5rem; align-items: start; }
 
-.nav { position: sticky; top: 1.5rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 1rem; }
+.nav, .side-panel {
+  position: sticky; top: 1.5rem; border-radius: var(--radius); padding: 1rem 1rem 1rem 1.85rem;
+  background-color: var(--color-surface-alt);
+  background-image: repeating-linear-gradient(to bottom, transparent, transparent 1.6rem, var(--color-page-rule) 1.6rem, var(--color-page-rule) calc(1.6rem + 1px));
+  background-position: 0 0.3rem;
+}
+.nav { border: 1px solid var(--color-border); }
+.nav::before, .side-panel::before {
+  content: ""; position: absolute; top: 0.6rem; bottom: 0.6rem; left: 1.15rem; width: 2px;
+  background: var(--color-margin-rule); opacity: 0.55; border-radius: 2px;
+}
 .nav__school-name { margin: 0.5rem 0 0.25rem; }
-.nav__version { margin: 0 0 0.75rem; }
-.nav__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.25rem; }
-.nav__link { display: flex; align-items: center; gap: 0.5rem; width: 100%; text-align: left; background: none; border: none; border-radius: 8px; padding: 0.5rem 0.6rem; cursor: pointer; font-family: var(--font-sans); font-size: 0.85rem; color: var(--color-text); }
-.nav__link:hover { background: var(--color-surface-alt); }
-.nav__link.is-current { background: var(--color-primary); color: #fff; }
-.nav__step-number { display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--color-surface-alt); color: var(--color-text); font-size: 0.75rem; flex-shrink: 0; }
-.nav__link.is-current .nav__step-number { background: rgba(255,255,255,0.25); color: #fff; }
+.nav__version { margin: 0 0 0.75rem; font-family: var(--font-hand); font-size: 1rem; }
+.nav__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+.nav__link { display: flex; align-items: center; gap: 0.6rem; width: 100%; text-align: left; background: none; border: none; border-radius: 8px; padding: 0.45rem 0.6rem; cursor: pointer; font-family: var(--font-sans); font-size: 0.85rem; color: var(--color-text); transition: transform 0.15s ease; }
+.nav__link:hover { background: rgba(255,255,255,0.35); }
+.nav__link.is-current { background: var(--color-surface); box-shadow: var(--shadow); transform: translateX(3px); font-weight: 600; }
+.nav__step-number {
+  display: inline-flex; align-items: center; justify-content: center; width: 1.7rem; height: 1.7rem; flex-shrink: 0;
+  border-radius: 50%; font-family: var(--font-hand); font-size: 1.15rem; font-weight: 700; color: var(--color-text-muted);
+  border: 2px solid transparent;
+}
+.nav__link.is-current .nav__step-number { color: var(--color-margin-rule); border-color: var(--color-margin-rule); transform: rotate(-4deg); }
 .nav__step-label { flex: 1; }
 
-.main { min-width: 0; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 1.75rem; }
-.side-panel { position: sticky; top: 1.5rem; background: var(--color-surface-alt); border-radius: var(--radius); padding: 1rem; font-size: 0.88rem; max-height: calc(100vh - 3rem); overflow-y: auto; }
+.main { min-width: 0; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 1.75rem 2rem; box-shadow: var(--shadow); }
+.side-panel { font-size: 0.88rem; max-height: calc(100vh - 3rem); overflow-y: auto; }
+.side-panel h3, .side-panel h4 { font-family: var(--font-hand); font-weight: 700; font-size: 1.4rem; letter-spacing: 0.01em; margin-bottom: 0.4rem; }
+.side-panel h4 { font-size: 1.2rem; }
 
 .stage-title { margin-top: 0; }
 .footer { text-align: center; padding: 1.5rem; font-size: 0.78rem; color: var(--color-text-muted); }
@@ -155,7 +184,7 @@ h1, h2, h3, h4, h5 { font-family: var(--font-serif); color: var(--color-heading)
 /* Formulários e botões                                                    */
 /* ---------------------------------------------------------------------- */
 
-.input { width: 100%; padding: 0.5rem 0.65rem; border: 1px solid var(--color-border); border-radius: 8px; font: inherit; background: var(--color-surface); color: var(--color-text); }
+.input { width: 100%; padding: 0.5rem 0.65rem; border: 1px solid var(--color-border); border-radius: 6px; font: inherit; background: var(--color-surface); color: var(--color-text); }
 .input--number { width: auto; min-width: 6rem; }
 .textarea { resize: vertical; }
 .field, .tutor-field, .field--compact { margin-bottom: 0.9rem; }
@@ -164,8 +193,8 @@ h1, h2, h3, h4, h5 { font-family: var(--font-serif); color: var(--color-heading)
 .form-row { display: flex; gap: 1rem; flex-wrap: wrap; }
 .form-row .field--compact { flex: 1 1 200px; }
 
-.btn { font: inherit; border-radius: 8px; padding: 0.5rem 0.9rem; cursor: pointer; border: 1px solid transparent; }
-.btn--primary { background: var(--color-primary); color: #fff; }
+.btn { font: inherit; border-radius: 6px; padding: 0.5rem 0.9rem; cursor: pointer; border: 1px solid transparent; }
+.btn--primary { background: var(--color-primary); color: var(--color-primary-contrast); }
 .btn--secondary { background: var(--color-accent); color: #fff; }
 .btn--outline { background: transparent; border-color: var(--color-border); color: var(--color-text); }
 .btn--ghost { background: transparent; border: none; color: var(--color-text-muted); text-decoration: underline; }
@@ -173,7 +202,7 @@ h1, h2, h3, h4, h5 { font-family: var(--font-serif); color: var(--color-heading)
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ---------------------------------------------------------------------- */
-/* Leitura do diagnóstico do cursista (somente leitura)                    */
+/* Leitura do diagnóstico do cursista (somente leitura — a página impressa)*/
 /* ---------------------------------------------------------------------- */
 
 .ro-section { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px dashed var(--color-border); }
@@ -245,11 +274,11 @@ h1, h2, h3, h4, h5 { font-family: var(--font-serif); color: var(--color-heading)
 .comment-thread__form { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.75rem; }
 .comment-thread__form--question { border-top: 1px dashed var(--color-border); padding-top: 0.6rem; }
 .item-comment-block { margin-top: 0.6rem; border-top: 1px dashed var(--color-border); padding-top: 0.5rem; }
-.item-comment-block summary { cursor: pointer; font-size: 0.82rem; font-weight: 600; color: var(--color-tutor); }
+.item-comment-block summary { cursor: pointer; font-family: var(--font-hand); font-size: 1.05rem; font-weight: 600; color: var(--color-margin-rule); }
 .item-comment-block[open] summary { margin-bottom: 0.5rem; }
 .evidence-list__item { display: inline-block; vertical-align: top; margin: 0 0.4rem 0.4rem 0; }
 .item-comment-block--compact { display: block; border-top: none; margin-top: 0.2rem; }
-.item-comment-block--compact summary { font-size: 0.72rem; font-weight: 400; text-decoration: underline; }
+.item-comment-block--compact summary { font-size: 0.95rem; font-weight: 500; text-decoration: underline; }
 
 /* ---------------------------------------------------------------------- */
 /* Rubrica transversal — nunca uma nota                                    */
@@ -277,7 +306,7 @@ h1, h2, h3, h4, h5 { font-family: var(--font-serif); color: var(--color-heading)
 /* ---------------------------------------------------------------------- */
 
 .table-scroll { overflow-x: auto; }
-.dashboard-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.dashboard-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; font-variant-numeric: tabular-nums; }
 .dashboard-table th, .dashboard-table td { text-align: left; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--color-border); }
 .summary-card__list { margin: 0; padding-left: 1.2rem; }
 .repeatable-group__item { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; background: var(--color-surface-alt); border-radius: 8px; padding: 0.4rem 0.6rem; margin-bottom: 0.4rem; }
@@ -293,7 +322,7 @@ h1, h2, h3, h4, h5 { font-family: var(--font-serif); color: var(--color-heading)
   body { background: #fff; }
   .header, .nav, .side-panel, .footer, .no-print, .stage-nav-buttons { display: none !important; }
   .layout { display: block; padding: 0; max-width: none; }
-  .main { border: none; padding: 0; }
+  .main { border: none; padding: 0; box-shadow: none; }
   section, .report-stage, .risk-card, .tutor-item-card { break-inside: avoid; }
   a[href]::after { content: ""; }
 }
