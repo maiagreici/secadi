@@ -198,6 +198,7 @@ h1, h2, h3, h4, h5 { font-family: var(--font-serif); font-weight: 600; color: va
 .btn--secondary { background: var(--color-accent); color: #fff; }
 .btn--outline { background: transparent; border-color: var(--color-border); color: var(--color-text); }
 .btn--ghost { background: transparent; border: none; color: var(--color-text-muted); text-decoration: underline; }
+.btn-link { background: none; border: none; padding: 0; margin: 0; font: inherit; font-weight: 600; color: var(--color-tutor); text-decoration: underline; cursor: pointer; }
 .btn--small { padding: 0.3rem 0.6rem; font-size: 0.82rem; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -317,6 +318,21 @@ h1, h2, h3, h4, h5 { font-family: var(--font-serif); font-weight: 600; color: va
 
 .tutor-report section { margin-bottom: 1.4rem; }
 .report-stage { border-left: 3px solid var(--color-tutor); padding-left: 0.8rem; margin-bottom: 1rem; }
+
+/* ---------------------------------------------------------------------- */
+/* Apresentação e guia metodológico                                        */
+/* ---------------------------------------------------------------------- */
+
+.guide { max-width: 68ch; }
+.guide-block { margin: 2rem 0; padding-top: 1.5rem; border-top: 1px dashed var(--color-border); }
+.guide-block:first-of-type { border-top: none; padding-top: 0; margin-top: 1rem; }
+.guide-eyebrow { margin: 0 0 0.2rem; font-family: var(--font-hand); font-size: 1.2rem; color: var(--color-margin-rule); }
+.guide h3 { margin-top: 0; }
+.guide h4 { margin-bottom: 0.4rem; font-size: 1.05rem; }
+.guide ul { padding-left: 1.3rem; }
+.guide li { margin-bottom: 0.35rem; }
+.guide-table th, .guide-table td { vertical-align: top; }
+.panel-card--guide-link { background: var(--color-information-bg); border-color: var(--color-information-border); }
 
 @media print {
   body { background: #fff; }

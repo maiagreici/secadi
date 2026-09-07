@@ -189,6 +189,11 @@
     render();
   }
 
+  function goToGuide() {
+    view = "guide";
+    render();
+  }
+
   /* ---------------------------------------------------------------------- */
   /* Renderização — cabeçalho                                                */
   /* ---------------------------------------------------------------------- */
@@ -215,6 +220,7 @@
     const actions = el("div", { class: "header__actions" }, [
       el("span", { class: "header__saved", "aria-live": "polite" }, savedAt ? `Salvo às ${savedAt}.` : "Ainda não salvo."),
       el("button", { class: "btn btn--outline btn--small", onclick: goToDashboard }, "Painel"),
+      el("button", { class: "btn btn--outline btn--small", onclick: goToGuide }, "Apresentação"),
       view === "school"
         ? el("button", { class: "btn btn--outline btn--small", onclick: goToReport }, "Relatório")
         : null,
@@ -379,6 +385,13 @@
     const { el } = C();
     const main = document.getElementById("tutor-main");
     main.appendChild(el("h2", { class: "stage-title" }, "Painel do tutor"));
+    main.appendChild(el("div", { class: "panel-card panel-card--guide-link" }, [
+      el("p", {}, [
+        "Novo por aqui? Leia a ",
+        el("button", { type: "button", class: "btn-link", onclick: goToGuide }, "Apresentação e guia metodológico"),
+        " do Caderno antes de começar.",
+      ]),
+    ]));
     main.appendChild(renderImportPanel());
     main.appendChild(renderDashboardTable());
     main.appendChild(renderClassInsights());
@@ -460,6 +473,7 @@
     document.getElementById("tutor-side").innerHTML = "";
     if (view === "dashboard") renderDashboard();
     else if (view === "report") renderReportView();
+    else if (view === "guide") document.getElementById("tutor-main").appendChild(window.TutorGuide.render());
     else renderSchoolView();
     C().restoreFocus(focusSnapshot);
   }
