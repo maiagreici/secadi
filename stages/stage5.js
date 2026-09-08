@@ -146,22 +146,23 @@
   }
 
   const CAPACITY_CATEGORIES = [
-    { key: "pedagogical", label: "Pedagógicas (CAP_PEDAGOGICAL)" },
-    { key: "social", label: "Sociais (CAP_SOCIAL)" },
-    { key: "institutional", label: "Institucionais (CAP_INSTITUTIONAL)" },
-    { key: "territorial", label: "Territoriais (CAP_TERRITORIAL)" },
-    { key: "material", label: "Materiais (CAP_MATERIAL)" },
+    { key: "pedagogical", label: "Pedagógicas (CAP_PEDAGOGICAL)", help: "Saberes e práticas de ensino já disponíveis na escola — ex.: professores com experiência em projetos interdisciplinares, metodologias ativas, uso do território como espaço de aprendizagem." },
+    { key: "social", label: "Sociais (CAP_SOCIAL)", help: "Formas de organização e mobilização das pessoas — ex.: participação estudantil ativa, rede de apoio entre famílias, mutirões, associações comunitárias." },
+    { key: "institutional", label: "Institucionais (CAP_INSTITUTIONAL)", help: "Estruturas, normas e gestão da própria escola — ex.: apoio da direção, PPP que sustenta continuidade, canais de decisão coletiva." },
+    { key: "territorial", label: "Territoriais (CAP_TERRITORIAL)", help: "Recursos e conhecimentos do entorno — ex.: conhecimento tradicional sobre o clima local, parceiros no bairro, espaços públicos de apoio." },
+    { key: "material", label: "Materiais (CAP_MATERIAL)", help: "Infraestrutura, equipamentos e recursos físicos — ex.: espaço para horta, materiais didáticos próprios, equipamentos disponíveis." },
   ];
 
   function renderCapacities(diagnosis) {
     const wrap = el("div", { class: "capacities" });
     wrap.appendChild(el("h3", {}, "Capacidades adaptativas"));
-    wrap.appendChild(el("p", { class: "field__help" }, "Capacidades comunitárias não são tratadas como inferiores às institucionais — registre o que já existe, mesmo que informal."));
+    wrap.appendChild(el("p", { class: "field__help" }, "São recursos, saberes e formas de organização que a escola e o território JÁ possuem e que ajudam a responder a desafios socioambientais e climáticos. Capacidades comunitárias não são tratadas como inferiores às institucionais — registre o que já existe, mesmo que informal."));
 
     CAPACITY_CATEGORIES.forEach((cat) => {
       const list = diagnosis.adaptiveCapacities[cat.key] || [];
       const section = el("div", { class: "capacities__category" });
       section.appendChild(el("h4", {}, cat.label));
+      if (cat.help) section.appendChild(el("p", { class: "field__help" }, cat.help));
       const tagList = el("ul", { class: "tag-list" });
       list.forEach((text, idx) => {
         tagList.appendChild(el("li", {}, [

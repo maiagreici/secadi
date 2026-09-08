@@ -29,12 +29,14 @@
     { value: "espacos_externos", label: "Espaços externos para atividades" },
   ];
 
+  // A condição térmica costuma variar por estação (ex.: RS — muito fria no
+  // inverno e muito quente no verão), por isso é multiescolha, não uma
+  // condição única fixa.
   const THERMAL_CONDITION_OPTIONS = [
-    { value: "very_hot", label: "Muito quente" },
-    { value: "hot", label: "Quente" },
-    { value: "adequate", label: "Adequada" },
-    { value: "cold", label: "Fria" },
-    { value: "variable", label: "Muito variável" },
+    { value: "very_hot_summer", label: "Muito quente no verão" },
+    { value: "cold_winter", label: "Muito fria no inverno" },
+    { value: "adequate_most_of_year", label: "Adequada na maior parte do ano" },
+    { value: "variable", label: "Muito variável, sem padrão sazonal claro" },
     { value: "dontknow", label: "Não sabe" },
   ];
 
@@ -79,6 +81,7 @@
     { value: "structural_damage", label: "Danos à estrutura" },
     { value: "contamination", label: "Contaminação" },
     { value: "access_interruption", label: "Acesso interrompido" },
+    { value: "low_attendance", label: "Baixa adesão dos estudantes (aulas mantidas, mas poucos conseguem frequentar)" },
     { value: "other", label: "Outro" },
   ];
 
@@ -91,6 +94,16 @@
     { value: "burning", label: "Queima" },
     { value: "burial", label: "Enterramento" },
     { value: "other", label: "Outro" },
+    { value: "dontknow", label: "Não sabe" },
+  ];
+
+  const WASTE_TERRITORIAL_PROBLEMS_OPTIONS = [
+    { value: "landfill_sanitary", label: "Aterro sanitário" },
+    { value: "open_dump", label: "Lixão" },
+    { value: "waste_burning", label: "Queima de resíduos" },
+    { value: "waste_accumulation", label: "Acúmulo de resíduos no entorno" },
+    { value: "other", label: "Outro" },
+    { value: "none", label: "Nenhum" },
     { value: "dontknow", label: "Não sabe" },
   ];
 
@@ -136,7 +149,7 @@
   const fields = [
     { id: "INF_STRUCTURES", type: "matrix", label: "Infraestrutura da escola — estado de cada espaço, quando pertinente", qNumber: "Q1.1", matrixRows: INFRA_ROWS, matrixCols: [{ value: "estado", label: "Estado", options: STATE_OPTIONS }], required: true },
     { id: "INF_OTHER_STRUCTURE", type: "text", label: "Outra estrutura relevante não listada (se houver)", qNumber: "Q1.2" },
-    { id: "INF_THERMAL_CONDITION", type: "singleChoice", label: "Condição térmica geral das salas de aula", qNumber: "Q1.3", options: THERMAL_CONDITION_OPTIONS },
+    { id: "INF_THERMAL_CONDITION", type: "multiChoice", label: "Condição térmica das salas de aula", qNumber: "Q1.3", options: THERMAL_CONDITION_OPTIONS, help: "A condição térmica costuma variar ao longo do ano — marque todas as situações que se aplicam (ex.: pode ser muito quente no verão E muito fria no inverno)." },
     { id: "INF_THERMAL_PROBLEMS", type: "multiChoice", label: "Problemas relacionados às condições térmicas/estruturais", qNumber: "Q1.4", options: THERMAL_PROBLEMS_OPTIONS, otherFieldId: "INF_THERMAL_OTHER" },
 
     { id: "WAT_SOURCE", type: "singleChoice", label: "Fonte de abastecimento de água", qNumber: "Q1.5", options: WATER_SOURCE_OPTIONS, required: true },
@@ -155,21 +168,34 @@
 
     { id: "WST_SEPARATION", type: "confirmation", label: "Há separação de resíduos na escola?", qNumber: "Q1.17" },
     { id: "WST_DESTINATION", type: "multiChoice", label: "Destinação dos resíduos", qNumber: "Q1.18", options: WASTE_DESTINATION_OPTIONS },
-    { id: "WST_TERRITORIAL_PROBLEMS", type: "confirmation", label: "Existem problemas territoriais relacionados a resíduos (lixões, queima, acúmulo)?", qNumber: "Q1.19" },
-    { id: "WST_PROBLEM_DESCRIPTION", type: "textarea", label: "Descreva esses problemas", qNumber: "Q1.20", condition: (d) => ga(d, "WST_TERRITORIAL_PROBLEMS") === "yes" },
+    {
+      id: "WST_TERRITORIAL_PROBLEMS", type: "multiChoice",
+      label: "Existem problemas relacionados a resíduos no entorno da escola?",
+      qNumber: "Q1.19", options: WASTE_TERRITORIAL_PROBLEMS_OPTIONS, otherFieldId: "WST_TERRITORIAL_PROBLEMS_OTHER",
+      help: "Considere a área imediatamente ao redor da escola, não o município inteiro.",
+    },
+    {
+      id: "WST_PROBLEM_DESCRIPTION", type: "textarea", label: "Descreva esses problemas", qNumber: "Q1.20",
+      condition: (d) => (ga(d, "WST_TERRITORIAL_PROBLEMS") || []).some((v) => !["none", "dontknow"].includes(v)),
+    },
 
-    { id: "TER_ELEMENTS", type: "multiChoice", label: "Elementos presentes no território ao redor da escola", qNumber: "Q1.21", options: TERRITORY_ELEMENTS_OPTIONS, required: true, help: "A existência de um elemento não significa, por si só, risco ou impacto — isso será explorado a seguir." },
+    {
+      id: "TER_ELEMENTS", type: "multiChoice", label: "Elementos presentes no território ao redor da escola", qNumber: "Q1.21",
+      options: TERRITORY_ELEMENTS_OPTIONS, required: true,
+      help: "Considere o território mais imediato da escola — em geral o bairro ou a região do entorno em que a comunidade escolar circula, não o município inteiro. A existência de um elemento não significa, por si só, risco ou impacto — isso será explorado a seguir.",
+    },
     {
       id: "TER_ELEMENT_RELATION",
       type: "relationalChoice",
-      label: "Para cada elemento selecionado, qual sua principal relação com a escola/comunidade?",
+      label: "Para cada elemento selecionado, qual sua relação com a escola/comunidade?",
       qNumber: "Q1.22",
       options: ELEMENT_RELATION_OPTIONS,
       emptyMessage: "Selecione elementos do território acima para caracterizar a relação de cada um.",
+      help: "Nota para tutoria: um mesmo elemento pode ter mais de uma relação ao mesmo tempo (ex.: um rio pode ser, simultaneamente, ambiente e cultura, ou risco e uso comunitário) — marque quantas se aplicarem.",
       sourceItems: (d) => (ga(d, "TER_ELEMENTS") || []).map((v) => TERRITORY_ELEMENTS_OPTIONS.find((o) => o.value === v) || { value: v, label: v }),
     },
 
-    { id: "TER_ECONOMIC_ACTIVITIES", type: "multiChoice", label: "Principais atividades econômicas do território", qNumber: "Q1.23", options: ECONOMIC_ACTIVITIES_OPTIONS },
+    { id: "TER_ECONOMIC_ACTIVITIES", type: "multiChoice", label: "Principais atividades econômicas do território", qNumber: "Q1.23", options: ECONOMIC_ACTIVITIES_OPTIONS, otherFieldId: "TER_ECONOMIC_ACTIVITIES_OTHER" },
     { id: "TER_ECON_IMPACT_EXISTS", type: "confirmation", label: "Essas atividades têm impacto percebido no ambiente ou na comunidade?", qNumber: "Q1.24", condition: (d) => (ga(d, "TER_ECONOMIC_ACTIVITIES") || []).length > 0 },
     {
       id: "TER_ECON_IMPACT_TABLE",
@@ -182,13 +208,14 @@
     },
 
     { id: "TER_SEASONAL_EVENTS", type: "confirmation", label: "Há eventos sazonais que afetam a escola/comunidade (safras, secas, chuvas, festas, etc.)?", qNumber: "Q1.26" },
-    { id: "TER_SEASONAL_MONTHS", type: "monthSelector", label: "Em quais meses eles costumam ocorrer?", qNumber: "Q1.27", condition: (d) => ga(d, "TER_SEASONAL_EVENTS") === "yes" },
-    { id: "TER_SEASONAL_IMPACT", type: "textarea", label: "Como esses eventos afetam a escola?", qNumber: "Q1.28", condition: (d) => ga(d, "TER_SEASONAL_EVENTS") === "yes" },
+    { id: "TER_SEASONAL_EVENT_DESCRIPTION", type: "textarea", label: "Qual é esse evento? Descreva-o.", qNumber: "Q1.27", condition: (d) => ga(d, "TER_SEASONAL_EVENTS") === "yes" },
+    { id: "TER_SEASONAL_MONTHS", type: "monthSelector", label: "Em quais meses ele costuma ocorrer?", qNumber: "Q1.28", condition: (d) => ga(d, "TER_SEASONAL_EVENTS") === "yes" },
+    { id: "TER_SEASONAL_IMPACT", type: "textarea", label: "Qual o impacto desse evento na escola?", qNumber: "Q1.29", condition: (d) => ga(d, "TER_SEASONAL_EVENTS") === "yes" },
 
-    { id: "TER_CLIMATE_EVENT_HISTORY", type: "confirmation", label: "Há histórico de eventos climáticos extremos que afetaram a escola/comunidade?", qNumber: "Q1.29", required: true },
-    { id: "TER_CLIMATE_EVENT_DESC", type: "textarea", label: "Descreva o(s) evento(s)", qNumber: "Q1.30", condition: (d) => ga(d, "TER_CLIMATE_EVENT_HISTORY") === "yes" },
-    { id: "TER_CLIMATE_EVENT_PERIOD", type: "text", label: "Quando ocorreu(ram)?", qNumber: "Q1.31", condition: (d) => ga(d, "TER_CLIMATE_EVENT_HISTORY") === "yes" },
-    { id: "TER_CLIMATE_EVENT_IMPACTS", type: "multiChoice", label: "Impactos observados", qNumber: "Q1.32", options: [
+    { id: "TER_CLIMATE_EVENT_HISTORY", type: "confirmation", label: "Há histórico de eventos climáticos extremos que afetaram a escola/comunidade?", qNumber: "Q1.30", required: true },
+    { id: "TER_CLIMATE_EVENT_DESC", type: "textarea", label: "Descreva o(s) evento(s)", qNumber: "Q1.31", condition: (d) => ga(d, "TER_CLIMATE_EVENT_HISTORY") === "yes" },
+    { id: "TER_CLIMATE_EVENT_PERIOD", type: "text", label: "Quando ocorreu(ram)?", qNumber: "Q1.32", condition: (d) => ga(d, "TER_CLIMATE_EVENT_HISTORY") === "yes" },
+    { id: "TER_CLIMATE_EVENT_IMPACTS", type: "multiChoice", label: "Impactos observados", qNumber: "Q1.33", options: [
       { value: "class_interruption", label: "Interrupção de aulas" },
       { value: "material_damage", label: "Danos materiais" },
       { value: "displacement", label: "Deslocamento de pessoas" },
@@ -196,10 +223,13 @@
       { value: "emotional_impact", label: "Impacto emocional" },
       { value: "other", label: "Outro" },
     ], condition: (d) => ga(d, "TER_CLIMATE_EVENT_HISTORY") === "yes" },
-    { id: "TER_CLIMATE_LEARNING", type: "textarea", label: "O que a escola/comunidade aprendeu com esse evento?", qNumber: "Q1.33", condition: (d) => ga(d, "TER_CLIMATE_EVENT_HISTORY") === "yes" },
+    { id: "TER_CLIMATE_LEARNING", type: "textarea", label: "O que a escola/comunidade aprendeu com esse evento?", qNumber: "Q1.34", condition: (d) => ga(d, "TER_CLIMATE_EVENT_HISTORY") === "yes" },
 
-    { id: "TER_KEY_CHARACTERISTICS", type: "textarea", label: "Quais são as características-chave deste território, na sua leitura?", qNumber: "Q1.34" },
-    { id: "TER_MISSING_ASPECT", type: "textarea", label: "Há algum aspecto do território que vocês reconhecem não saber ainda?", qNumber: "Q1.35", help: "'Não sabemos' é uma resposta válida — isso vira uma lacuna de conhecimento registrada." },
+    {
+      id: "TER_KEY_CHARACTERISTICS", type: "textarea", label: "Quais são as características-chave deste território, na sua leitura?", qNumber: "Q1.35",
+      help: "Pense, por exemplo, em: relação com a água (rios, córregos, abastecimento), vegetação e áreas verdes, uso do solo predominante, memória e cultura local, riscos já percebidos e atividades econômicas mais presentes.",
+    },
+    { id: "TER_MISSING_ASPECT", type: "textarea", label: "Há algum aspecto do território que vocês reconhecem não saber ainda?", qNumber: "Q1.36", help: "'Não sabemos' é uma resposta válida — isso vira uma lacuna de conhecimento registrada." },
   ];
 
   function render(diagnosis) {

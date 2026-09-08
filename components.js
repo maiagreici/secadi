@@ -140,11 +140,15 @@ function optionOtherText(fieldDef, diagnosis, onChange, selectedValues) {
   });
 }
 
+function resolveOptions(fieldDef, diagnosis) {
+  return typeof fieldDef.options === "function" ? fieldDef.options(diagnosis) || [] : fieldDef.options || [];
+}
+
 function renderSingleChoice(fieldDef, diagnosis, onChange, opts = {}) {
   const groupName = domId("radio");
   const value = window.DataModel.getAnswer(diagnosis, fieldDef.id);
   const group = el("div", { class: "choice-group", role: "radiogroup" });
-  (fieldDef.options || []).forEach((opt) => {
+  resolveOptions(fieldDef, diagnosis).forEach((opt) => {
     const optId = domId("opt");
     const wrap = el("label", { class: "choice-item", for: optId }, [
       el("input", {
@@ -167,7 +171,7 @@ function renderSingleChoice(fieldDef, diagnosis, onChange, opts = {}) {
 function renderMultiChoice(fieldDef, diagnosis, onChange, opts = {}) {
   const value = window.DataModel.getAnswer(diagnosis, fieldDef.id) || [];
   const group = el("div", { class: "choice-group" });
-  (fieldDef.options || []).forEach((opt) => {
+  resolveOptions(fieldDef, diagnosis).forEach((opt) => {
     const optId = domId("opt");
     const checked = value.includes(opt.value);
     const wrap = el("label", { class: "choice-item", for: optId }, [
@@ -618,7 +622,13 @@ function renderRelationalChoice(fieldDef, diagnosis, onChange, opts = {}) {
   if (sourceItems.length === 0) {
     container.appendChild(el("p", { class: "muted" }, fieldDef.emptyMessage || "Nada selecionado ainda."));
   }
+  if (fieldDef.help && sourceItems.length > 0) {
+    container.appendChild(el("p", { class: "field__help" }, fieldDef.help));
+  }
   sourceItems.forEach((item) => {
+    // Cada item guarda uma LISTA de relações (não uma só) — a mesma relação
+    // pode envolver mais de uma dimensão ao mesmo tempo (ex.: ambiente e cultura).
+    const selected = value[item.value] || [];
     const row = el("div", { class: "relational-choice__row" }, [el("span", { class: "relational-choice__item" }, item.label)]);
     const group = el("div", { class: "choice-group choice-group--inline" });
     (fieldDef.options || []).forEach((opt) => {
@@ -626,11 +636,15 @@ function renderRelationalChoice(fieldDef, diagnosis, onChange, opts = {}) {
       group.appendChild(
         el("label", { class: "choice-item choice-item--small", for: optId }, [
           el("input", {
-            type: "radio",
+            type: "checkbox",
             id: optId,
-            name: domId(`rel_${item.value}`),
-            checked: value[item.value] === opt.value,
-            onchange: () => onChange(fieldDef.id, { ...value, [item.value]: opt.value }),
+            checked: selected.includes(opt.value),
+            onchange: (e) => {
+              const set = new Set(selected);
+              if (e.target.checked) set.add(opt.value);
+              else set.delete(opt.value);
+              onChange(fieldDef.id, { ...value, [item.value]: [...set] });
+            },
           }),
           el("span", {}, opt.label),
         ])

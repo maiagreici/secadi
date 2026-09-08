@@ -212,8 +212,8 @@ function runEACoherenceRules(diagnosis) {
   applyOrRemove(
     diagnosis,
     "COH_EA_002",
-    ["common_objectives", "collective_territorial_intervention", "joint_investigation"].includes(
-      ga("EA_INTERDISCIPLINARITY_MODE")
+    (ga("EA_INTERDISCIPLINARITY_MODE") || []).some((v) =>
+      ["common_objectives", "collective_territorial_intervention", "joint_investigation"].includes(v)
     ) && areas.length <= 1,
     {
       type: "coherence",
@@ -313,7 +313,8 @@ function generateProblemCandidates(diagnosis) {
   }
 
   // Problemas territoriais de resíduos relatados
-  if (ga("WST_TERRITORIAL_PROBLEMS") === "yes") {
+  const wasteTerritorialProblems = ga("WST_TERRITORIAL_PROBLEMS") || [];
+  if (wasteTerritorialProblems.some((v) => !["none", "dontknow"].includes(v))) {
     ensureCandidateProblem(diagnosis, "CAND_WASTE_TERRITORY", {
       title: "Problemas territoriais relacionados a resíduos",
       description: ga("WST_PROBLEM_DESCRIPTION") || "Foram relatados problemas territoriais associados a resíduos.",

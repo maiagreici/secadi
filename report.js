@@ -92,7 +92,10 @@
       nodes.push(P(`A escola relata ocorrência de alagamentos${ter.SAN_FLOOD_LOCATION ? ` em: ${ter.SAN_FLOOD_LOCATION}` : ""}. Impactos observados: ${humanize(ter.SAN_FLOOD_IMPACTS) || "não especificados"}.`));
     }
     if (ter.WST_DESTINATION) nodes.push(P(`Destinação de resíduos: ${humanize(ter.WST_DESTINATION)}.`));
-    if (ter.WST_TERRITORIAL_PROBLEMS === "yes") nodes.push(P(`Problemas territoriais relacionados a resíduos: ${ter.WST_PROBLEM_DESCRIPTION || "relatados, sem descrição detalhada."}`));
+    const wasteTerritorialProblems = (ter.WST_TERRITORIAL_PROBLEMS || []).filter((v) => !["none", "dontknow"].includes(v));
+    if (wasteTerritorialProblems.length > 0) {
+      nodes.push(P(`Problemas relacionados a resíduos no entorno da escola: ${humanize(wasteTerritorialProblems)}. ${ter.WST_PROBLEM_DESCRIPTION || ""}`));
+    }
 
     if (ter.TER_ELEMENTS) {
       nodes.push(P(`Elementos territoriais identificados: ${humanize(ter.TER_ELEMENTS)}.`));
@@ -161,7 +164,10 @@
     }
     nodes.push(el("h3", {}, "Riscos analisados"));
     nodes.push(listOrNone(d.risks, (r) => {
-      const label = (window.Stages[4] && window.Stages[4].THREAT_OPTIONS.find((t) => t.value === r.riskType)?.label) || r.riskType;
+      const otherDesc = d.riskContext.RISK_THREATS_OTHER;
+      const label = r.riskType === "other" && otherDesc
+        ? otherDesc
+        : (window.Stages[4] && window.Stages[4].THREAT_OPTIONS.find((t) => t.value === r.riskType)?.label) || r.riskType;
       const parts = [`${label}: relatos indicam ocorrência ${humanize(r.occurredBefore) || "não informada"}`];
       if (r.frequency) parts.push(`frequência relatada ${humanize(r.frequency)}`);
       if (r.impactDescription) parts.push(`impactos relatados: ${r.impactDescription}`);

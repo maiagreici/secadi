@@ -55,11 +55,11 @@
   ];
 
   const RELATIONSHIP_OPTIONS = [
-    { value: "none", label: "Não existe relação" },
-    { value: "knows_exists", label: "Sabe que existe" },
-    { value: "occasional_contact", label: "Contato ocasional" },
-    { value: "partnership", label: "Parceria" },
-    { value: "permanent_articulation", label: "Articulação permanente" },
+    { value: "none", label: "Não existe relação — não é parceiro(a)" },
+    { value: "knows_exists", label: "Sabe que existe, mas nunca houve contato — não é parceiro(a)" },
+    { value: "occasional_contact", label: "Já houve contato pontual, sem combinação formal — ainda não é parceiro(a)" },
+    { value: "partnership", label: "Parceria — já colaboram em ações combinadas" },
+    { value: "permanent_articulation", label: "Articulação permanente — parceria contínua e estruturada" },
   ];
 
   const CONTRIBUTION_OPTIONS = [
@@ -144,7 +144,7 @@
   function renderActorEditor(diagnosis) {
     const wrap = el("div", { class: "actor-editor" });
     wrap.appendChild(el("h3", {}, "Atores do território (NET_ACTORS)"));
-    wrap.appendChild(el("p", { class: "field__help" }, "Existência, contato, parceria e articulação permanente são níveis diferentes — não confunda um com o outro."));
+    wrap.appendChild(el("p", { class: "field__help" }, "Existência, contato, parceria e articulação permanente são níveis diferentes — não confunda um com o outro. Só marque \"Parceria\" ou \"Articulação permanente\" se a escola já colabora de fato com esse ator; se ele apenas existe no território ou já houve um contato pontual, isso ainda NÃO é parceria."));
 
     diagnosis.actors.forEach((actor) => {
       const card = el("div", { class: "actor-card actor-card--editable" });

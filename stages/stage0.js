@@ -94,13 +94,13 @@
 
   const fields = [
     { id: "SCH_NAME", type: "text", label: "Nome da escola", qNumber: "Q0.1", required: true },
-    { id: "SCH_INEP_CODE", type: "text", label: "Código INEP", qNumber: "Q0.2" },
+    { id: "SCH_INEP_CODE", type: "text", label: "Código INEP", qNumber: "Q0.2", help: "Código público de 8 dígitos, o mesmo usado no Censo Escolar — não é uma informação sigilosa; pode ser consultado por qualquer pessoa no site do INEP ou com a secretaria da escola. Deixe em branco se não souber." },
     { id: "SCH_CITY", type: "text", label: "Município", qNumber: "Q0.3", required: true },
     { id: "SCH_STATE", type: "text", label: "UF", qNumber: "Q0.4", required: true },
     { id: "SCH_NETWORK", type: "singleChoice", label: "Rede", qNumber: "Q0.5", options: NETWORK_OPTIONS, otherFieldId: "SCH_NETWORK_OTHER", required: true },
     { id: "SCH_EDUCATION_LEVELS", type: "multiChoice", label: "Etapas/modalidades de ensino ofertadas", qNumber: "Q0.6", options: EDUCATION_LEVELS_OPTIONS, required: true },
     { id: "SCH_LOCATION", type: "singleChoice", label: "Localização", qNumber: "Q0.7", options: LOCATION_OPTIONS, required: true },
-    { id: "SCH_TERRITORIAL_CONTEXT", type: "multiChoice", label: "Contextos territoriais", qNumber: "Q0.8", options: TERRITORIAL_CONTEXT_OPTIONS, otherFieldId: "SCH_TERRITORIAL_OTHER" },
+    { id: "SCH_TERRITORIAL_CONTEXT", type: "multiChoice", label: "Contextos territoriais", qNumber: "Q0.8", options: TERRITORIAL_CONTEXT_OPTIONS, otherFieldId: "SCH_TERRITORIAL_OTHER", help: "Se a escola está em contexto urbano comum, sem nenhuma dessas identidades territoriais específicas, marque \"Nenhum\"." },
     { id: "SCH_STUDENT_COUNT", type: "number", label: "Número aproximado de estudantes", qNumber: "Q0.9", min: 0 },
     { id: "SCH_STAFF_COUNT", type: "number", label: "Número aproximado de profissionais", qNumber: "Q0.10", min: 0 },
 

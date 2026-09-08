@@ -119,7 +119,7 @@
       { value: "physical_education", label: "Educação Física" },
       { value: "other", label: "Outras" },
     ]},
-    { id: "EA_INTERDISCIPLINARITY_MODE", type: "singleChoice", label: "Como ocorre a articulação entre áreas/disciplinas?", qNumber: "Q2.7", options: [
+    { id: "EA_INTERDISCIPLINARITY_MODE", type: "multiChoice", label: "Como ocorre a articulação entre áreas/disciplinas?", qNumber: "Q2.7", help: "Mais de uma forma de articulação pode coexistir — marque todas que se aplicam.", options: [
       { value: "separate_disciplines", label: "Disciplinas separadas" },
       { value: "same_theme_no_joint_planning", label: "Mesmo tema, sem planejamento conjunto" },
       { value: "some_joint_planning", label: "Algum planejamento conjunto" },
@@ -178,6 +178,10 @@
     { id: "EA_RECENT_CHANGE", type: "textarea", label: "O que essa atividade mudou ou gerou?", qNumber: "Q2.20", condition: (d) => ga(d, "EA_RECENT_ACTIVITY") === "yes" },
 
     { id: "EA_THEME_FREQUENCY", type: "matrix", label: "Com que frequência cada tema é trabalhado?", qNumber: "Q2.21", matrixRows: THEMES_OPTIONS, matrixCols: [{ value: "freq", label: "Frequência", options: FREQ_OPTIONS }] },
+    {
+      id: "EA_THEME_FREQUENCY_OTHER_DESC", type: "text", label: "Você marcou uma frequência para \"Outros\" temas acima — quais temas são esses?", qNumber: "Q2.21a",
+      condition: (d) => !!(ga(d, "EA_THEME_FREQUENCY") || {}).other?.freq,
+    },
     { id: "EA_DIFFICULT_THEMES", type: "multiChoice", label: "Quais temas são mais difíceis de trabalhar?", qNumber: "Q2.22", options: THEMES_OPTIONS },
     { id: "EA_DIFFICULTY_CAUSES", type: "multiChoice", label: "O que causa essa dificuldade?", qNumber: "Q2.23", options: [
       { value: "lack_of_training", label: "Falta de formação" },
@@ -187,8 +191,19 @@
       { value: "curriculum", label: "Currículo" },
       { value: "other", label: "Outro" },
     ]},
-    { id: "EA_METHODS_USED", type: "multiChoice", label: "Métodos/estratégias já utilizados", qNumber: "Q2.24", options: METHODS_OPTIONS },
-    { id: "EA_MAIN_METHOD", type: "singleChoice", label: "Método mais utilizado", qNumber: "Q2.25", options: METHODS_OPTIONS },
+    {
+      id: "EA_METHODS_USED", type: "multiChoice", label: "Quais métodos/estratégias a escola já utilizou em práticas de Educação Ambiental?", qNumber: "Q2.24",
+      options: METHODS_OPTIONS, help: "Marque todos os que já foram usados, mesmo que raramente.",
+    },
+    {
+      id: "EA_MAIN_METHOD", type: "singleChoice", label: "Dentre os métodos marcados acima, qual é o mais utilizado no dia a dia?", qNumber: "Q2.25",
+      help: "Esta pergunta pede apenas UM, o predominante — diferente da anterior, que pedia todos os já usados.",
+      options: (d) => {
+        const used = ga(d, "EA_METHODS_USED") || [];
+        return METHODS_OPTIONS.filter((o) => used.includes(o.value));
+      },
+      condition: (d) => (ga(d, "EA_METHODS_USED") || []).length > 0,
+    },
     { id: "EA_TERRITORY_USE_FREQ", type: "singleChoice", label: "Frequência de uso do território como espaço pedagógico", qNumber: "Q2.26", options: FREQ_OPTIONS, required: true },
     { id: "EA_LOCAL_PROBLEM_APPROACH", type: "confirmation", label: "Problemas locais/territoriais são abordados nas práticas de EA?", qNumber: "Q2.27" },
 
@@ -215,6 +230,10 @@
       { value: "other", label: "Outro" },
     ]},
     { id: "EA_BARRIERS_MATRIX", type: "matrix", label: "Intensidade de cada barreira percebida", qNumber: "Q2.35", matrixRows: BARRIER_ROWS, matrixCols: [{ value: "intensity", label: "Intensidade", options: INTENSITY_OPTIONS }] },
+    {
+      id: "EA_BARRIERS_OTHER_DESC", type: "text", label: "Você marcou uma intensidade para \"Outras\" barreiras acima — quais são elas?", qNumber: "Q2.35a",
+      condition: (d) => !!(ga(d, "EA_BARRIERS_MATRIX") || {}).other?.intensity,
+    },
     { id: "EA_MAIN_BARRIER", type: "singleChoice", label: "Principal barreira hoje", qNumber: "Q2.36", options: BARRIER_ROWS },
     { id: "EA_MATERIALS_USED", type: "multiChoice", label: "Materiais didáticos utilizados", qNumber: "Q2.37", options: [
       { value: "textbooks", label: "Livros didáticos" },

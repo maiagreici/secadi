@@ -73,7 +73,7 @@
   ];
 
   const generalFields = [
-    { id: "RISK_THREATS_SELECTED", type: "multiChoice", label: "Quais ameaças/eventos climáticos já afetaram (ou podem afetar) a escola/comunidade?", qNumber: "Q4.1", options: THREAT_OPTIONS, required: true },
+    { id: "RISK_THREATS_SELECTED", type: "multiChoice", label: "Quais ameaças/eventos climáticos já afetaram (ou podem afetar) a escola/comunidade?", qNumber: "Q4.1", options: THREAT_OPTIONS, otherFieldId: "RISK_THREATS_OTHER", required: true },
     { id: "RISK_PERCEIVED_CLIMATE_CHANGE", type: "confirmation", label: "A comunidade percebe mudanças no padrão climático local ao longo dos anos?", qNumber: "Q4.2" },
     { id: "RISK_PERCEIVED_CHANGES", type: "textarea", label: "Que mudanças são percebidas?", qNumber: "Q4.3", condition: (d) => ga(d, "RISK_PERCEIVED_CLIMATE_CHANGE") === "yes", help: "Registre como percepção da comunidade — o relatório final não converterá isso em dado técnico comprovado." },
     { id: "RISK_PERCEPTION_SOURCES", type: "multiChoice", label: "Com base em quê essa percepção se formou?", qNumber: "Q4.4", options: [
@@ -126,7 +126,10 @@
   function renderRiskEditor(diagnosis, risk) {
     const update = (patch) => window.App.mutate((d) => Object.assign(d.risks.find((r) => r.riskId === risk.riskId), patch));
     const card = el("div", { class: "risk-card risk-card--editable" });
-    const label = THREAT_OPTIONS.find((t) => t.value === risk.riskType)?.label || risk.riskType;
+    const otherDesc = diagnosis.riskContext.RISK_THREATS_OTHER;
+    const label = risk.riskType === "other" && otherDesc
+      ? otherDesc
+      : THREAT_OPTIONS.find((t) => t.value === risk.riskType)?.label || risk.riskType;
     card.appendChild(el("h4", {}, label));
     if (risk.attentionSignal) {
       card.appendChild(el("span", { class: `signal signal--${risk.attentionSignal}` }, "sinal interno — apoio à reflexão, não é avaliação técnica"));
