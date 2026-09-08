@@ -110,6 +110,17 @@
     return container;
   }
 
+  function extraRequiredChecks(diagnosis) {
+    // Nada aplicável ainda se não há plano de ação para comunicar.
+    if (diagnosis.actionPlans.length === 0) return [];
+    return diagnosis.actionPlans.map((plan) => ({
+      id: `COM_STRATEGY_FOR_${plan.actionPlanId}`,
+      satisfied: diagnosis.communicationStrategies.some(
+        (s) => s.actionPlanId === plan.actionPlanId && (s.centralMessage || (s.purposes || []).length > 0)
+      ),
+    }));
+  }
+
   window.Stages = window.Stages || {};
-  window.Stages[8] = { id: 8, key: "communication", title: "Educomunicação", fields: [], render };
+  window.Stages[8] = { id: 8, key: "communication", title: "Educomunicação", fields: [], render, extraRequiredChecks };
 })();

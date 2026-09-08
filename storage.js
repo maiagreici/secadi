@@ -13,13 +13,46 @@ function setOnSaved(cb) {
   onSavedCallback = cb;
 }
 
+/**
+ * Migra campos que mudaram de formato entre versões do instrumento (ex.:
+ * de escolha única para múltipla escolha), para que um diagnóstico salvo
+ * com uma versão anterior não quebre ao ser aberto com o código atual.
+ * Nunca descarta o diagnóstico inteiro — apenas normaliza o formato de
+ * campos pontuais, na pior hipótese perdendo a seleção anterior desses
+ * poucos campos (que a pessoa pode revisar/reconfirmar na respectiva etapa).
+ */
+function toArrayField(value) {
+  if (value === undefined || value === null || value === "") return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+function migrateLegacyFields(diagnosis) {
+  if (diagnosis.territory) {
+    diagnosis.territory.WST_TERRITORIAL_PROBLEMS = toArrayField(diagnosis.territory.WST_TERRITORIAL_PROBLEMS);
+    diagnosis.territory.INF_THERMAL_CONDITION = toArrayField(diagnosis.territory.INF_THERMAL_CONDITION);
+    if (diagnosis.territory.TER_ELEMENT_RELATION && typeof diagnosis.territory.TER_ELEMENT_RELATION === "object") {
+      const migrated = {};
+      Object.entries(diagnosis.territory.TER_ELEMENT_RELATION).forEach(([key, value]) => {
+        migrated[key] = toArrayField(value);
+      });
+      diagnosis.territory.TER_ELEMENT_RELATION = migrated;
+    }
+  }
+  if (diagnosis.environmentalEducation) {
+    diagnosis.environmentalEducation.EA_INTERDISCIPLINARITY_MODE = toArrayField(
+      diagnosis.environmentalEducation.EA_INTERDISCIPLINARITY_MODE
+    );
+  }
+  return diagnosis;
+}
+
 function loadDiagnosis() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (!parsed || !parsed.metadata) return null;
-    return parsed;
+    return migrateLegacyFields(parsed);
   } catch (err) {
     console.error("Falha ao carregar diagnóstico salvo:", err);
     return null;
@@ -117,7 +150,7 @@ async function importDiagnosisFromFile(file) {
   if (payload.attachments) {
     await window.attachmentService.importBase64Map(payload.attachments);
   }
-  return diagnosis;
+  return migrateLegacyFields(diagnosis);
 }
 
 window.Storage = {

@@ -13,9 +13,27 @@
   }
 
   function persistAndReact() {
-    window.Rules.runAllRules(diagnosis);
+    try {
+      window.Rules.runAllRules(diagnosis);
+    } catch (err) {
+      console.error("Falha ao avaliar regras do diagnóstico:", err);
+    }
     window.Storage.scheduleAutosave(diagnosis);
-    render();
+    try {
+      render();
+    } catch (err) {
+      console.error("Falha ao renderizar a etapa atual:", err);
+      const main = document.getElementById("main-content");
+      if (main) {
+        main.innerHTML = "";
+        main.appendChild(
+          window.Components.el("div", { class: "alert-card alert-card--critical" }, [
+            window.Components.el("span", { class: "alert-card__badge" }, "Atenção"),
+            window.Components.el("p", {}, "Algo deu errado ao mostrar esta etapa. Seus dados continuam salvos. Tente recarregar a página; se o problema persistir, exporte o JSON antes de continuar."),
+          ])
+        );
+      }
+    }
   }
 
   function setField(fieldId, value) {
@@ -236,9 +254,8 @@
   function init() {
     const saved = window.Storage.loadDiagnosis();
     diagnosis = saved || window.DataModel.createDiagnosis();
-    window.Rules.runAllRules(diagnosis);
     window.Storage.setOnSaved(() => renderHeader());
-    render();
+    persistAndReact();
   }
 
   window.App = {
