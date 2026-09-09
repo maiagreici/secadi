@@ -67,6 +67,17 @@
     return t;
   }
 
+  function multiFieldWithOther(object, key, options, update, placeholder) {
+    const selected = object[key] || [];
+    const group = multiCheckbox(options, selected, (v, checked) => {
+      const set = new Set(selected); checked ? set.add(v) : set.delete(v); update({ [key]: [...set] });
+    });
+    const otherKey = `${key}Other`;
+    const otherInput = window.Components.renderOtherInline(selected.includes("other"), object[otherKey], (v) => update({ [otherKey]: v }), placeholder);
+    if (otherInput) group.appendChild(otherInput);
+    return group;
+  }
+
   function isPlanComplete(plan) {
     return !!(plan.priorityId && (plan.evidenceIds || []).length >= 1 && plan.problemStatement && plan.problemStatement.trim() && plan.objective && plan.objective.trim() && (plan.activities || []).length >= 1 && plan.expectedResult && plan.expectedResult.trim());
   }
@@ -146,11 +157,11 @@
 
     card.appendChild(row("Mudança desejada (ACT_DESIRED_CHANGE)", textareaInput(plan.desiredChange, (v) => update({ desiredChange: v }))));
     card.appendChild(row("Objetivo (ACT_OBJECTIVE) — obrigatório", textareaInput(plan.objective, (v) => update({ objective: v }))));
-    card.appendChild(row("Tipos de resposta (ACT_RESPONSE_TYPES)", multiCheckbox(RESPONSE_TYPES_OPTIONS, plan.responseTypes || [], (v, c) => { const s = new Set(plan.responseTypes || []); c ? s.add(v) : s.delete(v); update({ responseTypes: [...s] }); })));
+    card.appendChild(row("Tipos de resposta (ACT_RESPONSE_TYPES)", multiFieldWithOther(plan, "responseTypes", RESPONSE_TYPES_OPTIONS, update, "Especifique o tipo de resposta...")));
 
     card.appendChild(renderActivities(diagnosis, plan));
 
-    card.appendChild(row("Públicos envolvidos (ACT_AUDIENCES)", multiCheckbox(AUDIENCES_OPTIONS, plan.audiences || [], (v, c) => { const s = new Set(plan.audiences || []); c ? s.add(v) : s.delete(v); update({ audiences: [...s] }); })));
+    card.appendChild(row("Públicos envolvidos (ACT_AUDIENCES)", multiFieldWithOther(plan, "audiences", AUDIENCES_OPTIONS, update, "Especifique o público...")));
     card.appendChild(row("Papel dos estudantes (ACT_STUDENT_ROLE)", singleSelect(STUDENT_ROLE_OPTIONS, plan.studentParticipation, (v) => update({ studentParticipation: v }))));
     card.appendChild(row("Coordenador(a) (ACT_COORDINATOR)", textInput(plan.coordinator, (v) => update({ coordinator: v }))));
     card.appendChild(row("Outros participantes (ACT_OTHER_PARTICIPANTS)", textInput(plan.otherParticipants, (v) => update({ otherParticipants: v }))));
@@ -174,8 +185,8 @@
       card.appendChild(row("Detalhe das dependências (ACT_DEPENDENCY_DETAIL)", textareaInput(plan.dependencyDetail, (v) => update({ dependencyDetail: v }))));
     }
     card.appendChild(row("Resultado esperado (ACT_EXPECTED_RESULT) — obrigatório", textareaInput(plan.expectedResult, (v) => update({ expectedResult: v }))));
-    card.appendChild(row("Como o resultado será evidenciado (ACT_EXECUTION_EVIDENCE)", multiCheckbox(EXECUTION_EVIDENCE_OPTIONS, plan.executionEvidenceTypes || [], (v, c) => { const s = new Set(plan.executionEvidenceTypes || []); c ? s.add(v) : s.delete(v); update({ executionEvidenceTypes: [...s] }); })));
-    card.appendChild(row("Possíveis dificuldades de implementação (ACT_IMPLEMENTATION_BARRIERS)", multiCheckbox(IMPLEMENTATION_BARRIERS_OPTIONS, plan.implementationRisks || [], (v, c) => { const s = new Set(plan.implementationRisks || []); c ? s.add(v) : s.delete(v); update({ implementationRisks: [...s] }); })));
+    card.appendChild(row("Como o resultado será evidenciado (ACT_EXECUTION_EVIDENCE)", multiFieldWithOther(plan, "executionEvidenceTypes", EXECUTION_EVIDENCE_OPTIONS, update, "Especifique como...")));
+    card.appendChild(row("Possíveis dificuldades de implementação (ACT_IMPLEMENTATION_BARRIERS)", multiFieldWithOther(plan, "implementationRisks", IMPLEMENTATION_BARRIERS_OPTIONS, update, "Especifique a dificuldade...")));
     card.appendChild(row("Como mitigar? (ACT_MITIGATION)", textareaInput(plan.mitigation, (v) => update({ mitigation: v }))));
 
     card.appendChild(renderCoherenceTrail(diagnosis, plan));

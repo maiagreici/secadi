@@ -50,11 +50,20 @@
     { value: "professor", label: "Professor(a)" },
     { value: "gestor", label: "Gestor(a) / Direção" },
     { value: "coordenador_pedagogico", label: "Coordenador(a) pedagógico(a)" },
-    { value: "funcionario", label: "Funcionário(a)" },
+    { value: "supervisor_pedagogico", label: "Supervisor(a) pedagógico(a)" },
+    { value: "orientador_educacional", label: "Orientador(a) educacional" },
+    { value: "inspetor_alunos", label: "Inspetor(a) de alunos" },
+    { value: "secretario_escolar", label: "Secretário(a) escolar" },
+    { value: "nutricionista", label: "Nutricionista" },
+    { value: "psicologo_escolar", label: "Psicólogo(a) escolar" },
+    { value: "bibliotecario", label: "Bibliotecário(a)" },
+    { value: "assistente_alunos_deficiencia", label: "Assistente de alunos com deficiência" },
+    { value: "funcionario", label: "Outro(a) funcionário(a)" },
     { value: "other", label: "Outro" },
   ];
 
   const RESP_EDUCATION_LEVEL_OPTIONS = [
+    { value: "ensino_fundamental", label: "Ensino Fundamental" },
     { value: "ensino_medio", label: "Ensino Médio / Magistério" },
     { value: "graduacao", label: "Graduação" },
     { value: "especializacao", label: "Pós-graduação (especialização)" },
@@ -117,9 +126,13 @@
     { id: "RESP_EDUCATION_AREA", type: "text", label: "Área de formação", qNumber: "Q0.15" },
     { id: "RESP_TIME_AT_SCHOOL", type: "text", label: "Tempo de atuação nesta escola", qNumber: "Q0.16" },
 
-    { id: "MET_PARTICIPANTS", type: "multiChoice", label: "Quem participou da construção deste diagnóstico até agora", qNumber: "Q0.17", options: MET_PARTICIPANTS_OPTIONS, required: true },
-    { id: "MET_SOURCES", type: "multiChoice", label: "Quais fontes de informação foram utilizadas", qNumber: "Q0.18", options: MET_SOURCES_OPTIONS, required: true },
-    { id: "MET_PROCESS_DESCRIPTION", type: "textarea", label: "Descreva brevemente como o processo de diagnóstico foi conduzido", qNumber: "Q0.19", help: "Quem esteve envolvido, como as informações foram levantadas, em quantos encontros, etc." },
+    { id: "MET_PARTICIPANTS", type: "multiChoice", label: "Quem participou da construção deste diagnóstico até agora", qNumber: "Q0.17", options: MET_PARTICIPANTS_OPTIONS, otherFieldId: "MET_PARTICIPANTS_OTHER", required: true },
+    { id: "MET_SOURCES", type: "multiChoice", label: "Quais fontes de informação foram utilizadas", qNumber: "Q0.18", options: MET_SOURCES_OPTIONS, otherFieldId: "MET_SOURCES_OTHER", required: true },
+    {
+      id: "MET_PROCESS_DESCRIPTION", type: "textarea", label: "Descreva brevemente como o processo de diagnóstico foi conduzido", qNumber: "Q0.19",
+      help: "Procure trazer: quem participou de cada momento; como as informações foram levantadas (observação, conversas, reunião, documentos); em quantos encontros/etapas isso ocorreu e em que período; se houve alguma dificuldade para envolver a comunidade escolar; e o que motivou a escolha dessa forma de condução.",
+      rows: 4,
+    },
   ];
 
   function render(diagnosis) {

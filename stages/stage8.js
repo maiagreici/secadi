@@ -65,6 +65,15 @@
     const update = (patch) => window.App.mutate((d) => Object.assign(d.communicationStrategies.find((s) => s.communicationId === strategy.communicationId), patch));
     const card = el("div", { class: "communication-editor" });
 
+    function multiFieldWithOther(key, options, placeholder) {
+      const selected = strategy[key] || [];
+      const group = multiCheckbox(options, selected, (v, c) => { const s = new Set(selected); c ? s.add(v) : s.delete(v); update({ [key]: [...s] }); });
+      const otherKey = `${key}Other`;
+      const otherInput = window.Components.renderOtherInline(selected.includes("other"), strategy[otherKey], (v) => update({ [otherKey]: v }), placeholder);
+      if (otherInput) group.appendChild(otherInput);
+      return group;
+    }
+
     if (!(strategy.listeningChannels || []).length) {
       card.appendChild(el("div", { class: "alert-card alert-card--reflection" }, [
         el("span", { class: "alert-card__badge" }, "Reflexão"),
@@ -72,15 +81,15 @@
       ]));
     }
 
-    card.appendChild(row("Finalidades (COM_PURPOSE)", multiCheckbox(PURPOSE_OPTIONS, strategy.purposes || [], (v, c) => { const s = new Set(strategy.purposes || []); c ? s.add(v) : s.delete(v); update({ purposes: [...s] }); })));
-    card.appendChild(row("Públicos (COM_AUDIENCE)", multiCheckbox(AUDIENCE_OPTIONS, strategy.audiences || [], (v, c) => { const s = new Set(strategy.audiences || []); c ? s.add(v) : s.delete(v); update({ audiences: [...s] }); })));
+    card.appendChild(row("Finalidades (COM_PURPOSE)", multiFieldWithOther("purposes", PURPOSE_OPTIONS, "Especifique a finalidade...")));
+    card.appendChild(row("Públicos (COM_AUDIENCE)", multiFieldWithOther("audiences", AUDIENCE_OPTIONS, "Especifique o público...")));
     card.appendChild(row("Mensagem central (COM_CENTRAL_MESSAGE)", textareaInput(strategy.centralMessage, (v) => update({ centralMessage: v }))));
-    card.appendChild(row("Canais de escuta (COM_LISTENING_CHANNELS)", multiCheckbox(LISTENING_CHANNELS_OPTIONS, strategy.listeningChannels || [], (v, c) => { const s = new Set(strategy.listeningChannels || []); c ? s.add(v) : s.delete(v); update({ listeningChannels: [...s] }); })));
-    card.appendChild(row("Mídias/formatos (COM_MEDIA)", multiCheckbox(MEDIA_OPTIONS, strategy.media || [], (v, c) => { const s = new Set(strategy.media || []); c ? s.add(v) : s.delete(v); update({ media: [...s] }); })));
-    card.appendChild(row("Barreiras de acesso (COM_ACCESS_BARRIERS)", multiCheckbox(ACCESS_BARRIERS_OPTIONS, strategy.accessBarriers || [], (v, c) => { const s = new Set(strategy.accessBarriers || []); c ? s.add(v) : s.delete(v); update({ accessBarriers: [...s] }); })));
+    card.appendChild(row("Canais de escuta (COM_LISTENING_CHANNELS)", multiFieldWithOther("listeningChannels", LISTENING_CHANNELS_OPTIONS, "Especifique o canal...")));
+    card.appendChild(row("Mídias/formatos (COM_MEDIA)", multiFieldWithOther("media", MEDIA_OPTIONS, "Especifique a mídia/formato...")));
+    card.appendChild(row("Barreiras de acesso (COM_ACCESS_BARRIERS)", multiFieldWithOther("accessBarriers", ACCESS_BARRIERS_OPTIONS, "Especifique a barreira...")));
     card.appendChild(row("Necessidades de acessibilidade (COM_ACCESS_NEEDS)", textareaInput((strategy.accessibilityNeeds || []).join("; "), (v) => update({ accessibilityNeeds: v ? v.split(";").map((x) => x.trim()).filter(Boolean) : [] }))));
     card.appendChild(row("Estratégias de acessibilidade (COM_ACCESS_STRATEGIES)", textareaInput(strategy.accessibilityStrategies, (v) => update({ accessibilityStrategies: v }))));
-    card.appendChild(row("Quem produz (COM_PRODUCERS)", multiCheckbox(PRODUCERS_OPTIONS, strategy.producers || [], (v, c) => { const s = new Set(strategy.producers || []); c ? s.add(v) : s.delete(v); update({ producers: [...s] }); })));
+    card.appendChild(row("Quem produz (COM_PRODUCERS)", multiFieldWithOther("producers", PRODUCERS_OPTIONS, "Especifique quem produz...")));
     card.appendChild(row("Nível de decisão dos estudantes (COM_STUDENT_DECISION)", singleSelect(STUDENT_DECISION_OPTIONS, strategy.studentDecisionLevel, (v) => update({ studentDecisionLevel: v }))));
     card.appendChild(row("Momento em relação à ação (COM_TIMING)", textInput(strategy.timing, (v) => update({ timing: v }))));
 

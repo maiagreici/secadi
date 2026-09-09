@@ -99,12 +99,19 @@
     card.appendChild(row("Urgência (PRI_URGENCY)", singleSelect(SEVERITY_OPTIONS, problem.urgency, (v) => update({ urgency: v }))));
     card.appendChild(row("Abrangência (PRI_REACH)", singleSelect(REACH_OPTIONS, problem.reach, (v) => update({ reach: v }))));
     card.appendChild(row("A escola consegue agir? (PRI_ACTIONABILITY)", singleSelect(ACTIONABILITY_OPTIONS, problem.schoolActionability, (v) => update({ schoolActionability: v }))));
-    card.appendChild(row("Grupos afetados (PRI_AFFECTED_GROUPS)", multiCheckbox(AFFECTED_GROUPS_OPTIONS, problem.affectedGroups || [], (v, checked) => {
+    const affectedGroup = multiCheckbox(AFFECTED_GROUPS_OPTIONS, problem.affectedGroups || [], (v, checked) => {
       const set = new Set(problem.affectedGroups || []); checked ? set.add(v) : set.delete(v); update({ affectedGroups: [...set] });
-    })));
-    card.appendChild(row("Quem deveria participar da decisão sobre este problema? (PRI_DECISION_PARTICIPANTS)", multiCheckbox(DECISION_PARTICIPANTS_OPTIONS, problem.decisionParticipants || [], (v, checked) => {
+    });
+    const affectedOther = window.Components.renderOtherInline((problem.affectedGroups || []).includes("other"), problem.affectedGroupsOther, (v) => update({ affectedGroupsOther: v }), "Especifique o grupo...");
+    if (affectedOther) affectedGroup.appendChild(affectedOther);
+    card.appendChild(row("Grupos afetados (PRI_AFFECTED_GROUPS)", affectedGroup));
+
+    const decisionGroup = multiCheckbox(DECISION_PARTICIPANTS_OPTIONS, problem.decisionParticipants || [], (v, checked) => {
       const set = new Set(problem.decisionParticipants || []); checked ? set.add(v) : set.delete(v); update({ decisionParticipants: [...set] });
-    })));
+    });
+    const decisionOther = window.Components.renderOtherInline((problem.decisionParticipants || []).includes("other"), problem.decisionParticipantsOther, (v) => update({ decisionParticipantsOther: v }), "Especifique quem...");
+    if (decisionOther) decisionGroup.appendChild(decisionOther);
+    card.appendChild(row("Quem deveria participar da decisão sobre este problema? (PRI_DECISION_PARTICIPANTS)", decisionGroup));
 
     const evList = el("div", { class: "choice-group" });
     diagnosis.evidence.forEach((ev) => {
@@ -164,10 +171,17 @@
         detail.appendChild(changeArea);
 
         detail.appendChild(el("label", {}, "Participantes da decisão (PRI_SELECTION_PARTICIPANTS)"));
-        detail.appendChild(multiCheckbox(DECISION_PARTICIPANTS_OPTIONS, priority.selectionParticipants || [], (v, checked) => {
+        const selectionParticipantsGroup = multiCheckbox(DECISION_PARTICIPANTS_OPTIONS, priority.selectionParticipants || [], (v, checked) => {
           const set = new Set(priority.selectionParticipants || []); checked ? set.add(v) : set.delete(v);
           window.App.mutate((d) => (d.priorities.find((p) => p.problemId === problem.problemId).selectionParticipants = [...set]));
-        }));
+        });
+        const selectionParticipantsOther = window.Components.renderOtherInline(
+          (priority.selectionParticipants || []).includes("other"), priority.selectionParticipantsOther,
+          (v) => window.App.mutate((d) => (d.priorities.find((p) => p.problemId === problem.problemId).selectionParticipantsOther = v)),
+          "Especifique quem..."
+        );
+        if (selectionParticipantsOther) selectionParticipantsGroup.appendChild(selectionParticipantsOther);
+        detail.appendChild(selectionParticipantsGroup);
 
         detail.appendChild(el("label", {}, "Método de seleção (PRI_SELECTION_METHOD)"));
         detail.appendChild(singleSelect(SELECTION_METHOD_OPTIONS, priority.selectionMethod, (v) => window.App.mutate((d) => (d.priorities.find((p) => p.problemId === problem.problemId).selectionMethod = v))));

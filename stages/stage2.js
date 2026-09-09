@@ -75,11 +75,12 @@
   ];
 
   const fields = [
-    { id: "EA_INSTITUTIONAL_SPACES", type: "multiChoice", label: "Onde a Educação Ambiental acontece hoje na escola", qNumber: "Q2.1", options: [
+    { id: "EA_INSTITUTIONAL_SPACES", type: "multiChoice", label: "Onde a Educação Ambiental acontece hoje na escola", qNumber: "Q2.1", otherFieldId: "EA_INSTITUTIONAL_SPACES_OTHER", options: [
       { value: "regular_classes", label: "Aulas regulares" },
       { value: "interdisciplinary_projects", label: "Projetos interdisciplinares" },
       { value: "fairs_exhibitions", label: "Feiras/mostras" },
       { value: "civic_moments", label: "Momentos cívicos" },
+      { value: "commemorative_dates", label: "Em datas comemorativas" },
       { value: "student_club", label: "Clube/grêmio estudantil" },
       { value: "student_initiatives", label: "Iniciativas de estudantes" },
       { value: "external_partnerships", label: "Parcerias externas" },
@@ -109,7 +110,7 @@
       { value: "dontknow", label: "Não sabe" },
     ], condition: (d) => ["present_detailed", "present_generic"].includes(ga(d, "EA_PPP_STATUS")) },
 
-    { id: "EA_CURRICULAR_AREAS", type: "multiChoice", label: "Áreas curriculares que já trabalharam Educação Ambiental", qNumber: "Q2.6", options: [
+    { id: "EA_CURRICULAR_AREAS", type: "multiChoice", label: "Áreas curriculares que já trabalharam Educação Ambiental", qNumber: "Q2.6", otherFieldId: "EA_CURRICULAR_AREAS_OTHER", options: [
       { value: "science", label: "Ciências" },
       { value: "geography", label: "Geografia" },
       { value: "history", label: "História" },
@@ -138,7 +139,7 @@
       { value: "none", label: "Não ocorre" },
       { value: "dontknow", label: "Não sabe" },
     ]},
-    { id: "EA_PRACTICE_CONTEXTS", type: "multiChoice", label: "Em que contextos essas práticas costumam acontecer?", qNumber: "Q2.9", options: [
+    { id: "EA_PRACTICE_CONTEXTS", type: "multiChoice", label: "Em que contextos essas práticas costumam acontecer?", qNumber: "Q2.9", otherFieldId: "EA_PRACTICE_CONTEXTS_OTHER", options: [
       { value: "classroom", label: "Sala de aula" },
       { value: "outdoor_area", label: "Pátio/área externa" },
       { value: "field_visit", label: "Visita de campo" },
@@ -151,7 +152,7 @@
     { id: "EA_RECENT_ACTIVITY_DATE", type: "text", label: "Quando ocorreu?", qNumber: "Q2.11", condition: (d) => ga(d, "EA_RECENT_ACTIVITY") === "yes" },
     { id: "EA_RECENT_THEME", type: "text", label: "Qual foi o tema?", qNumber: "Q2.12", condition: (d) => ga(d, "EA_RECENT_ACTIVITY") === "yes" },
     { id: "EA_RECENT_MOTIVATION", type: "textarea", label: "O que motivou essa atividade?", qNumber: "Q2.13", condition: (d) => ga(d, "EA_RECENT_ACTIVITY") === "yes" },
-    { id: "EA_RECENT_PLANNERS", type: "multiChoice", label: "Quem planejou essa atividade?", qNumber: "Q2.14", options: [
+    { id: "EA_RECENT_PLANNERS", type: "multiChoice", label: "Quem planejou essa atividade?", qNumber: "Q2.14", otherFieldId: "EA_RECENT_PLANNERS_OTHER", options: [
       { value: "individual_teacher", label: "Professor(a) individualmente" },
       { value: "teacher_group", label: "Grupo de professores(as)" },
       { value: "coordination", label: "Coordenação pedagógica" },
@@ -182,8 +183,8 @@
       id: "EA_THEME_FREQUENCY_OTHER_DESC", type: "text", label: "Você marcou uma frequência para \"Outros\" temas acima — quais temas são esses?", qNumber: "Q2.21a",
       condition: (d) => !!(ga(d, "EA_THEME_FREQUENCY") || {}).other?.freq,
     },
-    { id: "EA_DIFFICULT_THEMES", type: "multiChoice", label: "Quais temas são mais difíceis de trabalhar?", qNumber: "Q2.22", options: THEMES_OPTIONS },
-    { id: "EA_DIFFICULTY_CAUSES", type: "multiChoice", label: "O que causa essa dificuldade?", qNumber: "Q2.23", options: [
+    { id: "EA_DIFFICULT_THEMES", type: "multiChoice", label: "Quais temas são mais difíceis de trabalhar?", qNumber: "Q2.22", options: THEMES_OPTIONS, otherFieldId: "EA_DIFFICULT_THEMES_OTHER" },
+    { id: "EA_DIFFICULTY_CAUSES", type: "multiChoice", label: "O que causa essa dificuldade?", qNumber: "Q2.23", otherFieldId: "EA_DIFFICULTY_CAUSES_OTHER", options: [
       { value: "lack_of_training", label: "Falta de formação" },
       { value: "lack_of_material", label: "Falta de material" },
       { value: "sensitive_theme", label: "Tema sensível/delicado" },
@@ -193,12 +194,12 @@
     ]},
     {
       id: "EA_METHODS_USED", type: "multiChoice", label: "Quais métodos/estratégias a escola já utilizou em práticas de Educação Ambiental?", qNumber: "Q2.24",
-      options: METHODS_OPTIONS, help: "Marque todos os que já foram usados, mesmo que raramente.",
+      options: METHODS_OPTIONS, otherFieldId: "EA_METHODS_USED_OTHER", help: "Marque todos os que já foram usados, mesmo que raramente.",
     },
     {
       id: "EA_MAIN_METHOD", type: "singleChoice", label: "Qual método/estratégia é o mais utilizado no dia a dia?", qNumber: "Q2.25",
       help: "Diferente da pergunta anterior (que pedia todos os já usados, mesmo raramente), esta pede só UM — o predominante. A lista de opções é a mesma da pergunta anterior.",
-      options: METHODS_OPTIONS,
+      options: METHODS_OPTIONS, otherFieldId: "EA_MAIN_METHOD_OTHER",
     },
     { id: "EA_TERRITORY_USE_FREQ", type: "singleChoice", label: "Frequência de uso do território como espaço pedagógico", qNumber: "Q2.26", options: FREQ_OPTIONS, required: true },
     { id: "EA_LOCAL_PROBLEM_APPROACH", type: "confirmation", label: "Problemas locais/territoriais são abordados nas práticas de EA?", qNumber: "Q2.27" },
@@ -216,7 +217,7 @@
     { id: "EA_TRAINING_IMPACT_EXAMPLE", type: "textarea", label: "Dê um exemplo desse impacto", qNumber: "Q2.32", condition: (d) => ga(d, "EA_TRAINING_RECENT") === "yes" },
 
     { id: "EA_TEACHER_CONFIDENCE", type: "scale", label: "Quão confiante você se sente para trabalhar Educação Ambiental hoje?", qNumber: "Q2.33", scaleMin: 1, scaleMax: 5, scaleLabels: { 1: "Pouco confiante", 5: "Muito confiante" } },
-    { id: "EA_SUPPORT_NEEDS", type: "multiChoice", label: "Que tipo de apoio faria diferença?", qNumber: "Q2.34", options: [
+    { id: "EA_SUPPORT_NEEDS", type: "multiChoice", label: "Que tipo de apoio faria diferença?", qNumber: "Q2.34", otherFieldId: "EA_SUPPORT_NEEDS_OTHER", options: [
       { value: "training", label: "Formação" },
       { value: "didactic_material", label: "Material didático" },
       { value: "planning_time", label: "Tempo de planejamento" },
@@ -230,8 +231,8 @@
       id: "EA_BARRIERS_OTHER_DESC", type: "text", label: "Você marcou uma intensidade para \"Outras\" barreiras acima — quais são elas?", qNumber: "Q2.35a",
       condition: (d) => !!(ga(d, "EA_BARRIERS_MATRIX") || {}).other?.intensity,
     },
-    { id: "EA_MAIN_BARRIER", type: "singleChoice", label: "Principal barreira hoje", qNumber: "Q2.36", options: BARRIER_ROWS },
-    { id: "EA_MATERIALS_USED", type: "multiChoice", label: "Materiais didáticos utilizados", qNumber: "Q2.37", options: [
+    { id: "EA_MAIN_BARRIER", type: "singleChoice", label: "Principal barreira hoje", qNumber: "Q2.36", options: BARRIER_ROWS, otherFieldId: "EA_MAIN_BARRIER_OTHER" },
+    { id: "EA_MATERIALS_USED", type: "multiChoice", label: "Materiais didáticos utilizados", qNumber: "Q2.37", otherFieldId: "EA_MATERIALS_USED_OTHER", options: [
       { value: "textbooks", label: "Livros didáticos" },
       { value: "videos", label: "Vídeos" },
       { value: "games", label: "Jogos" },

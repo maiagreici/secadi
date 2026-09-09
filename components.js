@@ -747,6 +747,21 @@ function renderEvidenceBuilder(diagnosis, opts) {
   return wrap;
 }
 
+/* Texto livre condicional para opção "outro/outra" em UI customizada (fora
+   do renderField genérico) — usado pelos editores de ator, risco, plano de
+   ação e comunicação, que constroem seus próprios grupos de opções. */
+function renderOtherInline(active, value, onChange, placeholder) {
+  if (!active) return null;
+  return el("input", {
+    type: "text",
+    class: "input input--other",
+    placeholder: placeholder || "Especifique...",
+    "aria-label": placeholder || "Especifique outro",
+    value: value || "",
+    oninput: (e) => onChange(e.target.value),
+  });
+}
+
 function renderSummaryCard(title, lines, opts = {}) {
   const card = el("div", { class: "summary-card" + (opts.tone ? ` summary-card--${opts.tone}` : "") });
   card.appendChild(el("h4", {}, title));
@@ -878,6 +893,7 @@ window.Components = {
   renderField,
   renderSummaryCard,
   renderEvidenceBuilder,
+  renderOtherInline,
   isApplicable,
   isRequired,
   AlertCard,

@@ -80,7 +80,7 @@
       { value: "long_term_observation", label: "Observação ao longo dos anos" }, { value: "elder_accounts", label: "Relatos de moradores antigos" },
       { value: "record_comparison", label: "Comparação com registros" }, { value: "news", label: "Notícias" }, { value: "dontknow", label: "Não sabe" },
     ], condition: (d) => ga(d, "RISK_PERCEIVED_CLIMATE_CHANGE") === "yes" },
-    { id: "RISK_INFORMATION_SOURCES", type: "multiChoice", label: "Existem fontes técnicas de informação sobre riscos consultadas pela escola?", qNumber: "Q4.5", options: [
+    { id: "RISK_INFORMATION_SOURCES", type: "multiChoice", label: "Existem fontes técnicas de informação sobre riscos consultadas pela escola?", qNumber: "Q4.5", otherFieldId: "RISK_INFORMATION_SOURCES_OTHER", options: [
       { value: "defesa_civil", label: "Defesa Civil" }, { value: "meteorological_data", label: "Dados meteorológicos (ex.: INMET)" },
       { value: "university", label: "Universidade" }, { value: "ngo", label: "ONG" }, { value: "traditional_knowledge", label: "Conhecimento tradicional" },
       { value: "none", label: "Não há fonte consultada" }, { value: "other", label: "Outra" },
@@ -125,6 +125,17 @@
 
   function renderRiskEditor(diagnosis, risk) {
     const update = (patch) => window.App.mutate((d) => Object.assign(d.risks.find((r) => r.riskId === risk.riskId), patch));
+
+    function multiFieldWithOther(label, options, key, ariaLabel, placeholder) {
+      const selected = risk[key] || [];
+      const group = multiCheckboxGroup(options, selected, (v, checked) => {
+        const set = new Set(selected); checked ? set.add(v) : set.delete(v); update({ [key]: [...set] });
+      }, ariaLabel);
+      const otherKey = `${key}Other`;
+      const otherInput = window.Components.renderOtherInline(selected.includes("other"), risk[otherKey], (v) => update({ [otherKey]: v }), placeholder);
+      if (otherInput) group.appendChild(otherInput);
+      return riskFieldRow(label, group);
+    }
     const card = el("div", { class: "risk-card risk-card--editable" });
     const otherDesc = diagnosis.riskContext.RISK_THREATS_OTHER;
     const label = risk.riskType === "other" && otherDesc
@@ -144,26 +155,19 @@
     const periodInput = el("input", { type: "text", class: "input", value: risk.lastOccurrencePeriod || "", oninput: (e) => update({ lastOccurrencePeriod: e.target.value }) });
     card.appendChild(riskFieldRow("Período do ano em que costuma ocorrer", periodInput));
 
-    card.appendChild(riskFieldRow("Impactos observados", multiCheckboxGroup(IMPACT_OPTIONS, risk.observedImpacts || [], (v, checked) => {
-      const set = new Set(risk.observedImpacts || []); checked ? set.add(v) : set.delete(v); update({ observedImpacts: [...set] });
-    }, "observedImpacts")));
+    card.appendChild(multiFieldWithOther("Impactos observados", IMPACT_OPTIONS, "observedImpacts", "observedImpacts", "Especifique o impacto..."));
     const impactDesc = el("textarea", { class: "input textarea", rows: 2 }); impactDesc.value = risk.impactDescription || "";
     impactDesc.addEventListener("input", (e) => update({ impactDescription: e.target.value }));
     card.appendChild(riskFieldRow("Descreva os impactos", impactDesc));
 
-    card.appendChild(riskFieldRow("Ativos/estruturas expostos", multiCheckboxGroup(EXPOSED_ASSETS_OPTIONS, risk.exposedAssets || [], (v, checked) => {
-      const set = new Set(risk.exposedAssets || []); checked ? set.add(v) : set.delete(v); update({ exposedAssets: [...set] });
-    }, "exposedAssets")));
-    card.appendChild(riskFieldRow("Grupos expostos", multiCheckboxGroup(EXPOSED_GROUPS_OPTIONS, risk.exposedGroups || [], (v, checked) => {
-      const set = new Set(risk.exposedGroups || []); checked ? set.add(v) : set.delete(v); update({ exposedGroups: [...set] });
-    }, "exposedGroups")));
-    card.appendChild(riskFieldRow("Condições que podem ampliar dificuldades de proteção (não são características das pessoas — são condições do ambiente/organização)", multiCheckboxGroup(VULNERABILITY_CONDITIONS_OPTIONS, risk.vulnerabilityConditions || [], (v, checked) => {
-      const set = new Set(risk.vulnerabilityConditions || []); checked ? set.add(v) : set.delete(v); update({ vulnerabilityConditions: [...set] });
-    }, "vulnerabilityConditions")));
+    card.appendChild(multiFieldWithOther("Ativos/estruturas expostos", EXPOSED_ASSETS_OPTIONS, "exposedAssets", "exposedAssets", "Especifique o ativo/estrutura..."));
+    card.appendChild(multiFieldWithOther("Grupos expostos", EXPOSED_GROUPS_OPTIONS, "exposedGroups", "exposedGroups", "Especifique o grupo..."));
+    card.appendChild(multiFieldWithOther(
+      "Condições que podem ampliar dificuldades de proteção (não são características das pessoas — são condições do ambiente/organização)",
+      VULNERABILITY_CONDITIONS_OPTIONS, "vulnerabilityConditions", "vulnerabilityConditions", "Especifique a condição..."
+    ));
 
-    card.appendChild(riskFieldRow("Capacidades de resposta já existentes", multiCheckboxGroup(RESPONSE_CAPACITY_OPTIONS, risk.responseCapacities || [], (v, checked) => {
-      const set = new Set(risk.responseCapacities || []); checked ? set.add(v) : set.delete(v); update({ responseCapacities: [...set] });
-    }, "responseCapacities")));
+    card.appendChild(multiFieldWithOther("Capacidades de resposta já existentes", RESPONSE_CAPACITY_OPTIONS, "responseCapacities", "responseCapacities", "Especifique a capacidade..."));
     card.appendChild(riskFieldRow("Avaliação geral da capacidade de resposta", singleSelect([{ value: "good", label: "Boa" }, { value: "regular", label: "Regular" }, { value: "weak", label: "Fraca" }, { value: "none", label: "Inexistente" }, { value: "dontknow", label: "Não sabe" }], risk.responseCapacityAssessment, (v) => update({ responseCapacityAssessment: v }), "responseCapacityAssessment")));
 
     card.appendChild(riskFieldRow("Probabilidade percebida (não é medição técnica)", singleSelect(LOW_MED_HIGH, risk.perceivedProbability, (v) => update({ perceivedProbability: v }), "perceivedProbability")));
@@ -233,6 +237,9 @@
         control = multiCheckboxGroup(f.options, value, (v, checked) => window.App.mutate((d) => {
           const set = new Set(d.cartography[f.id] || []); checked ? set.add(v) : set.delete(v); d.cartography[f.id] = [...set];
         }), f.id);
+        const otherKey = `${f.id}_OTHER`;
+        const otherInput = window.Components.renderOtherInline(value.includes("other"), diagnosis.cartography[otherKey], (v) => window.App.mutate((d) => (d.cartography[otherKey] = v)), "Especifique...");
+        if (otherInput) control.appendChild(otherInput);
       } else if (f.type === "confirmation") {
         control = singleSelect([{ value: "yes", label: "Sim" }, { value: "no", label: "Não" }, { value: "dontknow", label: "Não sabe" }], diagnosis.cartography[f.id], (v) => window.App.mutate((d) => (d.cartography[f.id] = v)), f.id);
       } else {

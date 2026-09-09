@@ -152,22 +152,22 @@
     { id: "INF_THERMAL_CONDITION", type: "multiChoice", label: "Condição térmica das salas de aula", qNumber: "Q1.3", options: THERMAL_CONDITION_OPTIONS, help: "A condição térmica costuma variar ao longo do ano — marque todas as situações que se aplicam (ex.: pode ser muito quente no verão E muito fria no inverno)." },
     { id: "INF_THERMAL_PROBLEMS", type: "multiChoice", label: "Problemas relacionados às condições térmicas/estruturais", qNumber: "Q1.4", options: THERMAL_PROBLEMS_OPTIONS, otherFieldId: "INF_THERMAL_OTHER" },
 
-    { id: "WAT_SOURCE", type: "singleChoice", label: "Fonte de abastecimento de água", qNumber: "Q1.5", options: WATER_SOURCE_OPTIONS, required: true },
+    { id: "WAT_SOURCE", type: "singleChoice", label: "Fonte de abastecimento de água", qNumber: "Q1.5", options: WATER_SOURCE_OPTIONS, otherFieldId: "WAT_SOURCE_OTHER", required: true },
     { id: "WAT_INTERRUPTION", type: "confirmation", label: "Há interrupções no abastecimento de água?", qNumber: "Q1.6" },
     { id: "WAT_INTERRUPTION_PERIOD", type: "text", label: "Em que período(s) isso costuma ocorrer?", qNumber: "Q1.7", condition: (d) => ga(d, "WAT_INTERRUPTION") === "yes" },
     { id: "WAT_QUALITY_MONITORING", type: "confirmation", label: "Existe monitoramento da qualidade da água?", qNumber: "Q1.8" },
     { id: "WAT_MONITORING_RESPONSIBLE", type: "text", label: "Quem é responsável por esse monitoramento?", qNumber: "Q1.9", condition: (d) => ga(d, "WAT_QUALITY_MONITORING") === "yes" },
     { id: "WAT_MONITORING_RECORDS", type: "confirmation", label: "Existem registros desse monitoramento?", qNumber: "Q1.10", condition: (d) => ga(d, "WAT_QUALITY_MONITORING") === "yes" },
-    { id: "WAT_INFRASTRUCTURE", type: "multiChoice", label: "Infraestrutura hídrica disponível", qNumber: "Q1.11", options: WATER_INFRA_OPTIONS },
+    { id: "WAT_INFRASTRUCTURE", type: "multiChoice", label: "Infraestrutura hídrica disponível", qNumber: "Q1.11", options: WATER_INFRA_OPTIONS, otherFieldId: "WAT_INFRASTRUCTURE_OTHER" },
 
-    { id: "SAN_SEWAGE_DESTINATION", type: "singleChoice", label: "Destinação do esgoto", qNumber: "Q1.12", options: SEWAGE_DESTINATION_OPTIONS },
+    { id: "SAN_SEWAGE_DESTINATION", type: "singleChoice", label: "Destinação do esgoto", qNumber: "Q1.12", options: SEWAGE_DESTINATION_OPTIONS, otherFieldId: "SAN_SEWAGE_DESTINATION_OTHER" },
     { id: "SAN_OPEN_SEWAGE", type: "confirmation", label: "Há esgoto a céu aberto no entorno da escola?", qNumber: "Q1.13" },
     { id: "SAN_FLOOD_OCCURRENCE", type: "confirmation", label: "Ocorrem alagamentos na escola ou no entorno?", qNumber: "Q1.14", required: true },
     { id: "SAN_FLOOD_LOCATION", type: "text", label: "Onde costumam ocorrer?", qNumber: "Q1.15", condition: (d) => ga(d, "SAN_FLOOD_OCCURRENCE") === "yes" },
-    { id: "SAN_FLOOD_IMPACTS", type: "multiChoice", label: "Impactos observados nesses episódios", qNumber: "Q1.16", options: FLOOD_IMPACTS_OPTIONS, condition: (d) => ga(d, "SAN_FLOOD_OCCURRENCE") === "yes" },
+    { id: "SAN_FLOOD_IMPACTS", type: "multiChoice", label: "Impactos observados nesses episódios", qNumber: "Q1.16", options: FLOOD_IMPACTS_OPTIONS, otherFieldId: "SAN_FLOOD_IMPACTS_OTHER", condition: (d) => ga(d, "SAN_FLOOD_OCCURRENCE") === "yes" },
 
     { id: "WST_SEPARATION", type: "confirmation", label: "Há separação de resíduos na escola?", qNumber: "Q1.17" },
-    { id: "WST_DESTINATION", type: "multiChoice", label: "Destinação dos resíduos", qNumber: "Q1.18", options: WASTE_DESTINATION_OPTIONS },
+    { id: "WST_DESTINATION", type: "multiChoice", label: "Destinação dos resíduos", qNumber: "Q1.18", options: WASTE_DESTINATION_OPTIONS, otherFieldId: "WST_DESTINATION_OTHER" },
     {
       id: "WST_TERRITORIAL_PROBLEMS", type: "multiChoice",
       label: "Existem problemas relacionados a resíduos no entorno da escola?",
@@ -181,7 +181,7 @@
 
     {
       id: "TER_ELEMENTS", type: "multiChoice", label: "Elementos presentes no território ao redor da escola", qNumber: "Q1.21",
-      options: TERRITORY_ELEMENTS_OPTIONS, required: true,
+      options: TERRITORY_ELEMENTS_OPTIONS, otherFieldId: "TER_ELEMENTS_OTHER", required: true,
       help: "Considere o território mais imediato da escola — em geral o bairro ou a região do entorno em que a comunidade escolar circula, não o município inteiro. A existência de um elemento não significa, por si só, risco ou impacto — isso será explorado a seguir.",
     },
     {
@@ -193,6 +193,10 @@
       emptyMessage: "Selecione elementos do território acima para caracterizar a relação de cada um.",
       help: "Nota para tutoria: um mesmo elemento pode ter mais de uma relação ao mesmo tempo (ex.: um rio pode ser, simultaneamente, ambiente e cultura, ou risco e uso comunitário) — marque quantas se aplicarem.",
       sourceItems: (d) => (ga(d, "TER_ELEMENTS") || []).map((v) => TERRITORY_ELEMENTS_OPTIONS.find((o) => o.value === v) || { value: v, label: v }),
+    },
+    {
+      id: "TER_ELEMENT_RELATION_OTHER_DESC", type: "text", label: "Você marcou \"Outra\" relação para algum elemento acima — qual?", qNumber: "Q1.22a",
+      condition: (d) => Object.values(ga(d, "TER_ELEMENT_RELATION") || {}).some((rels) => Array.isArray(rels) && rels.includes("other")),
     },
 
     { id: "TER_ECONOMIC_ACTIVITIES", type: "multiChoice", label: "Principais atividades econômicas do território", qNumber: "Q1.23", options: ECONOMIC_ACTIVITIES_OPTIONS, otherFieldId: "TER_ECONOMIC_ACTIVITIES_OTHER" },
@@ -215,7 +219,7 @@
     { id: "TER_CLIMATE_EVENT_HISTORY", type: "confirmation", label: "Há histórico de eventos climáticos extremos que afetaram a escola/comunidade?", qNumber: "Q1.30", required: true },
     { id: "TER_CLIMATE_EVENT_DESC", type: "textarea", label: "Descreva o(s) evento(s)", qNumber: "Q1.31", condition: (d) => ga(d, "TER_CLIMATE_EVENT_HISTORY") === "yes" },
     { id: "TER_CLIMATE_EVENT_PERIOD", type: "text", label: "Quando ocorreu(ram)?", qNumber: "Q1.32", condition: (d) => ga(d, "TER_CLIMATE_EVENT_HISTORY") === "yes" },
-    { id: "TER_CLIMATE_EVENT_IMPACTS", type: "multiChoice", label: "Impactos observados", qNumber: "Q1.33", options: [
+    { id: "TER_CLIMATE_EVENT_IMPACTS", type: "multiChoice", label: "Impactos observados", qNumber: "Q1.33", otherFieldId: "TER_CLIMATE_EVENT_IMPACTS_OTHER", options: [
       { value: "class_interruption", label: "Interrupção de aulas" },
       { value: "material_damage", label: "Danos materiais" },
       { value: "displacement", label: "Deslocamento de pessoas" },

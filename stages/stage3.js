@@ -73,7 +73,7 @@
   ];
 
   const fields = [
-    { id: "PAR_EA_PARTICIPANTS", type: "multiChoice", label: "Quem participa das ações de Educação Ambiental hoje?", qNumber: "Q3.1", options: [
+    { id: "PAR_EA_PARTICIPANTS", type: "multiChoice", label: "Quem participa das ações de Educação Ambiental hoje?", qNumber: "Q3.1", otherFieldId: "PAR_EA_PARTICIPANTS_OTHER", options: [
       { value: "students", label: "Estudantes" }, { value: "teachers", label: "Professores(as)" },
       { value: "management", label: "Gestão" }, { value: "staff", label: "Funcionários(as)" },
       { value: "families", label: "Famílias" }, { value: "community", label: "Comunidade" }, { value: "other", label: "Outros" },
@@ -85,7 +85,7 @@
       { value: "protagonist", label: "Protagonista (decidem e conduzem)" },
       { value: "dontknow", label: "Não sabe" },
     ], help: "Participação não é sinônimo de presença — o que importa é o nível de envolvimento na decisão." },
-    { id: "PAR_STUDENT_SPACES", type: "multiChoice", label: "Espaços de participação estudantil existentes", qNumber: "Q3.3", options: [
+    { id: "PAR_STUDENT_SPACES", type: "multiChoice", label: "Espaços de participação estudantil existentes", qNumber: "Q3.3", otherFieldId: "PAR_STUDENT_SPACES_OTHER", options: [
       { value: "student_council", label: "Grêmio estudantil" }, { value: "assemblies", label: "Assembleias" },
       { value: "student_projects", label: "Projetos protagonizados por estudantes" }, { value: "councils", label: "Conselhos" },
       { value: "none", label: "Nenhum" }, { value: "other", label: "Outro" },
@@ -96,7 +96,7 @@
       { value: "absent", label: "Ausente" }, { value: "sporadic", label: "Esporádico" },
       { value: "regular", label: "Regular" }, { value: "active", label: "Ativo/protagonista" }, { value: "dontknow", label: "Não sabe" },
     ]},
-    { id: "PAR_FAMILY_BARRIERS", type: "multiChoice", label: "Barreiras à participação das famílias", qNumber: "Q3.7", options: [
+    { id: "PAR_FAMILY_BARRIERS", type: "multiChoice", label: "Barreiras à participação das famílias", qNumber: "Q3.7", otherFieldId: "PAR_FAMILY_BARRIERS_OTHER", options: [
       { value: "work_schedule", label: "Horário de trabalho" }, { value: "distance", label: "Distância" },
       { value: "communication", label: "Comunicação inadequada" }, { value: "lack_of_invitation", label: "Falta de convite/convocação" },
       { value: "other", label: "Outra" },
@@ -114,7 +114,7 @@
     { id: "NET_EMERGENCY_DOCUMENT", type: "confirmation", label: "Esse procedimento está documentado/formalizado?", qNumber: "Q3.14", condition: (d) => ga(d, "NET_EMERGENCY_PROCEDURE") === "yes" },
     { id: "NET_PREPAREDNESS_ACTIONS", type: "textarea", label: "Que ações de preparação já foram feitas (simulados, sinalização, etc.)?", qNumber: "Q3.15" },
 
-    { id: "NET_COMM_CHANNELS", type: "multiChoice", label: "Canais de comunicação da escola com a comunidade", qNumber: "Q3.16", options: [
+    { id: "NET_COMM_CHANNELS", type: "multiChoice", label: "Canais de comunicação da escola com a comunidade", qNumber: "Q3.16", otherFieldId: "NET_COMM_CHANNELS_OTHER", options: [
       { value: "whatsapp", label: "WhatsApp" }, { value: "printed_notices", label: "Comunicados impressos" },
       { value: "school_meetings", label: "Reuniões" }, { value: "social_media", label: "Redes sociais" },
       { value: "loudspeaker_local_radio", label: "Alto-falante/rádio local" }, { value: "other", label: "Outro" },
@@ -126,7 +126,7 @@
 
     { id: "NET_COMMUNITY_CAPACITIES", type: "textarea", label: "Que capacidades/conhecimentos a comunidade já possui e podem ser mobilizados?", qNumber: "Q3.19", help: "Ex.: conhecimento tradicional sobre o clima local, organização comunitária, mutirões, saberes de manejo." },
     { id: "NET_PRIORITY_CAPACITIES", type: "textarea", label: "Quais dessas capacidades parecem mais estratégicas de fortalecer?", qNumber: "Q3.20" },
-    { id: "NET_ARTICULATION_BARRIERS", type: "multiChoice", label: "Barreiras para articular com atores do território", qNumber: "Q3.21", options: [
+    { id: "NET_ARTICULATION_BARRIERS", type: "multiChoice", label: "Barreiras para articular com atores do território", qNumber: "Q3.21", otherFieldId: "NET_ARTICULATION_BARRIERS_OTHER", options: [
       { value: "no_contact", label: "Falta de contato" }, { value: "bureaucracy", label: "Burocracia" },
       { value: "distrust", label: "Desconfiança/histórico de relação" }, { value: "time", label: "Falta de tempo" }, { value: "other", label: "Outra" },
     ]},
@@ -182,6 +182,12 @@
           el("span", {}, o.label),
         ]));
       });
+      const contribOther = window.Components.renderOtherInline(
+        (actor.currentContributions || []).includes("other"), actor.currentContributionsOther,
+        (v) => window.App.mutate((d) => { d.actors.find((a) => a.actorId === actor.actorId).currentContributionsOther = v; }),
+        "Especifique a contribuição atual..."
+      );
+      if (contribOther) contribGroup.appendChild(contribOther);
       card.appendChild(el("div", { class: "field field--compact" }, [el("label", {}, "Contribuições atuais"), contribGroup]));
 
       const potGroup = el("div", { class: "choice-group", "aria-label": "NET_ACTOR_POTENTIAL" });
@@ -197,6 +203,12 @@
           el("span", {}, o.label),
         ]));
       });
+      const potOther = window.Components.renderOtherInline(
+        (actor.potentialContributions || []).includes("other"), actor.potentialContributionsOther,
+        (v) => window.App.mutate((d) => { d.actors.find((a) => a.actorId === actor.actorId).potentialContributionsOther = v; }),
+        "Especifique a contribuição potencial..."
+      );
+      if (potOther) potGroup.appendChild(potOther);
       card.appendChild(el("div", { class: "field field--compact" }, [el("label", {}, "Contribuições potenciais"), potGroup]));
 
       const priorityCheckbox = el("input", { type: "checkbox", checked: actor.priorityForStrengthening, onchange: (e) => window.App.mutate((d) => { d.actors.find((a) => a.actorId === actor.actorId).priorityForStrengthening = e.target.checked; }) });
