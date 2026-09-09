@@ -207,6 +207,7 @@
 
   function render(diagnosis) {
     const container = el("div", { class: "stage-form" });
+    container.appendChild(el("p", { class: "stage-intro" }, "Esta matriz não começa em branco: ela é alimentada automaticamente pelas respostas já registradas nas etapas anteriores (principalmente Riscos e Participação e Redes). Quanto mais completo o preenchimento até aqui, mais sugestões aparecem para confirmação — nada é adicionado definitivamente sem revisão humana."));
     topFields.forEach((f) => { const n = renderField(f, diagnosis, window.App.setField); if (n) container.appendChild(n); });
 
     const suggested = diagnosis.swotItems.filter((i) => i.systemSuggested && !i.userConfirmed);

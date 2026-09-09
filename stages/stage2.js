@@ -196,13 +196,9 @@
       options: METHODS_OPTIONS, help: "Marque todos os que já foram usados, mesmo que raramente.",
     },
     {
-      id: "EA_MAIN_METHOD", type: "singleChoice", label: "Dentre os métodos marcados acima, qual é o mais utilizado no dia a dia?", qNumber: "Q2.25",
-      help: "Esta pergunta pede apenas UM, o predominante — diferente da anterior, que pedia todos os já usados.",
-      options: (d) => {
-        const used = ga(d, "EA_METHODS_USED") || [];
-        return METHODS_OPTIONS.filter((o) => used.includes(o.value));
-      },
-      condition: (d) => (ga(d, "EA_METHODS_USED") || []).length > 0,
+      id: "EA_MAIN_METHOD", type: "singleChoice", label: "Qual método/estratégia é o mais utilizado no dia a dia?", qNumber: "Q2.25",
+      help: "Diferente da pergunta anterior (que pedia todos os já usados, mesmo raramente), esta pede só UM — o predominante. A lista de opções é a mesma da pergunta anterior.",
+      options: METHODS_OPTIONS,
     },
     { id: "EA_TERRITORY_USE_FREQ", type: "singleChoice", label: "Frequência de uso do território como espaço pedagógico", qNumber: "Q2.26", options: FREQ_OPTIONS, required: true },
     { id: "EA_LOCAL_PROBLEM_APPROACH", type: "confirmation", label: "Problemas locais/territoriais são abordados nas práticas de EA?", qNumber: "Q2.27" },

@@ -212,6 +212,7 @@
     const wrap = el("div", { class: "cartography" });
     wrap.appendChild(el("h3", {}, "Cartografia participativa (MAP_*)"));
     wrap.appendChild(el("p", { class: "field__help" }, "A cartografia pode registrar zonas de risco, de insegurança, de afeto, recursos/pontos de apoio, lugares de memória e áreas de cuidado/preservação."));
+    wrap.appendChild(el("p", { class: "field__help" }, "Esta costuma ser uma etapa que se beneficia de apoio de tutoria — se tiver dúvidas sobre como conduzir a cartografia com a turma/comunidade, procure a equipe de tutoria antes de preencher."));
 
     const mapFields = [
       { id: "MAP_PARTICIPANTS", type: "multiChoice", label: "Quem participou da cartografia?", options: [
