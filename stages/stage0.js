@@ -98,11 +98,11 @@
     { id: "SCH_CITY", type: "text", label: "Município", qNumber: "Q0.3", required: true },
     { id: "SCH_STATE", type: "text", label: "UF", qNumber: "Q0.4", required: true },
     { id: "SCH_NETWORK", type: "singleChoice", label: "Rede", qNumber: "Q0.5", options: NETWORK_OPTIONS, otherFieldId: "SCH_NETWORK_OTHER", required: true },
-    { id: "SCH_EDUCATION_LEVELS", type: "multiChoice", label: "Etapas/modalidades de ensino ofertadas", qNumber: "Q0.6", options: EDUCATION_LEVELS_OPTIONS, required: true },
+    { id: "SCH_EDUCATION_LEVELS", type: "multiChoice", label: "Etapas/modalidades de ensino ofertadas", qNumber: "Q0.6", options: EDUCATION_LEVELS_OPTIONS, otherFieldId: "SCH_EDUCATION_LEVELS_OTHER", required: true },
     { id: "SCH_LOCATION", type: "singleChoice", label: "Localização", qNumber: "Q0.7", options: LOCATION_OPTIONS, required: true },
     { id: "SCH_TERRITORIAL_CONTEXT", type: "multiChoice", label: "Contextos territoriais", qNumber: "Q0.8", options: TERRITORIAL_CONTEXT_OPTIONS, otherFieldId: "SCH_TERRITORIAL_OTHER", help: "Se a escola está em contexto urbano comum, sem nenhuma dessas identidades territoriais específicas, marque \"Nenhum\"." },
     { id: "SCH_STUDENT_COUNT", type: "number", label: "Número aproximado de estudantes", qNumber: "Q0.9", min: 0 },
-    { id: "SCH_STAFF_COUNT", type: "number", label: "Número aproximado de profissionais", qNumber: "Q0.10", min: 0 },
+    { id: "SCH_STAFF_COUNT", type: "number", label: "Número aproximado de profissionais que trabalham na escola", qNumber: "Q0.10", min: 0, help: "Considere todas as pessoas que atuam na escola — professores(as), gestão/direção, coordenação pedagógica e demais funcionários(as) — não apenas o corpo docente." },
 
     { id: "RESP_NAME", type: "text", label: "Seu nome", qNumber: "Q0.11", required: true },
     { id: "RESP_ROLE", type: "singleChoice", label: "Sua função na escola", qNumber: "Q0.12", options: RESP_ROLE_OPTIONS, otherFieldId: "RESP_ROLE_OTHER", required: true },
