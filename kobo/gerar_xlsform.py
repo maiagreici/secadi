@@ -375,14 +375,16 @@ q("1.21", "select_multiple elementos", "Elementos presentes no território ao re
   "território mais imediato da escola — em geral o bairro ou a região do entorno em que a comunidade escolar circula, "
   "não o município inteiro. A existência de um elemento não significa, por si só, risco ou impacto — isso será "
   "explorado a seguir.", req=True)
-note("q1_22_nota", "Q1.22. Para cada elemento selecionado, qual sua relação com a escola/comunidade? "
-                   "Nota para tutoria: um mesmo elemento pode ter mais de uma relação ao mesmo tempo (ex.: um rio pode "
-                   "ser, simultaneamente, ambiente e cultura, ou risco e uso comunitário) — marque quantas se "
-                   "aplicarem.", rel="${q1_21} != ''")
+bg("t1_22", "Q1.22. Para cada elemento selecionado, qual sua relação com a escola/comunidade?", app="table-list",
+   rel="${q1_21} != ''")
 for i, el in enumerate(ELEM):
     ch = choices["elementos"][i][0]
-    q("", "select_multiple relacao_elem", f"Q1.22 — Relação: {el}", name=f"q1_22_{i + 1:02d}",
-      rel=f"selected(${{q1_21}}, '{ch}')", other=False)
+    row(type="select_multiple relacao_elem", name=f"q1_22_{i + 1:02d}", label=el,
+        relevant=f"selected(${{q1_21}}, '{ch}')", hint="")
+eg()
+note("q1_22_nota", "Nota para tutoria: um mesmo elemento pode ter mais de uma relação ao mesmo tempo (ex.: um rio pode "
+                   "ser, simultaneamente, ambiente e cultura, ou risco e uso comunitário) — marque quantas se "
+                   "aplicarem.", rel="${q1_21} != ''")
 q("1.23", "select_multiple ativ_econ", "Principais atividades econômicas do território")
 q("1.24", "select_one sim_nao_ns", "Essas atividades têm impacto percebido no ambiente ou na comunidade?")
 txt("1.25", "Descreva os impactos percebidos por atividade", rel=eq("q1_24", "sim"))
