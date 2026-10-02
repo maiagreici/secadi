@@ -740,33 +740,78 @@ txt("10.7", "Nossa escola será mais resiliente quando...", "Complete a frase co
 eg()
 
 # ---------------------------------------------------------------- ESCRITA
-wb = Workbook()
-ws = wb.active
-ws.title = "survey"
-cols = ["type", "name", f"label::{LANG}", f"hint::{LANG}", "required", "relevant", "appearance", "constraint",
-        f"constraint_message::{LANG}", "repeat_count"]
-ws.append(cols)
-keymap = {"label": cols[2], "hint": cols[3], "constraint_message": cols[8]}
-for r in survey:
-    ws.append([r.get({v: k for k, v in keymap.items()}.get(c, c), "") or "" for c in cols])
+def salvar(path, rows, titulo, form_id, versao="1.0.0"):
+    usadas = {m.group(1) for r in rows for m in [re.match(r"select_\w+ (\w+)", r.get("type", ""))] if m}
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "survey"
+    cols = ["type", "name", f"label::{LANG}", f"hint::{LANG}", "required", "relevant", "appearance", "constraint",
+            f"constraint_message::{LANG}", "repeat_count"]
+    inv = {f"label::{LANG}": "label", f"hint::{LANG}": "hint", f"constraint_message::{LANG}": "constraint_message"}
+    ws.append(cols)
+    for r in rows:
+        ws.append([r.get(inv.get(c, c), "") or "" for c in cols])
+    wc = wb.create_sheet("choices")
+    wc.append(["list_name", "name", f"label::{LANG}"])
+    for ln, items in choices.items():
+        if ln in usadas:
+            for n, lab in items:
+                wc.append([ln, n, lab])
+    wsett = wb.create_sheet("settings")
+    wsett.append(["form_title", "form_id", "version", "default_language", "style"])
+    wsett.append([titulo, form_id, versao, LANG, "pages"])
+    fill = PatternFill("solid", fgColor="DDEBF7")
+    for sh in (ws, wc, wsett):
+        for c in sh[1]:
+            c.font = Font(bold=True)
+            c.fill = fill
+    ws.freeze_panes = "A2"
+    for col, w in zip("ABCDEFGHIJ", (22, 24, 70, 50, 9, 40, 16, 30, 30, 12)):
+        ws.column_dimensions[col].width = w
+    wb.save(path)
+    print(f"{path}: {len(rows)} linhas")
 
-wc = wb.create_sheet("choices")
-wc.append(["list_name", "name", f"label::{LANG}"])
-for ln, items in choices.items():
-    for n, lab in items:
-        wc.append([ln, n, lab])
 
-wsett = wb.create_sheet("settings")
-wsett.append(["form_title", "form_id", "version", "default_language", "style"])
-wsett.append(["Diagnóstico Socioambiental, Climático e de Educação Ambiental da Escola",
-              "diagnostico_socioambiental_escola", "1.0.0", LANG, "pages"])
-bold = PatternFill("solid", fgColor="DDEBF7")
-for sh in (ws, wc, wsett):
-    for c in sh[1]:
-        c.font = Font(bold=True)
-        c.fill = bold
-ws.freeze_panes = "A2"
-for col, w in zip("ABCDEFGHIJ", (22, 24, 70, 50, 9, 40, 16, 30, 30, 12)):
-    ws.column_dimensions[col].width = w
-wb.save("diagnostico_socioambiental_escola.xlsx")
-print(f"survey: {len(survey)} linhas | listas: {len(choices)} | opções: {sum(map(len, choices.values()))}")
+def blocos():
+    """Divide o survey em grupos de nível superior (etapas)."""
+    meta = [r for r in survey[:4]]
+    out, cur, depth = {}, None, 0
+    for r in survey[4:]:
+        t = r["type"]
+        if depth == 0 and t == "begin_group":
+            cur = r["name"]
+            out[cur] = []
+        out[cur].append(r)
+        if t in ("begin_group", "begin_repeat"):
+            depth += 1
+        elif t in ("end_group", "end_repeat"):
+            depth -= 1
+    return meta, out
+
+
+salvar("diagnostico_socioambiental_escola.xlsx", survey,
+       "Diagnóstico Socioambiental, Climático e de Educação Ambiental da Escola", "diagnostico_socioambiental_escola")
+
+SEMANAS = [
+    (1, "Identificação, Escola e Território", ["etapa0", "etapa1"]),
+    (2, "Educação Ambiental, Participação e Redes", ["etapa2", "etapa3"]),
+    (3, "Riscos Climáticos e Leitura Integrada (FOFA)", ["etapa4", "etapa5"]),
+    (4, "Problemas, Prioridades e Plano de Ação", ["etapa6", "etapa7"]),
+    (5, "Educomunicação, Monitoramento e Síntese", ["etapa8", "etapa9", "etapa10"]),
+]
+meta, bl = blocos()
+for n, nome, etapas in SEMANAS:
+    rows = list(meta)
+    if n > 1:  # identifica a escola/cursista para cruzar as semanas
+        rows += [
+            dict(type="begin_group", name="identificacao", label="Identificação (igual à Semana 1)"),
+            dict(type="text", name="id_escola", label="Nome da escola", required="true"),
+            dict(type="text", name="id_inep", label="Código INEP (8 dígitos; deixe em branco se não souber)",
+                 constraint="regex(., '^[0-9]{8}$')", constraint_message="O código INEP deve ter 8 dígitos."),
+            dict(type="text", name="id_nome", label="Seu nome", required="true"),
+            dict(type="end_group"),
+        ]
+    for e in etapas:
+        rows += bl[e]
+    salvar(f"semana{n}_diagnostico.xlsx", rows, f"Diagnóstico Socioambiental — Semana {n}/5: {nome}",
+           f"diagnostico_semana{n}")
