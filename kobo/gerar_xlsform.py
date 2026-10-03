@@ -42,7 +42,7 @@ def row(**k):
 
 def q(id, type, label, hint="", req=False, rel="", app="", cons="", cmsg="", name=None, other=True):
     nm = name or "q" + id.replace(".", "_")
-    lab = f"Q{id}. {label}" if id and id[0].isdigit() else label
+    lab = f"Q{id.rstrip('r')}. {label}" if id and id[0].isdigit() else label
     t = type
     r = dict(type=t, name=nm, label=lab, hint=hint, required="true" if req else "",
              relevant=rel, appearance=app, constraint=cons, constraint_message=cmsg)
@@ -361,6 +361,7 @@ q("1.3", "select_multiple termica", "Condição térmica das salas de aula",
   "quente no verão E muito fria no inverno).", rel=eq("q0_9", "escola"))
 q("1.4", "select_multiple prob_estrut", "Problemas relacionados às condições térmicas/estruturais",
   rel=eq("q0_9", "escola"))
+bg("e1_escola", "Água, esgoto e resíduos — escola", rel=eq("q0_9", "escola"))
 q("1.5", "select_one agua_fonte", "Fonte de abastecimento de água", req=True)
 q("1.6", "select_one sim_nao_ns", "Há interrupções no abastecimento de água?")
 txt("1.7", "Em que período(s) isso costuma ocorrer?", rel=eq("q1_6", "sim"))
@@ -381,10 +382,46 @@ q("1.19", "select_multiple prob_res", "Existem problemas relacionados a resíduo
   cmsg='"Nenhum" e "Não sabe" não podem ser combinados com outras opções.')
 txt("1.20", "Descreva esses problemas",
     rel="${q1_19} != '' and not(selected(${q1_19}, 'nenhum')) and not(selected(${q1_19}, 'nao_sabe'))")
-q("1.21", "select_multiple elementos", "Elementos presentes no território ao redor da escola", "Considere o "
-  "território mais imediato da escola — em geral o bairro ou a região do entorno em que a comunidade escolar circula, "
-  "não o município inteiro. A existência de um elemento não significa, por si só, risco ou impacto — isso será "
-  "explorado a seguir.", req=True)
+eg()
+
+# ---- Etapa 1 para locais que não são escola (secretaria/regional): visão da rede
+bg("e1_rede", "Água, esgoto e resíduos — escolas da rede", rel="${q0_9} != 'escola'")
+note("e1_rede_nota", "Responda com base na sua visão geral das escolas da rede/região de atuação. Estimativas são "
+                     "bem-vindas; \"Não sabe\" é uma resposta válida e vira lacuna de conhecimento registrada.")
+q("1.3r", "select_multiple termica", "Condição térmica das salas de aula nas escolas da rede",
+  "Marque todas as situações que se aplicam à rede.")
+q("1.4r", "select_multiple prob_estrut", "Problemas estruturais mais comuns nas escolas da rede")
+q("1.5r", "select_multiple agua_fonte", "Fontes de abastecimento de água das escolas da rede", req=True)
+q("1.6r", "select_one qtd_rede", "Em quantas escolas da rede há interrupções no abastecimento de água?")
+txt("1.7r", "Em que período(s) isso costuma ocorrer?",
+    rel="${q1_6r} != '' and ${q1_6r} != 'em_nenhuma' and ${q1_6r} != 'nao_sabe'")
+q("1.8r", "select_one qtd_rede", "Em quantas escolas da rede há monitoramento da qualidade da água?")
+txt("1.9r", "Quem é responsável por esse monitoramento?",
+    rel="${q1_8r} != '' and ${q1_8r} != 'em_nenhuma' and ${q1_8r} != 'nao_sabe'", multiline=False)
+q("1.10r", "select_one sim_nao_ns", "A secretaria/órgão tem acesso aos registros desse monitoramento?",
+  rel="${q1_8r} != '' and ${q1_8r} != 'em_nenhuma' and ${q1_8r} != 'nao_sabe'")
+q("1.11r", "select_multiple infra_hidrica", "Infraestrutura hídrica presente nas escolas da rede")
+q("1.12r", "select_multiple esgoto", "Destinação do esgoto nas escolas da rede")
+q("1.13r", "select_one qtd_rede", "Em quantas escolas da rede há esgoto a céu aberto no entorno?")
+q("1.14r", "select_one qtd_rede", "Em quantas escolas da rede ocorrem alagamentos na escola ou no entorno?", req=True)
+txt("1.15r", "Quais escolas/regiões são mais afetadas?",
+    rel="${q1_14r} != '' and ${q1_14r} != 'em_nenhuma' and ${q1_14r} != 'nao_sabe'")
+q("1.16r", "select_multiple impacto_alag", "Impactos observados nesses episódios",
+  rel="${q1_14r} != '' and ${q1_14r} != 'em_nenhuma' and ${q1_14r} != 'nao_sabe'")
+q("1.17r", "select_one qtd_rede", "Em quantas escolas da rede há separação de resíduos?")
+q("1.18r", "select_multiple destino_res", "Destinação dos resíduos nas escolas da rede")
+q("1.19r", "select_multiple prob_res", "Problemas relacionados a resíduos no entorno das escolas da rede",
+  "Considere a área imediatamente ao redor das escolas, não o município inteiro.",
+  cons="not((selected(., 'nenhum') or selected(., 'nao_sabe')) and count-selected(.) > 1)",
+  cmsg='"Nenhum" e "Não sabe" não podem ser combinados com outras opções.')
+txt("1.20r", "Descreva esses problemas",
+    rel="${q1_19r} != '' and not(selected(${q1_19r}, 'nenhum')) and not(selected(${q1_19r}, 'nao_sabe'))")
+eg()
+
+q("1.21", "select_multiple elementos", "Elementos presentes no território de atuação", "Considere o território mais "
+  "imediato — para uma escola, o bairro ou a região do entorno em que a comunidade escolar circula; para uma "
+  "secretaria ou regional, a área de abrangência da rede (não o município inteiro, se a atuação for menor). A "
+  "existência de um elemento não significa, por si só, risco ou impacto — isso será explorado a seguir.", req=True)
 bg("t1_22", "Q1.22. Para cada elemento selecionado, qual sua relação com a escola/comunidade?", app="table-list",
    rel="${q1_21} != ''")
 for i, el in enumerate(ELEM):
@@ -777,7 +814,7 @@ def _loc(t):
 
 def salvar(path, rows, titulo, form_id, versao="1.0.0"):
     titulo = _loc(titulo)
-    rows = [{k: (_loc(v) if k in ("label", "hint", "constraint_message") and r.get("name") not in ("q0_8", "q0_10", "t1_1r") else v)
+    rows = [{k: (_loc(v) if k in ("label", "hint", "constraint_message") and not (r.get("name") in ("q0_8", "q0_10", "t1_1r", "e1_rede") or re.fullmatch(r"q1_\d+r(_outro)?", r.get("name", ""))) else v)
              for k, v in r.items()} for r in rows]
     usadas = {m.group(1) for r in rows for m in [re.match(r"select_\w+ (\w+)", r.get("type", ""))] if m}
     wb = Workbook()
