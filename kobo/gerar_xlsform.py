@@ -94,6 +94,8 @@ L("sim_nao_ns", ["Sim", "Não", "Não sabemos"])
 L("sim_nao_nsabe", ["Sim", "Não", "Não sabe"])
 L("sim_nao", ["Sim", "Não"])
 L("uf", [(u, u) for u in "AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO".split()])
+L("tipo_local", [("escola", "Escola"), "Secretaria municipal de educação", "Secretaria estadual de educação",
+                 "Diretoria/coordenadoria regional de ensino", "Outro"])
 L("rede", ["Municipal", "Estadual", "Federal", "Privada", "Comunitária", "Outra"])
 L("etapas_ens", ["Educação Infantil", "Ensino Fundamental — anos iniciais", "Ensino Fundamental — anos finais",
                  "Ensino Médio", "EJA", "Educação Profissional e Tecnológica", "Educação Especial", "Outra"])
@@ -111,6 +113,7 @@ L("fontes", ["Observação direta", "Conversa com estudantes", "Conversa com pro
              "Reunião coletiva", "PPP", "Documentos escolares", "Dados públicos", "Cartografia participativa",
              "Registros históricos", "Outras"])
 L("estado_infra", ["Inexistente", "Inadequado", "Regular", "Bom", "Não sabe"])
+L("qtd_rede", ["Em nenhuma", "Em poucas", "Em cerca de metade", "Na maioria", "Em todas", "Não sabe"])
 L("termica", ["Muito quente no verão", "Muito fria no inverno", "Adequada na maior parte do ano",
               "Muito variável, sem padrão sazonal claro", "Não sabe"])
 L("prob_estrut", ["Mofo", "Infiltração", "Calor excessivo", "Frio excessivo", "Falta de ventilação", "Outro"])
@@ -295,8 +298,8 @@ def evidencias(key, titulo):
     er()
 
 
-def tabela(id, titulo, hint, itens, lst, req=False, prefix=None, outros_id=None, outros_label=None):
-    bg(f"t{id.replace('.', '_')}", f"Q{id}. {titulo}", app="table-list")
+def tabela(id, titulo, hint, itens, lst, req=False, prefix=None, rel=""):
+    bg(f"t{id.replace('.', '_')}", f"Q{id}. {titulo}", app="table-list", rel=rel)
     for i, it in enumerate(itens):
         row(type=f"select_one {lst}", name=f"{prefix}_{i + 1:02d}", label=it, required="true" if req else "")
     eg()
@@ -310,36 +313,35 @@ row(type="deviceid", name="deviceid")
 
 # ======================= ETAPA 0
 bg("etapa0", "Etapa 0 — Identificação")
-note("e0_intro", "Estas informações identificam a escola, quem está respondendo e como o diagnóstico está sendo "
-                 "construído. Elas serão reaproveitadas nas próximas etapas. Este formulário é respondido pelo(a) gestor(a) escolar, com apoio da equipe e da comunidade escolar sempre que possível. | Instrumento de Diagnóstico "
-                 "Socioambiental, Climático e de Educação Ambiental da Escola — versão 1.0.0.")
-q("0.1", "text", "Nome da escola", req=True)
-q("0.2", "text", "Código INEP", "Código público de 8 dígitos, o mesmo usado no Censo Escolar — não é uma informação "
-  "sigilosa; pode ser consultado por qualquer pessoa no site do INEP ou com a secretaria da escola. Deixe em branco "
-  "se não souber.", cons="regex(., '^[0-9]{8}$')", cmsg="O código INEP deve ter exatamente 8 dígitos.")
-q("0.3", "text", "Município", req=True)
-q("0.4", "select_one uf", "UF", req=True)
-q("0.5", "select_one rede", "Rede", req=True)
-q("0.6", "select_multiple etapas_ens", "Etapas/modalidades de ensino ofertadas", req=True)
-q("0.7", "select_one localizacao", "Localização", req=True)
-q("0.8", "select_multiple contextos", "Contextos territoriais",
-  'Se a escola está em contexto urbano comum, sem nenhuma dessas identidades territoriais específicas, marque "Nenhum".',
+note("e0_intro", "Estas informações identificam quem está respondendo, o local de atuação e como o diagnóstico está "
+                 "sendo construído. Elas serão reaproveitadas nas próximas etapas. Este formulário é respondido pelo(a) "
+                 "gestor(a), com apoio da equipe e da comunidade sempre que possível. | Instrumento de Diagnóstico "
+                 "Socioambiental, Climático e de Educação Ambiental — Gestores — versão 1.0.0.")
+q("0.1", "text", "Seu nome", req=True)
+q("0.2", "select_one funcao", "Sua função de gestão", req=True)
+q("0.3", "text", "Disciplina/área em que atuou como docente (se aplicável)")
+q("0.4", "select_one formacao", "Nível de formação")
+q("0.5", "text", "Área de formação")
+q("0.6", "text", "Tempo de atuação neste local")
+q("0.7", "text", "Tempo na função de gestão (neste ou em outro local)")
+q("0.8", "text", "Nome do local de atuação", "Escola, secretaria de educação, diretoria regional ou outro órgão.",
+  req=True)
+q("0.9", "select_one tipo_local", "Tipo de local", req=True)
+q("0.10", "text", "Código INEP", "Preencha apenas se o local for uma escola. Código público de 8 dígitos, o mesmo "
+  "usado no Censo Escolar — não é uma informação sigilosa; pode ser consultado por qualquer pessoa no site do INEP. "
+  "Deixe em branco se não souber.", rel=eq("q0_9", "escola"), cons="regex(., '^[0-9]{8}$')",
+  cmsg="O código INEP deve ter exatamente 8 dígitos.")
+q("0.11", "text", "Município", req=True)
+q("0.12", "select_one uf", "UF", req=True)
+q("0.13", "select_one rede", "Rede", req=True)
+q("0.14", "select_one localizacao", "Localização", req=True)
+q("0.15", "select_multiple contextos", "Contextos territoriais",
+  'Se o local está em contexto urbano comum, sem nenhuma dessas identidades territoriais específicas, marque "Nenhum".',
   cons="not(selected(., 'nenhum') and count-selected(.) > 1)",
   cmsg='"Nenhum" não pode ser combinado com outras opções.')
-q("0.9", "integer", "Número aproximado de estudantes", cons=". >= 0", cmsg="Informe um número positivo.")
-q("0.10", "integer", "Número aproximado de profissionais que trabalham na escola",
-  "Considere todas as pessoas que atuam na escola — professores(as), gestão/direção, coordenação pedagógica e demais "
-  "funcionários(as) — não apenas o corpo docente.", cons=". >= 0", cmsg="Informe um número positivo.")
-q("0.11", "text", "Seu nome", req=True)
-q("0.12", "select_one funcao", "Sua função na gestão da escola", req=True)
-q("0.13", "text", "Disciplina/área em que atuou como docente (se aplicável)")
-q("0.14", "select_one formacao", "Nível de formação")
-q("0.15", "text", "Área de formação")
-q("0.16", "text", "Tempo de atuação nesta escola")
-q("0.16a", "text", "Tempo na função de gestão (nesta ou em outra escola)")
-q("0.17", "select_multiple participantes_diag", "Quem participou da construção deste diagnóstico até agora", req=True)
-q("0.18", "select_multiple fontes", "Quais fontes de informação foram utilizadas", req=True)
-txt("0.19", "Descreva brevemente como o processo de diagnóstico foi conduzido",
+q("0.16", "select_multiple participantes_diag", "Quem participou da construção deste diagnóstico até agora", req=True)
+q("0.17", "select_multiple fontes", "Quais fontes de informação foram utilizadas", req=True)
+txt("0.18", "Descreva brevemente como o processo de diagnóstico foi conduzido",
     "Procure trazer: quem participou de cada momento; como as informações foram levantadas (observação, conversas, "
     "reunião, documentos); em quantos encontros/etapas isso ocorreu e em que período; se houve alguma dificuldade "
     "para envolver a comunidade escolar; e o que motivou a escolha dessa forma de condução.")
@@ -350,12 +352,15 @@ bg("etapa1", "Etapa 1 — Escola e Território")
 INFRA = ["Biblioteca / espaço de leitura", "Laboratório de Ciências", "Laboratório de informática", "Internet", "Pátio",
          "Espaços esportivos", "Áreas verdes", "Horta", "Pomar", "Sombreamento", "Espaços externos para atividades"]
 tabela("1.1", "Infraestrutura da escola — estado de cada espaço, quando pertinente", "", INFRA, "estado_infra",
-       req=True, prefix="q1_1")
+       req=True, prefix="q1_1", rel=eq("q0_9", "escola"))
+tabela("1.1r", "Infraestrutura da rede — em quantas escolas da rede existe cada espaço?", "", INFRA, "qtd_rede",
+       req=True, prefix="q1_1r", rel="${q0_9} != 'escola'")
 txt("1.2", "Outra estrutura relevante não listada (se houver)")
 q("1.3", "select_multiple termica", "Condição térmica das salas de aula",
   "A condição térmica costuma variar ao longo do ano — marque todas as situações que se aplicam (ex.: pode ser muito "
-  "quente no verão E muito fria no inverno).")
-q("1.4", "select_multiple prob_estrut", "Problemas relacionados às condições térmicas/estruturais")
+  "quente no verão E muito fria no inverno).", rel=eq("q0_9", "escola"))
+q("1.4", "select_multiple prob_estrut", "Problemas relacionados às condições térmicas/estruturais",
+  rel=eq("q0_9", "escola"))
 q("1.5", "select_one agua_fonte", "Fonte de abastecimento de água", req=True)
 q("1.6", "select_one sim_nao_ns", "Há interrupções no abastecimento de água?")
 txt("1.7", "Em que período(s) isso costuma ocorrer?", rel=eq("q1_6", "sim"))
@@ -754,7 +759,26 @@ txt("10.7", "Nossa escola será mais resiliente quando...", "Complete a frase co
 eg()
 
 # ---------------------------------------------------------------- ESCRITA
+def _loc(t):
+    if not isinstance(t, str):
+        return t
+    for p, r in [
+        (r"\bA escola pode agir sozinha", "O local pode agir sozinho"),
+        (r"\bNossa escola\b", "Nosso local"), (r"\bda própria escola\b", "do próprio local"),
+        (r"\bToda a escola\b", "Todo o local"),
+        (r"\b(d|n)?(es[st]a|essa) escola\b", lambda m: (m.group(1) or "") + {"esta": "este", "essa": "esse"}[m.group(2)] + " local"),
+        (r"\bna escola\b", "neste local"), (r"\bNa escola\b", "Neste local"),
+        (r"\bda escola\b", "do local"), (r"\bà escola\b", "ao local"), (r"\bpela escola\b", "pelo local"),
+        (r"\bcom a escola\b", "com o local"), (r"\bA escola\b", "O local"), (r"\ba escola\b", "o local"),
+        (r"\bescolas\b", "locais"), (r"\bEscola\b", "Local"), (r"\bescola\b", "local")]:
+        t = re.sub(p, r, t)
+    return t
+
+
 def salvar(path, rows, titulo, form_id, versao="1.0.0"):
+    titulo = _loc(titulo)
+    rows = [{k: (_loc(v) if k in ("label", "hint", "constraint_message") and r.get("name") not in ("q0_8", "q0_10", "t1_1r") else v)
+             for k, v in r.items()} for r in rows]
     usadas = {m.group(1) for r in rows for m in [re.match(r"select_\w+ (\w+)", r.get("type", ""))] if m}
     wb = Workbook()
     ws = wb.active
@@ -770,7 +794,7 @@ def salvar(path, rows, titulo, form_id, versao="1.0.0"):
     for ln, items in choices.items():
         if ln in usadas:
             for n, lab in items:
-                wc.append([ln, n, lab])
+                wc.append([ln, n, lab if ln in ("tipo_local", "cat_ator") else _loc(lab)])
     wsett = wb.create_sheet("settings")
     wsett.append(["form_title", "form_id", "version", "default_language", "style"])
     wsett.append([titulo, form_id, versao, LANG, "pages"])
@@ -819,8 +843,8 @@ for n, nome, etapas in SEMANAS:
     if n > 1:  # identifica a escola/cursista para cruzar as semanas
         rows += [
             dict(type="begin_group", name="identificacao", label="Identificação (igual à Semana 1)"),
-            dict(type="text", name="id_escola", label="Nome da escola", required="true"),
-            dict(type="text", name="id_inep", label="Código INEP (8 dígitos; deixe em branco se não souber)",
+            dict(type="text", name="id_escola", label="Nome do local de atuação", required="true"),
+            dict(type="text", name="id_inep", label="Código INEP (apenas se for escola; 8 dígitos)",
                  constraint="regex(., '^[0-9]{8}$')", constraint_message="O código INEP deve ter 8 dígitos."),
             dict(type="text", name="id_nome", label="Seu nome", required="true"),
             dict(type="end_group"),
