@@ -299,7 +299,7 @@ def evidencias(key, titulo):
 
 
 def tabela(id, titulo, hint, itens, lst, req=False, prefix=None, rel=""):
-    bg(f"t{id.replace('.', '_')}", f"Q{id}. {titulo}", app="table-list", rel=rel)
+    bg(f"t{id.replace('.', '_')}", f"Q{id.rstrip('r')}. {titulo}", app="table-list", rel=rel)
     for i, it in enumerate(itens):
         row(type=f"select_one {lst}", name=f"{prefix}_{i + 1:02d}", label=it, required="true" if req else "")
     eg()
