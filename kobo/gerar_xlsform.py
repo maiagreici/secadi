@@ -814,7 +814,7 @@ def _loc(t):
 
 def salvar(path, rows, titulo, form_id, versao="1.0.0"):
     titulo = _loc(titulo)
-    rows = [{k: (_loc(v) if k in ("label", "hint", "constraint_message") and not (r.get("name") in ("q0_8", "q0_10", "t1_1r", "e1_rede") or re.fullmatch(r"q1_\d+r(_outro)?", r.get("name", ""))) else v)
+    rows = [{k: (_loc(v) if k in ("label", "hint", "constraint_message") and not (r.get("name") in ("q0_8", "q0_10", "t1_1r", "e1_rede", "e1_rede_nota", "e1_escola") or re.fullmatch(r"q1_\d+r(_outro)?", r.get("name", ""))) else v)
              for k, v in r.items()} for r in rows]
     usadas = {m.group(1) for r in rows for m in [re.match(r"select_\w+ (\w+)", r.get("type", ""))] if m}
     wb = Workbook()
