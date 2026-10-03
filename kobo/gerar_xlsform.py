@@ -100,15 +100,13 @@ L("etapas_ens", ["Educação Infantil", "Ensino Fundamental — anos iniciais", 
 L("localizacao", ["Urbana", "Rural", "Periurbana / de transição", "Não sabe"])
 L("contextos", ["Educação do Campo", "Território indígena", "Quilombola", "Ribeirinho", "Caiçara", "Extrativista",
                 "Assentamento", "Outro", "Nenhum", "Não sabe"])
-L("funcao", ["Professor(a)", "Gestor(a) / Direção", "Coordenador(a) pedagógico(a)", "Supervisor(a) pedagógico(a)",
-             "Orientador(a) educacional", "Inspetor(a) de alunos", "Secretário(a) escolar", "Nutricionista",
-             "Psicólogo(a) escolar", "Bibliotecário(a)", "Assistente de alunos com deficiência",
-             "Outro(a) funcionário(a)", "Outro"])
+L("funcao", ["Diretor(a)", "Vice-diretor(a)", "Coordenador(a) pedagógico(a)", "Supervisor(a) pedagógico(a)",
+             "Orientador(a) educacional", "Secretário(a) escolar", ("outro", "Outro (equipe gestora)")])
 L("formacao", ["Ensino Fundamental", "Ensino Médio / Magistério", "Graduação", "Pós-graduação (especialização)",
                "Mestrado", "Doutorado", "Não sabe / não se aplica"])
 L("participantes_diag", ["Estudantes", "Professores(as)", "Gestão", "Coordenação pedagógica", "Funcionários(as)",
                          "Famílias", "Conselho escolar", "Comunidade", "Lideranças", "Parceiros", "Outros",
-                         "Somente o(a) cursista"])
+                         "Somente o(a) gestor(a)"])
 L("fontes", ["Observação direta", "Conversa com estudantes", "Conversa com professores(as)", "Famílias/comunidade",
              "Reunião coletiva", "PPP", "Documentos escolares", "Dados públicos", "Cartografia participativa",
              "Registros históricos", "Outras"])
@@ -178,6 +176,12 @@ BARR = ["Tempo", "Currículo sobrecarregado", "Formação", "Materiais", "Recurs
         "Rotatividade de profissionais", "Outras"]
 L("barreiras", BARR)
 L("intensidade", ["Baixa", "Média", "Alta", "Não se aplica"])
+L("apoio_gestao", ["Reserva tempo para planejamento coletivo", "Inclui a EA no PPP/planejamento anual",
+                   "Viabiliza recursos e materiais", "Articula parcerias externas", "Apoia projetos de estudantes",
+                   "Participa de formações sobre o tema", "Acompanha e valoriza as práticas da equipe",
+                   ("nenhum", "Nenhum apoio sistemático"), "Outro"])
+L("instancias", ["Conselho escolar", "APM / caixa escolar", "Grêmio estudantil", "Conselho de classe",
+                 "Reunião pedagógica/planejamento coletivo", "Associação de pais e mestres", "Nenhuma", "Outra"])
 L("materiais", ["Livros didáticos", "Vídeos", "Jogos", "Kits científicos", "Materiais produzidos pela escola",
                 "Recursos digitais", "Outro"])
 L("acesso_mat", ["Fácil", "Moderado", "Difícil", "Inexistente", "Não sabe"])
@@ -307,7 +311,7 @@ row(type="deviceid", name="deviceid")
 # ======================= ETAPA 0
 bg("etapa0", "Etapa 0 — Identificação")
 note("e0_intro", "Estas informações identificam a escola, quem está respondendo e como o diagnóstico está sendo "
-                 "construído. Elas serão reaproveitadas nas próximas etapas. | Instrumento de Diagnóstico "
+                 "construído. Elas serão reaproveitadas nas próximas etapas. Este formulário é respondido pelo(a) gestor(a) escolar, com apoio da equipe e da comunidade escolar sempre que possível. | Instrumento de Diagnóstico "
                  "Socioambiental, Climático e de Educação Ambiental da Escola — versão 1.0.0.")
 q("0.1", "text", "Nome da escola", req=True)
 q("0.2", "text", "Código INEP", "Código público de 8 dígitos, o mesmo usado no Censo Escolar — não é uma informação "
@@ -327,11 +331,12 @@ q("0.10", "integer", "Número aproximado de profissionais que trabalham na escol
   "Considere todas as pessoas que atuam na escola — professores(as), gestão/direção, coordenação pedagógica e demais "
   "funcionários(as) — não apenas o corpo docente.", cons=". >= 0", cmsg="Informe um número positivo.")
 q("0.11", "text", "Seu nome", req=True)
-q("0.12", "select_one funcao", "Sua função na escola", req=True)
-q("0.13", "text", "Área de atuação/disciplina (se docente)")
+q("0.12", "select_one funcao", "Sua função na gestão da escola", req=True)
+q("0.13", "text", "Disciplina/área em que atuou como docente (se aplicável)")
 q("0.14", "select_one formacao", "Nível de formação")
 q("0.15", "text", "Área de formação")
 q("0.16", "text", "Tempo de atuação nesta escola")
+q("0.16a", "text", "Tempo na função de gestão (nesta ou em outra escola)")
 q("0.17", "select_multiple participantes_diag", "Quem participou da construção deste diagnóstico até agora", req=True)
 q("0.18", "select_multiple fontes", "Quais fontes de informação foram utilizadas", req=True)
 txt("0.19", "Descreva brevemente como o processo de diagnóstico foi conduzido",
@@ -451,7 +456,7 @@ txt("2.29", "Quem ofereceu a formação?", rel=r28, multiline=False)
 txt("2.30", "Quais temas foram abordados?", rel=r28)
 q("2.31", "select_one impacto_form", "Qual o impacto dessa formação na prática?", rel=r28)
 txt("2.32", "Dê um exemplo desse impacto", rel=r28)
-q("2.33", "select_one confianca", "Quão confiante você se sente para trabalhar Educação Ambiental hoje?",
+q("2.33", "select_one confianca", "Quão confiante você se sente, como gestor(a), para liderar e apoiar a Educação Ambiental na escola hoje?",
   "Escala de 1 (nada confiante) a 5 (muito confiante).", app="horizontal-compact")
 q("2.34", "select_multiple apoio", "Que tipo de apoio faria diferença?")
 tabela("2.35", "Intensidade de cada barreira percebida", "", BARR, "intensidade", prefix="q2_35")
@@ -463,6 +468,9 @@ txt("2.39", "Que materiais fazem falta?")
 q("2.40", "select_one part_estud", "Como caracterizar, de modo geral, a participação dos estudantes nas ações de EA?",
   req=True)
 q("2.41", "select_one continuidade_proj", "De modo geral, a continuidade dos projetos de EA está...")
+q("2.41a", "select_multiple apoio_gestao", "Como a gestão escolar apoia a Educação Ambiental hoje?",
+  "Pense no que a gestão efetivamente faz, não no que deveria fazer.",
+  cons="not(selected(., 'nenhum') and count-selected(.) > 1)", cmsg='"Nenhum apoio sistemático" não pode ser combinado com outras opções.')
 note("e2_leitura", "Como o sistema está lendo suas respostas (revise e confirme) — no Kobo não há leitura automática: "
                    "a tutoria/quem aplica o formulário deve revisar as respostas desta etapa antes de responder abaixo.")
 q("2.42", "select_one sim_nao_ns", "Essa leitura reflete a realidade da escola?")
@@ -485,6 +493,10 @@ q("3.8", "select_one freq5", "Frequência de atividades da escola com o territó
 txt("3.9", "Quais atividades com o território/comunidade já ocorreram?")
 q("3.10", "select_one sim_nao_ns", "A escola tem mecanismos de escuta da comunidade?")
 
+q("3.10a", "select_multiple instancias", "Quais instâncias de decisão colegiada existem e funcionam na escola?",
+  cons="not(selected(., 'nenhuma') and count-selected(.) > 1)", cmsg='"Nenhuma" não pode ser combinada com outras opções.')
+q("3.10b", "select_one sim_nao_ns", "A gestão tem autonomia para decidir e destinar recursos a ações de Educação "
+  "Ambiental?")
 br("net_actors", "Atores do território (NET_ACTORS)")
 note("net_nota", "Existência, contato, parceria e articulação permanente são níveis diferentes — não confunda um com o "
                  "outro. Só marque \"Parceria\" ou \"Articulação permanente\" se a escola já colabora de fato com esse "
@@ -791,8 +803,8 @@ def blocos():
     return meta, out
 
 
-salvar("diagnostico_socioambiental_escola.xlsx", survey,
-       "Diagnóstico Socioambiental, Climático e de Educação Ambiental da Escola", "diagnostico_socioambiental_escola")
+salvar("gestores_diagnostico_completo.xlsx", survey,
+       "Diagnóstico Socioambiental, Climático e de Educação Ambiental da Escola — Gestores Escolares", "diagnostico_gestores_escola")
 
 SEMANAS = [
     (1, "Identificação, Escola e Território", ["etapa0", "etapa1"]),
@@ -815,5 +827,5 @@ for n, nome, etapas in SEMANAS:
         ]
     for e in etapas:
         rows += bl[e]
-    salvar(f"semana{n}_diagnostico.xlsx", rows, f"Diagnóstico Socioambiental — Semana {n}/5: {nome}",
-           f"diagnostico_semana{n}")
+    salvar(f"gestores_semana{n}_diagnostico.xlsx", rows,
+           f"Diagnóstico Socioambiental (Gestores) — Semana {n}/5: {nome}", f"diagnostico_gestores_semana{n}")
