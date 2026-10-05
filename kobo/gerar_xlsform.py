@@ -90,13 +90,14 @@ def eq(n, v):
 
 
 # ---------------------------------------------------------------- LISTAS
+L("concordo", [("concordo", "Sim, concordo em participar"), ("nao_concordo", "Não concordo")])
 L("sim_nao_ns", ["Sim", "Não", "Não sabemos"])
 L("sim_nao_nsabe", ["Sim", "Não", "Não sabe"])
 L("sim_nao", ["Sim", "Não"])
 L("uf", [(u, u) for u in "AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO".split()])
 L("tipo_local", [("escola", "Escola"), "Secretaria municipal de educação", "Secretaria estadual de educação",
                  "Diretoria/coordenadoria regional de ensino", "Outro"])
-L("rede", ["Municipal", "Estadual", "Federal", "Privada", "Comunitária", "Outra"])
+L("rede", ["Municipal", "Estadual", "Federal", "Privado", "Comunitário", "Outro"])
 L("etapas_ens", ["Educação Infantil", "Ensino Fundamental — anos iniciais", "Ensino Fundamental — anos finais",
                  "Ensino Médio", "EJA", "Educação Profissional e Tecnológica", "Educação Especial", "Outra"])
 L("localizacao", ["Urbana", "Rural", "Periurbana / de transição", "Não sabe"])
@@ -121,21 +122,23 @@ L("agua_fonte", ["Rede pública", "Poço", "Nascente", "Cisterna", "Outra", "Nã
 L("infra_hidrica", ["Reservatório / caixa d'água", "Filtro / purificador", "Bebedouros", "Rede encanada interna",
                     "Outro", "Não sabe"])
 L("esgoto", ["Rede coletora", "Fossa séptica", "Fossa rudimentar", "Céu aberto", "Outro", "Não sabe"])
-L("impacto_alag", ["Interrupção de aulas", "Danos à estrutura", "Contaminação", "Acesso interrompido",
+L("impacto_alag", ["Interrupção de aulas", "Danos à estrutura", ("acesso_interrompido", "Dificuldade ou interrupção do acesso à escola"),
                    ("baixa_adesao", "Baixa adesão dos estudantes (aulas mantidas, mas poucos conseguem frequentar)"),
                    "Outro"])
 L("destino_res", ["Coleta pública", "Coleta seletiva", "Cooperativa", "Compostagem", "Reutilização", "Queima",
                   "Enterramento", "Outro", "Não sabe"])
 L("prob_res", ["Aterro sanitário", "Lixão", "Queima de resíduos", "Acúmulo de resíduos no entorno", "Outro",
                "Nenhum", "Não sabe"])
-ELEM = ["Rios/córregos", "Lagoas/lagos/reservatórios", "Vegetação", "Parques", "Encostas", "Agricultura", "Indústria",
-        "Mineração", "Aterro/lixão", "Áreas queimadas", "Áreas inundáveis", "Áreas degradadas", "Outros"]
+ELEM = ["Rios/córregos", "Lagoas/lagos/reservatórios", "Áreas de vegetação nativa (matas, florestas, campos)",
+        "Parques", "Encostas", "Agricultura", "Indústria", "Mineração", "Aterro/lixão", "Áreas queimadas",
+        "Áreas inundáveis", "Comércios", "Outras áreas degradadas", "Equipamentos Urbanos", "Outros"]
 L("elementos", ELEM)
 L("relacao_elem", ["Ambiente", "Cultura", "Uso comunitário", "Renda", "Risco", "Degradação", "Conflito", "Outra",
                    "Não sabe"])
 L("ativ_econ", ["Agricultura", "Pecuária", "Comércio", "Indústria", "Turismo", "Pesca", "Extrativismo", "Outro"])
 L("meses", [(m.lower(), m) for m in "Jan Fev Mar Abr Mai Jun Jul Ago Set Out Nov Dez".split()])
-L("impacto_clima", ["Interrupção de aulas", "Danos materiais", "Deslocamento de pessoas", "Perdas",
+L("impacto_clima", ["Interrupção de aulas", "Danos materiais",
+                    ("deslocamento_de_pessoas", "Deslocamento de pessoas (necessidade de migração)"), ("perdas", "Óbitos"),
                     "Impacto emocional", "Outro"])
 L("tipo_evid", ["Observação direta", "Documento", "Foto", "Depoimento", "Registro histórico", "Outra"])
 
@@ -318,12 +321,13 @@ note("e0_intro", "Estas informações identificam quem está respondendo, o loca
                  "gestor(a), com apoio da equipe e da comunidade sempre que possível. | Instrumento de Diagnóstico "
                  "Socioambiental, Climático e de Educação Ambiental — Gestores — versão 1.0.0.")
 q("0.1", "text", "Seu nome", req=True)
-q("0.2", "select_one funcao", "Sua função de gestão", req=True)
+q("0.2", "select_one funcao", "Sua função ou cargo", req=True)
 q("0.3", "text", "Disciplina/área em que atuou como docente (se aplicável)")
 q("0.4", "select_one formacao", "Nível de formação")
 q("0.5", "text", "Área de formação")
-q("0.6", "text", "Tempo de atuação neste local")
-q("0.7", "text", "Tempo na função de gestão (neste ou em outro local)")
+q("0.6", "integer", "Tempo de atuação (anos)", cons=". >= 0", cmsg="Informe um número positivo.")
+q("0.7", "integer", "Tempo na função de gestão (anos, neste ou em outro local)", cons=". >= 0",
+  cmsg="Informe um número positivo.")
 q("0.8", "text", "Nome do local de atuação", "Escola, secretaria de educação, diretoria regional ou outro órgão.",
   req=True)
 q("0.9", "select_one tipo_local", "Tipo de local", req=True)
@@ -333,22 +337,16 @@ q("0.10", "text", "Código INEP", "Preencha apenas se o local for uma escola. C�
   cmsg="O código INEP deve ter exatamente 8 dígitos.")
 q("0.11", "text", "Município", req=True)
 q("0.12", "select_one uf", "UF", req=True)
-q("0.13", "select_one rede", "Rede", req=True)
+q("0.13", "select_one rede", "Âmbito do local em que atua", req=True)
 q("0.14", "select_one localizacao", "Localização", req=True)
 q("0.15", "select_multiple contextos", "Contextos territoriais",
   'Se o local está em contexto urbano comum, sem nenhuma dessas identidades territoriais específicas, marque "Nenhum".',
   cons="not(selected(., 'nenhum') and count-selected(.) > 1)",
   cmsg='"Nenhum" não pode ser combinado com outras opções.')
-q("0.16", "select_multiple participantes_diag", "Quem participou da construção deste diagnóstico até agora", req=True)
-q("0.17", "select_multiple fontes", "Quais fontes de informação foram utilizadas", req=True)
-txt("0.18", "Descreva brevemente como o processo de diagnóstico foi conduzido",
-    "Procure trazer: quem participou de cada momento; como as informações foram levantadas (observação, conversas, "
-    "reunião, documentos); em quantos encontros/etapas isso ocorreu e em que período; se houve alguma dificuldade "
-    "para envolver a comunidade escolar; e o que motivou a escolha dessa forma de condução.")
 eg()
 
 # ======================= ETAPA 1
-bg("etapa1", "Etapa 1 — Escola e Território")
+bg("etapa1", "Etapa 1 — Território")
 INFRA = ["Biblioteca / espaço de leitura", "Laboratório de Ciências", "Laboratório de informática", "Internet", "Pátio",
          "Espaços esportivos", "Áreas verdes", "Horta", "Pomar", "Sombreamento", "Espaços externos para atividades"]
 tabela("1.1", "Infraestrutura da escola — estado de cada espaço, quando pertinente", "", INFRA, "estado_infra",
@@ -362,7 +360,7 @@ q("1.3", "select_multiple termica", "Condição térmica das salas de aula",
 q("1.4", "select_multiple prob_estrut", "Problemas relacionados às condições térmicas/estruturais",
   rel=eq("q0_9", "escola"))
 bg("e1_escola", "Água, esgoto e resíduos — escola", rel=eq("q0_9", "escola"))
-q("1.5", "select_one agua_fonte", "Fonte de abastecimento de água", req=True)
+q("1.5", "select_multiple agua_fonte", "Fonte de abastecimento de água")
 q("1.6", "select_one sim_nao_ns", "Há interrupções no abastecimento de água?")
 txt("1.7", "Em que período(s) isso costuma ocorrer?", rel=eq("q1_6", "sim"))
 q("1.8", "select_one sim_nao_ns", "Existe monitoramento da qualidade da água?")
@@ -372,7 +370,8 @@ q("1.11", "select_multiple infra_hidrica", "Infraestrutura hídrica disponível"
 q("1.12", "select_multiple esgoto", "Destinação do esgoto")
 q("1.13", "select_one sim_nao_ns", "Há esgoto a céu aberto no entorno da escola?")
 q("1.14", "select_one sim_nao_ns", "Ocorrem alagamentos na escola ou no entorno?", req=True)
-txt("1.15", "Onde costumam ocorrer?", rel=eq("q1_14", "sim"))
+txt("1.15", "Em que espaços da escola esses alagamentos costumam ocorrer (Ex: apenas na área externa, invadem as "
+    "salas, etc)?", rel=eq("q1_14", "sim"))
 q("1.16", "select_multiple impacto_alag", "Impactos observados nesses episódios", rel=eq("q1_14", "sim"))
 q("1.17", "select_one sim_nao_ns", "Há separação de resíduos na escola?")
 q("1.18", "select_multiple destino_res", "Destinação dos resíduos")
@@ -380,7 +379,7 @@ q("1.19", "select_multiple prob_res", "Existem problemas relacionados a resíduo
   "Considere a área imediatamente ao redor da escola, não o município inteiro.",
   cons="not((selected(., 'nenhum') or selected(., 'nao_sabe')) and count-selected(.) > 1)",
   cmsg='"Nenhum" e "Não sabe" não podem ser combinados com outras opções.')
-txt("1.20", "Descreva esses problemas",
+txt("1.20", "Descreva os problemas causados pela disposição incorreta dos resíduos, caso ocorra.",
     rel="${q1_19} != '' and not(selected(${q1_19}, 'nenhum')) and not(selected(${q1_19}, 'nao_sabe'))")
 eg()
 
@@ -414,14 +413,14 @@ q("1.19r", "select_multiple prob_res", "Problemas relacionados a resíduos no en
   "Considere a área imediatamente ao redor das escolas, não o município inteiro.",
   cons="not((selected(., 'nenhum') or selected(., 'nao_sabe')) and count-selected(.) > 1)",
   cmsg='"Nenhum" e "Não sabe" não podem ser combinados com outras opções.')
-txt("1.20r", "Descreva esses problemas",
+txt("1.20r", "Descreva os problemas causados pela disposição incorreta dos resíduos, caso ocorra.",
     rel="${q1_19r} != '' and not(selected(${q1_19r}, 'nenhum')) and not(selected(${q1_19r}, 'nao_sabe'))")
 eg()
 
 q("1.21", "select_multiple elementos", "Elementos presentes no território de atuação", "Considere o território mais "
   "imediato — para uma escola, o bairro ou a região do entorno em que a comunidade escolar circula; para uma "
   "secretaria ou regional, a área de abrangência da rede (não o município inteiro, se a atuação for menor). A "
-  "existência de um elemento não significa, por si só, risco ou impacto — isso será explorado a seguir.", req=True)
+  "existência de um elemento não significa, por si só, risco ou impacto, isso será explorado a seguir.", req=True)
 bg("t1_22", "Q1.22. Para cada elemento selecionado, qual sua relação com a escola/comunidade?", app="table-list",
    rel="${q1_21} != ''")
 for i, el in enumerate(ELEM):
@@ -433,24 +432,19 @@ note("q1_22_nota", "Nota para tutoria: um mesmo elemento pode ter mais de uma re
                    "ser, simultaneamente, ambiente e cultura, ou risco e uso comunitário) — marque quantas se "
                    "aplicarem.", rel="${q1_21} != ''")
 q("1.23", "select_multiple ativ_econ", "Principais atividades econômicas do território")
-q("1.24", "select_one sim_nao_ns", "Essas atividades têm impacto percebido no ambiente ou na comunidade?")
+q("1.24", "select_one sim_nao_ns", "Essas atividades têm impacto percebido no ambiente ou na comunidade (Ex: odor desagradável, excesso de "
+  "veículos pesados, etc)?")
 txt("1.25", "Descreva os impactos percebidos por atividade", rel=eq("q1_24", "sim"))
 q("1.26", "select_one sim_nao_ns", "Há eventos sazonais que afetam a escola/comunidade (safras, secas, chuvas, "
   "festas, etc.)?")
-txt("1.27", "Qual é esse evento? Descreva-o.", rel=eq("q1_26", "sim"))
-q("1.28", "select_multiple meses", "Em quais meses ele costuma ocorrer?", rel=eq("q1_26", "sim"))
+txt("1.27", "Qual é esse evento? Descreva-o, incluindo o período do ano que costuma ocorrer.", rel=eq("q1_26", "sim"))
 txt("1.29", "Qual o impacto desse evento na escola?", rel=eq("q1_26", "sim"))
-q("1.30", "select_one sim_nao_ns", "Há histórico de eventos climáticos extremos que afetaram a escola/comunidade?",
+q("1.30", "select_one sim_nao_ns", "Há histórico recente de eventos climáticos extremos que afetaram a escola/comunidade?",
   req=True)
-txt("1.31", "Descreva o(s) evento(s)", rel=eq("q1_30", "sim"))
+txt("1.31", "Descreva o(s) evento(s) e a intensidade.", rel=eq("q1_30", "sim"))
 txt("1.32", "Quando ocorreu(ram)?", rel=eq("q1_30", "sim"), multiline=False)
 q("1.33", "select_multiple impacto_clima", "Impactos observados", rel=eq("q1_30", "sim"))
 txt("1.34", "O que a escola/comunidade aprendeu com esse evento?", rel=eq("q1_30", "sim"))
-txt("1.35", "Quais são as características-chave deste território, na sua leitura?",
-    "Pense, por exemplo, em: relação com a água (rios, córregos, abastecimento), vegetação e áreas verdes, uso do "
-    "solo predominante, memória e cultura local, riscos já percebidos e atividades econômicas mais presentes.")
-txt("1.36", "Há algum aspecto do território que vocês reconhecem não saber ainda?",
-    "'Não sabemos' é uma resposta válida — isso vira uma lacuna de conhecimento registrada.")
 evidencias("e1", "Evidências sobre a escola e o território")
 eg()
 
@@ -834,7 +828,7 @@ def salvar(path, rows, titulo, form_id, versao="1.0.0"):
                 wc.append([ln, n, lab if ln in ("tipo_local", "cat_ator") else _loc(lab)])
     wsett = wb.create_sheet("settings")
     wsett.append(["form_title", "form_id", "version", "default_language", "style"])
-    wsett.append([titulo, form_id, versao, LANG, "pages"])
+    wsett.append([titulo, form_id, versao, LANG, "theme-grid no-text-transform"])
     fill = PatternFill("solid", fgColor="DDEBF7")
     for sh in (ws, wc, wsett):
         for c in sh[1]:
@@ -845,6 +839,36 @@ def salvar(path, rows, titulo, form_id, versao="1.0.0"):
         ws.column_dimensions[col].width = w
     wb.save(path)
     print(f"{path}: {len(rows)} linhas")
+
+
+TCLE_TEXTO = (
+    "TERMO DE CONSENTIMENTO LIVRE E ESCLARECIDO. Você está sendo convidado(a) a responder este Diagnóstico "
+    "Socioambiental, Climático e de Educação Ambiental. A participação é voluntária: você pode recusar ou "
+    "interromper a qualquer momento, sem qualquer prejuízo. As informações fornecidas, inclusive seus dados "
+    "pessoais e de identificação (nome, função, local de atuação), serão tratadas com sigilo, NÃO serão "
+    "compartilhadas com terceiros de forma que identifique você ou o seu local de atuação e serão utilizadas "
+    "apenas para compor um banco de dados do projeto. Eventuais resultados e relatórios serão apresentados "
+    "somente de forma agregada, sem identificar pessoas. O tratamento dos dados segue a Lei Geral de Proteção de "
+    "Dados (Lei nº 13.709/2018). Em caso de dúvidas, procure a equipe responsável pelo projeto.")
+
+
+def tcle():
+    return [
+        dict(type="begin_group", name="tcle", label="Termo de Consentimento"),
+        dict(type="note", name="tcle_texto", label=TCLE_TEXTO),
+        dict(type="select_one concordo", name="tcle_consentimento", required="true",
+             label="Li o termo acima e concordo em participar e em ter minhas respostas e meus dados utilizados "
+                   "no banco de dados do projeto, nos termos descritos."),
+        dict(type="note", name="tcle_recusa", relevant="${tcle_consentimento} = 'nao_concordo'",
+             label="Sem o seu consentimento não é possível continuar. Obrigado(a) pelo seu tempo! Você pode "
+                   "encerrar o formulário."),
+        dict(type="end_group"),
+    ]
+
+
+def com_tcle(meta, corpo):
+    return list(meta) + tcle() + [dict(type="begin_group", name="conteudo", label="Diagnóstico",
+                                       relevant="${tcle_consentimento} = 'concordo'")] + corpo + [dict(type="end_group")]
 
 
 def blocos():
@@ -864,11 +888,11 @@ def blocos():
     return meta, out
 
 
-salvar("gestores_diagnostico_completo.xlsx", survey,
+salvar("gestores_diagnostico_completo.xlsx", com_tcle(survey[:4], survey[4:]),
        "Diagnóstico Socioambiental, Climático e de Educação Ambiental da Escola — Gestores Escolares", "diagnostico_gestores_escola")
 
 SEMANAS = [
-    (1, "Identificação, Escola e Território", ["etapa0", "etapa1"]),
+    (1, "Identificação e Território", ["etapa0", "etapa1"]),
     (2, "Educação Ambiental, Participação e Redes", ["etapa2", "etapa3"]),
     (3, "Riscos Climáticos e Leitura Integrada (FOFA)", ["etapa4", "etapa5"]),
     (4, "Problemas, Prioridades e Plano de Ação", ["etapa6", "etapa7"]),
@@ -876,7 +900,7 @@ SEMANAS = [
 ]
 meta, bl = blocos()
 for n, nome, etapas in SEMANAS:
-    rows = list(meta)
+    rows = []
     if n > 1:  # identifica a escola/cursista para cruzar as semanas
         rows += [
             dict(type="begin_group", name="identificacao", label="Identificação (igual à Semana 1)"),
@@ -888,5 +912,6 @@ for n, nome, etapas in SEMANAS:
         ]
     for e in etapas:
         rows += bl[e]
+    rows = com_tcle(meta, rows)
     salvar(f"gestores_semana{n}_diagnostico.xlsx", rows,
            f"Diagnóstico Socioambiental (Gestores) — Semana {n}/5: {nome}", f"diagnostico_gestores_semana{n}")
