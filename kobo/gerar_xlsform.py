@@ -349,7 +349,8 @@ eg()
 # ======================= ETAPA 1
 bg("etapa1", "Etapa 1 — Território")
 INFRA = ["Biblioteca / espaço de leitura", "Laboratório de Ciências", "Laboratório de informática", "Internet", "Pátio",
-         "Espaços esportivos", "Áreas verdes", "Horta", "Pomar", "Sombreamento", "Espaços externos para atividades"]
+         "Espaços esportivos", "Áreas verdes", "Horta", "Pomar", "Sombreamento", "Espaços externos para atividades", "Ar-condicionado nas salas de aula",
+         "Ventiladores/estufas nas salas de aula"]
 tabela("1.1", "Infraestrutura da escola — estado de cada espaço, quando pertinente", "", INFRA, "estado_infra",
        req=True, prefix="q1_1", rel=eq("q0_9", "escola"))
 tabela("1.1r", "Infraestrutura da rede — em quantas escolas da rede existe cada espaço?", "", INFRA, "qtd_rede_tab",
@@ -437,11 +438,16 @@ q("1.24", "select_one sim_nao_ns", "Essas atividades têm impacto percebido no a
   "veículos pesados, etc)?")
 txt("1.25", "Descreva os impactos percebidos por atividade", rel=eq("q1_24", "sim"))
 q("1.26", "select_one sim_nao_ns", "Há eventos sazonais que afetam a escola/comunidade (safras, secas, chuvas, "
-  "festas, etc.)?")
+  "festas, etc.)?",
+  "Os eventos sazonais podem ter efeitos negativos e/ou positivos.")
 txt("1.27", "Qual é esse evento? Descreva-o, incluindo o período do ano que costuma ocorrer.", rel=eq("q1_26", "sim"))
-txt("1.29", "Qual o impacto desse evento na escola?", rel=eq("q1_26", "sim"))
+txt("1.29", "Qual o impacto desse evento na escola?",
+    "Os impactos podem ser negativos e/ou positivos (ex.: negativo — falta de água, aulas suspensas; positivo — "
+    "chuvas que renovam as nascentes, safra que gera renda para as famílias). Descreva ambos, se houver.",
+    rel=eq("q1_26", "sim"))
 q("1.30", "select_one sim_nao_ns", "Há histórico recente de eventos climáticos extremos que afetaram a escola/comunidade?",
-  req=True)
+  "Eventos climáticos extremos são fenômenos fora do padrão habitual, como ciclones, queimadas, ondas de calor, "
+  "períodos de seca extrema, enchentes, vendavais, granizo, entre outros.", req=True)
 txt("1.31", "Descreva o(s) evento(s) e a intensidade.", rel=eq("q1_30", "sim"))
 txt("1.32", "Quando ocorreu(ram)?", rel=eq("q1_30", "sim"), multiline=False)
 q("1.33", "select_multiple impacto_clima", "Impactos observados", rel=eq("q1_30", "sim"))
