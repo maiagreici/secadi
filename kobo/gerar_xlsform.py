@@ -113,8 +113,9 @@ L("participantes_diag", ["Estudantes", "Professores(as)", "Gestão", "Coordenaç
 L("fontes", ["Observação direta", "Conversa com estudantes", "Conversa com professores(as)", "Famílias/comunidade",
              "Reunião coletiva", "PPP", "Documentos escolares", "Dados públicos", "Cartografia participativa",
              "Registros históricos", "Outras"])
-L("estado_infra", ["Inexistente", "Inadequado", "Regular", "Bom", "Não sabe"])
+L("estado_infra", ["Inexistente", "Inadequado", "Regular", "Bom", "Não se aplica", "Não sabe"])
 L("qtd_rede", ["Em nenhuma", "Em poucas", "Em cerca de metade", "Na maioria", "Em todas", "Não sabe"])
+L("qtd_rede_tab", ["Em nenhuma", "Em poucas", "Em cerca de metade", "Na maioria", "Em todas", "Não se aplica", "Não sabe"])
 L("termica", ["Muito quente no verão", "Muito fria no inverno", "Adequada na maior parte do ano",
               "Muito variável, sem padrão sazonal claro", "Não sabe"])
 L("prob_estrut", ["Mofo", "Infiltração", "Calor excessivo", "Frio excessivo", "Falta de ventilação", "Outro"])
@@ -351,7 +352,7 @@ INFRA = ["Biblioteca / espaço de leitura", "Laboratório de Ciências", "Labora
          "Espaços esportivos", "Áreas verdes", "Horta", "Pomar", "Sombreamento", "Espaços externos para atividades"]
 tabela("1.1", "Infraestrutura da escola — estado de cada espaço, quando pertinente", "", INFRA, "estado_infra",
        req=True, prefix="q1_1", rel=eq("q0_9", "escola"))
-tabela("1.1r", "Infraestrutura da rede — em quantas escolas da rede existe cada espaço?", "", INFRA, "qtd_rede",
+tabela("1.1r", "Infraestrutura da rede — em quantas escolas da rede existe cada espaço?", "", INFRA, "qtd_rede_tab",
        req=True, prefix="q1_1r", rel="${q0_9} != 'escola'")
 txt("1.2", "Outra estrutura relevante não listada (se houver)")
 q("1.3", "select_multiple termica", "Condição térmica das salas de aula",
