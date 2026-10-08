@@ -90,6 +90,7 @@ def eq(n, v):
 
 
 # ---------------------------------------------------------------- LISTAS
+L("confirmo", [("confirmo", "Sim, confirmo o envio")])
 L("concordo", [("concordo", "Sim, concordo em participar"), ("nao_concordo", "Não concordo")])
 L("sim_nao_ns", ["Sim", "Não", "Não sabemos"])
 L("sim_nao_nsabe", ["Sim", "Não", "Não sabe"])
@@ -873,9 +874,20 @@ def tcle():
     ]
 
 
-def com_tcle(meta, corpo):
+def confirmacao(semana=None):
+    msg = ("Semana %d/5 concluída. " % semana if semana else "") + (
+        "Obrigado(a) pela sua participação! Suas respostas ajudam a construir um diagnóstico mais completo. "
+        "Revise o que respondeu, confirme abaixo e clique em Enviar para concluir.")
+    return [dict(type="begin_group", name="confirmacao", label="Confirmação final"),
+            dict(type="note", name="confirmacao_msg", label=msg),
+            dict(type="select_one confirmo", name="confirmacao_envio", required="true",
+                 label="Revisei minhas respostas e confirmo o envio."),
+            dict(type="end_group")]
+
+
+def com_tcle(meta, corpo, semana=None):
     return list(meta) + tcle() + [dict(type="begin_group", name="conteudo", label="Diagnóstico",
-                                       relevant="${tcle_consentimento} = 'concordo'")] + corpo + [dict(type="end_group")]
+                                       relevant="${tcle_consentimento} = 'concordo'")] + corpo + confirmacao(semana) + [dict(type="end_group")]
 
 
 def blocos():
@@ -919,6 +931,6 @@ for n, nome, etapas in SEMANAS:
         ]
     for e in etapas:
         rows += bl[e]
-    rows = com_tcle(meta, rows)
+    rows = com_tcle(meta, rows, n)
     salvar(f"gestores_semana{n}_diagnostico.xlsx", rows,
            f"Diagnóstico Socioambiental (Gestores) — Semana {n}/5: {nome}", f"diagnostico_gestores_semana{n}")
