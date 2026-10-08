@@ -877,7 +877,9 @@ def tcle():
 def confirmacao(semana=None):
     msg = ("Semana %d/5 concluída. " % semana if semana else "") + (
         "Obrigado(a) pela sua participação! Suas respostas ajudam a construir um diagnóstico mais completo. "
-        "Revise o que respondeu, confirme abaixo e clique em Enviar para concluir.")
+        "Revise o que respondeu, confirme abaixo e clique em Enviar para concluir. ATENÇÃO: depois de clicar em "
+        "Enviar, aparecerá a mensagem \"Submission successful\" e o formulário voltará em branco. Isso significa que "
+        "suas respostas FORAM ENVIADAS. Não preencha nem envie novamente.")
     return [dict(type="begin_group", name="confirmacao", label="Confirmação final"),
             dict(type="note", name="confirmacao_msg", label=msg),
             dict(type="select_one confirmo", name="confirmacao_envio", required="true",
