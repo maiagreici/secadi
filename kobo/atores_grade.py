@@ -45,19 +45,6 @@ def atores_rows():
     for i, (_, lab) in enumerate(CATS, 1):
         add(dict(type="select_one nivel_rel_grade", name="net_rel_%02d" % i, label=lab, required="true"))
     add(dict(type="end_group"))
-    for key, titulo, cond in (
-            ("atual", "Q3.0. Contribuições atuais — o que cada ator parceiro(a) já oferece à escola?",
-             lambda i: "%s = 'parceria' or %s = 'articulacao'" % (ref(i), ref(i))),
-            ("pot", "Q3.0. Contribuições potenciais — o que cada ator que existe no território poderia oferecer?",
-             lambda i: "%s != '' and %s != 'nao_existe' and %s != 'nao_sei'" % (ref(i), ref(i), ref(i)))):
-        add(dict(type="begin_group", name="net_" + key, appearance="table-list", label=titulo,
-                 relevant=_or("(%s)" % cond(i) for i in range(1, n + 1))))
-        for i, (_, lab) in enumerate(CATS, 1):
-            add(dict(type="select_multiple contrib", name="net_%s_%02d" % (key, i), label=lab, relevant=cond(i)))
-        add(dict(type="end_group"))
-        add(dict(type="text", name="net_%s_outro" % key, label="Especifique (Outro) — contribuições %s" % (
-            "atuais" if key == "atual" else "potenciais"), appearance="multiline",
-                 relevant=_or("selected(${net_%s_%02d}, 'outro')" % (key, i) for i in range(1, n + 1))))
     add(dict(type="select_multiple cat_ator", name="net_prioridade",
              label="Q3.0. Quais atores são prioritários para fortalecer a relação? (NET_PRIORITY_ACTORS)"))
     add(dict(type="text", name="net_ator_relevante", appearance="multiline",
