@@ -205,27 +205,9 @@ L("esp_estud", ["Grêmio estudantil", "Assembleias", "Projetos protagonizados po
                 "Outro"])
 L("env_fam", ["Ausente", "Esporádico", "Regular", "Ativo/protagonista", "Não sabe"])
 L("barr_fam", ["Horário de trabalho", "Distância", "Comunicação inadequada", "Falta de convite/convocação", "Outra"])
-L("cat_ator", [
-    ("sec_educacao", "Secretaria de Educação"), ("sec_meio_amb", "Secretaria de Meio Ambiente"),
-    ("defesa_civil", "Defesa Civil"), ("sec_saude", "Secretaria de Saúde"), ("assist_social", "Assistência Social"),
-    ("obras", "Obras"), ("bombeiros", "Bombeiros"), ("ubs", "UBS"), ("vigilancia", "Vigilância"),
-    ("outro_publico", "Outro (poder público)"), ("universidade", "Universidade"),
-    ("inst_federal", "Instituto Federal"), ("escola_tecnica", "Escola técnica"),
-    ("centro_pesquisa", "Centro de pesquisa"), ("museu", "Museu"), ("jardim_botanico", "Jardim botânico"),
-    ("outro_educ_ciencia", "Outro (educação/ciência)"), ("assoc_moradores", "Associação de moradores"),
-    ("ong", "ONG"), ("cooperativa", "Cooperativa"), ("catadores", "Catadores"),
-    ("mov_sociais", "Movimentos sociais"), ("coletivos", "Coletivos"), ("grupos_culturais", "Grupos culturais"),
-    ("org_comunit_relig", "Organizações comunitárias/religiosas"),
-    ("outro_soc_civil", "Outro (sociedade civil)"), ("povos_indigenas", "Povos indígenas"),
-    ("quilombolas", "Quilombolas"), ("agric_familiares", "Agricultores familiares"), ("pescadores", "Pescadores"),
-    ("com_tradicionais", "Comunidades tradicionais"), ("liderancas", "Lideranças"),
-    ("detentores_saberes", "Detentores de conhecimentos locais"),
-    ("outro_comunidades", "Outro (comunidades e conhecimentos)")])
-L("nivel_rel", [("nao_existe", "Não existe relação — não é parceiro(a)"),
-                ("sabe_existe", "Sabe que existe, mas nunca houve contato — não é parceiro(a)"),
-                ("contato_pontual", "Já houve contato pontual, sem combinação formal — ainda não é parceiro(a)"),
-                ("parceria", "Parceria — já colaboram em ações combinadas"),
-                ("articulacao", "Articulação permanente — parceria contínua e estruturada")])
+from atores_grade import CATS, LEVELS, atores_rows, renumber
+L("cat_ator", CATS)
+L("nivel_rel_grade", LEVELS)
 L("contrib", ["Recursos", "Formação", "Articulação institucional", "Apoio técnico", "Mobilização comunitária",
               "Conhecimentos tradicionais/locais", "Outro"])
 L("canais", ["WhatsApp", "Comunicados impressos", "Reuniões", "Redes sociais", "Alto-falante/rádio local", "Outro"])
@@ -541,20 +523,9 @@ q("3.10a", "select_multiple instancias", "Quais instâncias de decisão colegiad
   cons="not(selected(., 'nenhuma') and count-selected(.) > 1)", cmsg='"Nenhuma" não pode ser combinada com outras opções.')
 q("3.10b", "select_one sim_nao_ns", "A gestão tem autonomia para decidir e destinar recursos a ações de Educação "
   "Ambiental?")
-br("net_actors", "Atores do território (NET_ACTORS)")
-note("net_nota", "Existência, contato, parceria e articulação permanente são níveis diferentes — não confunda um com o "
-                 "outro. Só marque \"Parceria\" ou \"Articulação permanente\" se a escola já colabora de fato com esse "
-                 "ator; se ele apenas existe no território ou já houve um contato pontual, isso ainda NÃO é parceria. "
-                 "Use \"Adicionar\" para registrar um ator por vez.")
-q("", "select_one cat_ator", "Categoria do ator", name="net_cat")
-q("", "text", "Nome do ator (ex.: UBS Vila Nova)", name="net_nome")
-q("", "select_one sim_nao_nsabe", "Existe no território?", name="net_existe")
-q("", "select_one nivel_rel", "Nível de relação", name="net_nivel")
-q("", "select_multiple contrib", "Contribuições atuais", name="net_contrib_atual")
-q("", "select_multiple contrib", "Contribuições potenciais", name="net_contrib_pot")
-q("", "select_one sim_nao", "Prioridade para fortalecimento (NET_PRIORITY_ACTORS) — é um ator prioritário a "
-  "fortalecer?", name="net_prioridade")
-er()
+for _r in atores_rows():
+    row(**_r)
+
 
 q("3.11", "select_one sim_nao_ns", "A escola sabe a quem contatar em uma emergência climática?", req=True)
 txt("3.12", "Quais são esses contatos?", rel=eq("q3_11", "sim"))
@@ -796,6 +767,8 @@ txt("10.6", "Que transformação a escola espera alcançar com os planos constru
 txt("10.7", "Nossa escola será mais resiliente quando...", "Complete a frase com suas próprias palavras — ela encerra "
     "este diagnóstico.", req=True)
 eg()
+
+renumber(survey, 3)
 
 # ---------------------------------------------------------------- ESCRITA
 def _loc(t):
