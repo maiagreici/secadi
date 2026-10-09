@@ -787,9 +787,10 @@ def _loc(t):
     return t
 
 
-def salvar(path, rows, titulo, form_id, versao="1.0.0"):
-    titulo = _loc(titulo)
-    rows = [{k: (_loc(v) if k in ("label", "hint", "constraint_message") and not (r.get("name") in ("q0_8", "q0_10", "t1_1r", "e1_rede", "e1_rede_nota", "e1_escola", "q1_15") or re.fullmatch(r"q1_\d+r(_outro)?", r.get("name", ""))) else v)
+def salvar(path, rows, titulo, form_id, versao="1.0.0", loc=None):
+    loc = loc or _loc
+    titulo = loc(titulo)
+    rows = [{k: (loc(v) if k in ("label", "hint", "constraint_message") and not (r.get("name") in ("q0_8", "q0_10", "t1_1r", "e1_rede", "e1_rede_nota", "e1_escola", "q1_15") or re.fullmatch(r"q1_\d+r(_outro)?", r.get("name", ""))) else v)
              for k, v in r.items()} for r in rows]
     usadas = {m.group(1) for r in rows for m in [re.match(r"select_\w+ (\w+)", r.get("type", ""))] if m}
     wb = Workbook()
@@ -806,7 +807,7 @@ def salvar(path, rows, titulo, form_id, versao="1.0.0"):
     for ln, items in choices.items():
         if ln in usadas:
             for n, lab in items:
-                wc.append([ln, n, lab if ln in ("tipo_local", "cat_ator") else _loc(lab)])
+                wc.append([ln, n, lab if ln in ("tipo_local", "cat_ator") else loc(lab)])
     wsett = wb.create_sheet("settings")
     wsett.append(["form_title", "form_id", "version", "default_language", "style"])
     wsett.append([titulo, form_id, versao, LANG, "theme-grid no-text-transform"])

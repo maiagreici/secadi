@@ -57,7 +57,7 @@ def renumber(rows, stage, lab="label"):
     referências em relevant/constraint de todas as linhas."""
     start = None
     depth = 0
-    mp, last, cnt = {}, None, 0
+    mp, last, last_old, cnt = {}, None, None, 0
     for r in rows:
         t = r["type"]
         if start is None:
@@ -78,9 +78,8 @@ def renumber(rows, stage, lab="label"):
             if t not in ("begin_group", "begin_repeat") and r.get("name"):
                 new = "q%d_%d" % (stage, cnt)
                 mp[r["name"]] = new
-                last = new
-        elif r.get("name", "") and r["name"].endswith("_outro") and last and not r["name"].startswith(
-                ("evid", "net_")):
+                last, last_old = new, r["name"]
+        elif last_old and r.get("name") == last_old + "_outro":
             mp[r["name"]] = last + "_outro"
     for r in rows:
         if r.get("name") in mp:
