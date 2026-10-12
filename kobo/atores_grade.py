@@ -52,7 +52,7 @@ def atores_rows():
     return rows
 
 
-def renumber(rows, stage, lab="label"):
+def renumber(rows, stage, lab="label", keep_letters=False):
     """Renumera sequencialmente os rótulos 'Q<stage>.n' da etapa (e os nomes q<stage>_n), atualizando as
     referências em relevant/constraint de todas as linhas."""
     start = None
@@ -71,12 +71,14 @@ def renumber(rows, stage, lab="label"):
             if depth == 0:
                 break
         l = r.get(lab)
-        m = re.match(r"^Q%d\.\d+[a-z]*\.\s*" % stage, l) if isinstance(l, str) else None
+        m = re.match(r"^Q%d\.\d+([a-z]*)\.\s*" % stage, l) if isinstance(l, str) else None
         if m:
-            cnt += 1
-            r[lab] = "Q%d.%d. " % (stage, cnt) + l[m.end():]
+            letra = m.group(1) if keep_letters else ""
+            if not letra:
+                cnt += 1
+            r[lab] = "Q%d.%d%s. " % (stage, cnt, letra) + l[m.end():]
             if t not in ("begin_group", "begin_repeat") and r.get("name"):
-                new = "q%d_%d" % (stage, cnt)
+                new = "q%d_%d%s" % (stage, cnt, letra)
                 mp[r["name"]] = new
                 last, last_old = new, r["name"]
         elif last_old and r.get("name") == last_old + "_outro":

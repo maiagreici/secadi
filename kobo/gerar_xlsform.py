@@ -770,6 +770,20 @@ eg()
 
 renumber(survey, 3)
 
+
+def _add_choice(lst, nome, label, antes):
+    itens = choices[lst]
+    pos = next((k for k, (n, _) in enumerate(itens) if n == antes), len(itens))
+    itens.insert(pos, (nome, label))
+
+
+import copy
+import revisao_s2
+survey_pre_rev = copy.deepcopy(survey)
+revisao_s2.apply(survey, "label", "hint", _add_choice, keep=True)
+renumber(survey, 2, keep_letters=True)
+renumber(survey, 3)
+
 # ---------------------------------------------------------------- ESCRITA
 def _loc(t):
     if not isinstance(t, str):
@@ -790,7 +804,7 @@ def _loc(t):
 def salvar(path, rows, titulo, form_id, versao="1.0.0", loc=None):
     loc = loc or _loc
     titulo = loc(titulo)
-    rows = [{k: (loc(v) if k in ("label", "hint", "constraint_message") and not (r.get("name") in ("q0_8", "q0_10", "t1_1r", "e1_rede", "e1_rede_nota", "e1_escola", "q1_15") or re.fullmatch(r"q1_\d+r(_outro)?", r.get("name", ""))) else v)
+    rows = [{k: (loc(v) if k in ("label", "hint", "constraint_message") and not (r.get("keep") or r.get("name") in ("q0_8", "q0_10", "t1_1r", "e1_rede", "e1_rede_nota", "e1_escola", "q1_15") or re.fullmatch(r"q1_\d+r(_outro)?", r.get("name", ""))) else v)
              for k, v in r.items()} for r in rows]
     usadas = {m.group(1) for r in rows for m in [re.match(r"select_\w+ (\w+)", r.get("type", ""))] if m}
     wb = Workbook()

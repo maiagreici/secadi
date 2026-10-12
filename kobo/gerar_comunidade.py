@@ -110,7 +110,7 @@ def build(fn):
 
 
 # ---------------------------------------------------------------- conteúdo-base e listas
-rows = copy.deepcopy(g.survey)
+rows = copy.deepcopy(g.survey_pre_rev)
 PROTEGER = {"cat_ator", "tipo_local"}
 for ln, items in list(g.choices.items()):
     if ln not in PROTEGER:
