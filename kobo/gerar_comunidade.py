@@ -111,6 +111,8 @@ def build(fn):
 
 # ---------------------------------------------------------------- conteúdo-base e listas
 rows = copy.deepcopy(g.survey_pre_rev)
+import revisao_s2
+revisao_s2.nao_sabe(rows, None, listas=False)  # listas já receberam "Não sabe" em gerar_xlsform
 PROTEGER = {"cat_ator", "tipo_local"}
 for ln, items in list(g.choices.items()):
     if ln not in PROTEGER:

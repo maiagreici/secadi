@@ -61,3 +61,20 @@ def apply(rows, lab, hint, add_choice, keep=False):
     setlabel(idx(label_re=r"Quais atores são prioritários"),
              "Quais atores são prioritários para fortalecer a relação da escola com o território? (NET_PRIORITY_ACTORS)",
              protect=True)
+    nao_sabe(rows, add_choice)
+
+
+NAO_SABE = {"q2_6": "areas_curr", "q2_9": "contexto_ea", "q2_22": "temas", "q2_24": "metodos", "q2_25": "metodos",
+            "q2_37": "materiais"}
+
+
+def nao_sabe(rows, add_choice, listas=True):
+    """Acrescenta a opção "Não sabe" (exclusiva nas perguntas de múltipla escolha)."""
+    if listas:
+        for lst in sorted(set(NAO_SABE.values())):
+            add_choice(lst, "nao_sabe", "Não sabe", None)
+    for r in rows:
+        if r.get("name") in NAO_SABE and r["type"].startswith("select_multiple"):
+            r["constraint"] = "not(selected(., 'nao_sabe') and count-selected(.) > 1)"
+            r["constraint_message::Português (pt)" if "constraint_message::Português (pt)" in r else "constraint_message"] = \
+                '"Não sabe" não pode ser combinado com outras opções.'
