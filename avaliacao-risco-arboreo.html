@@ -124,6 +124,7 @@ table.list { border-collapse: collapse; width: 100%; font-size: .93rem; min-widt
           <li><b>Exposição:</b> circulação de pessoas e presença de edificações, veículos e equipamentos na área potencialmente atingível.</li>
           <li><b>Consequências potenciais:</b> gravidade dos possíveis danos humanos, materiais e operacionais caso ocorra uma falha.</li>
           <li><b>Risco ecológico:</b> evidências de impactos negativos sobre a biodiversidade nativa, como restrição à regeneração natural, dispersão e estabelecimento de exóticas, alterações no habitat ou comprometimento dos objetivos de recuperação. A simples presença de eucaliptos não justifica nota elevada.</li>
+          <li><b>Prazo de resposta à FEPAM:</b> proximidade do prazo legal indicado no ofício, na notificação ou na licença do caso. Nota 1: o prazo pode esperar. Nota 3: prazo em acompanhamento. Nota 5: prazo urgente, vencendo ou vencido.</li>
         </ul>
       </details>
 
@@ -138,8 +139,8 @@ table.list { border-collapse: collapse; width: 100%; font-size: .93rem; min-widt
       </div>
 
       <div class="result" aria-live="polite">
-        <div class="total"><span id="total">0</span> <small>/ 25 pontos</small></div>
-        <span class="chip" id="prio">Preencha os 5 critérios</span>
+        <div class="total"><span id="total">0</span> <small>/ 30 pontos</small></div>
+        <span class="chip" id="prio">Preencha os 6 critérios</span>
       </div>
       <div class="alert" id="alert" hidden></div>
 
@@ -167,10 +168,10 @@ table.list { border-collapse: collapse; width: 100%; font-size: .93rem; min-widt
 (function () {
   var CRIT = [
     ["c1", "Integridade estrutural"], ["c2", "Probabilidade de falha"], ["c3", "Exposição"],
-    ["c4", "Consequências potenciais"], ["c5", "Risco ecológico"]
+    ["c4", "Consequências potenciais"], ["c5", "Risco ecológico"], ["c6", "Prazo de resposta à FEPAM"]
   ];
   var BANDS = [
-    [9, "pr1", "Muito baixa"], [13, "pr2", "Baixa"], [17, "pr3", "Moderada"], [21, "pr4", "Alta"], [25, "pr5", "Muito alta"]
+    [11, "pr1", "Muito baixa"], [16, "pr2", "Baixa"], [21, "pr3", "Moderada"], [25, "pr4", "Alta"], [30, "pr5", "Muito alta"]
   ];
   function band(sum) { for (var i = 0; i < BANDS.length; i++) if (sum <= BANDS[i][0]) return BANDS[i]; return BANDS[4]; }
   function $(id) { return document.getElementById(id); }
@@ -196,7 +197,7 @@ table.list { border-collapse: collapse; width: 100%; font-size: .93rem; min-widt
     $("total").textContent = sum;
     var chip = $("prio");
     if (full) { var b = band(sum); chip.className = "chip " + b[1]; chip.textContent = "Prioridade " + b[2].toLowerCase(); }
-    else { chip.className = "chip"; chip.textContent = "Preencha os 5 critérios"; }
+    else { chip.className = "chip"; chip.textContent = "Preencha os 6 critérios"; }
     var five = [];
     n.forEach(function (v, i) { if (v === 5) five.push(CRIT[i][1].toLowerCase()); });
     $("alert").hidden = !five.length;
@@ -236,13 +237,13 @@ table.list { border-collapse: collapse; width: 100%; font-size: .93rem; min-widt
   $("form").addEventListener("submit", function (e) {
     e.preventDefault();
     var r = recalc();
-    if (!r.full) { status("Dê uma nota a todos os 5 critérios.", "err"); return; }
+    if (!r.full) { status("Dê uma nota a todos os 6 critérios.", "err"); return; }
     if (!col) { status("Salvar não está disponível nesta visualização.", "err"); return; }
     var b = band(r.sum);
     var doc = {
       zona: $("zona").value.trim(), local: $("local").value.trim(),
       coords: $("coords").value.trim(), avaliador: $("avaliador").value.trim(), obs: $("obs").value.trim(),
-      c1: r.n[0], c2: r.n[1], c3: r.n[2], c4: r.n[3], c5: r.n[4],
+      c1: r.n[0], c2: r.n[1], c3: r.n[2], c4: r.n[3], c5: r.n[4], c6: r.n[5],
       total: r.sum, prioridade: b[2], criadoEm: new Date().toISOString(), autor: uid || ""
     };
     $("save").disabled = true; status("Salvando...");
@@ -273,17 +274,17 @@ table.list { border-collapse: collapse; width: 100%; font-size: .93rem; min-widt
       return;
     }
     var h = "<div class='tablewrap'><table class='list'><thead><tr><th>Zona</th><th>Ponto de referência</th><th>Avaliador</th>" +
-      "<th class='n' title='Integridade estrutural'>C1</th><th class='n' title='Probabilidade de falha'>C2</th><th class='n' title='Exposição'>C3</th><th class='n' title='Consequências potenciais'>C4</th><th class='n' title='Risco ecológico'>C5</th>" +
+      "<th class='n' title='Integridade estrutural'>C1</th><th class='n' title='Probabilidade de falha'>C2</th><th class='n' title='Exposição'>C3</th><th class='n' title='Consequências potenciais'>C4</th><th class='n' title='Risco ecológico'>C5</th><th class='n' title='Prazo de resposta à FEPAM'>C6</th>" +
       "<th class='n'>Total</th><th>Prioridade</th><th>Data</th><th></th></tr></thead><tbody>";
     rows.forEach(function (r) {
       var b = band(+r.total || 0), dt = r.criadoEm ? new Date(r.criadoEm).toLocaleDateString("pt-BR") : "";
       h += "<tr><td><b>" + esc(r.zona) + "</b></td><td>" + esc(r.local) + "</td><td>" + esc(r.avaliador) + "</td>";
-      ["c1", "c2", "c3", "c4", "c5"].forEach(function (k) { h += "<td class='n" + (r[k] === 5 ? " crit5" : "") + "'>" + esc(r[k]) + "</td>"; });
+      ["c1", "c2", "c3", "c4", "c5", "c6"].forEach(function (k) { h += "<td class='n" + (r[k] === 5 ? " crit5" : "") + "'>" + esc(r[k]) + "</td>"; });
       h += "<td class='n'><b>" + esc(r.total) + "</b></td><td><span class='chip " + b[1] + "'>" + b[2] + "</span></td><td>" + esc(dt) + "</td><td>";
       if (r.autor && uid && r.autor === uid) h += "<button class='link' data-del='" + esc(r._id) + "'>" + (pendingDelete === r._id ? "Confirmar exclusão" : "Excluir") + "</button>";
       h += "</td></tr>";
     });
-    area.innerHTML = h + "</tbody></table></div><p class='note' style='margin-top:10px'>C1 a C5 seguem a ordem dos critérios. Notas 5 aparecem em vermelho.</p>";
+    area.innerHTML = h + "</tbody></table></div><p class='note' style='margin-top:10px'>C1 a C6 seguem a ordem dos critérios. Notas 5 aparecem em vermelho.</p>";
   }
   $("listarea").addEventListener("click", function (e) {
     var id = e.target && e.target.getAttribute && e.target.getAttribute("data-del");
@@ -295,11 +296,11 @@ table.list { border-collapse: collapse; width: 100%; font-size: .93rem; min-widt
 
   // --- CSV
   $("csv").onclick = function () {
-    var head = ["Zona do campus", "Ponto de referência", "Coordenadas", "Avaliador", "Integridade estrutural", "Probabilidade de falha", "Exposição", "Consequências potenciais", "Risco ecológico", "Total", "Prioridade", "Observações", "Data"];
+    var head = ["Zona do campus", "Ponto de referência", "Coordenadas", "Avaliador", "Integridade estrutural", "Probabilidade de falha", "Exposição", "Consequências potenciais", "Risco ecológico", "Prazo de resposta à FEPAM", "Total", "Prioridade", "Observações", "Data"];
     function q(v) { v = v == null ? "" : String(v); return '"' + v.replace(/"/g, '""') + '"'; }
     var lines = [head.map(q).join(";")];
     rows.forEach(function (r) {
-      lines.push([r.zona, r.local, r.coords, r.avaliador, r.c1, r.c2, r.c3, r.c4, r.c5, r.total, r.prioridade, r.obs, r.criadoEm].map(q).join(";"));
+      lines.push([r.zona, r.local, r.coords, r.avaliador, r.c1, r.c2, r.c3, r.c4, r.c5, r.c6, r.total, r.prioridade, r.obs, r.criadoEm].map(q).join(";"));
     });
     var data = "﻿" + lines.join("\r\n");
     claude.use("downloads").then(function (dl) {
