@@ -1,0 +1,314 @@
+<title>Avaliação de Risco Arbóreo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,700&display=swap">
+<style>
+/* Layout: one column with two tabs (new assessment form with a rating grid, and the shared list of saved assessments). */
+:root {
+  --bg: #f6f7f4; --surface: #ffffff; --fg: #1d2620; --muted: #5b675f; --line: #d9dfd6;
+  --accent: #2f5d3a; --accent-fg: #ffffff; --accent-soft: #e4eee3;
+  --p1: #3f7d4e; --p1-bg: #e1efe3; --p2: #6b8a2e; --p2-bg: #edf1d9;
+  --p3: #9a7410; --p3-bg: #f7ecc9; --p4: #b4561a; --p4-bg: #f9e0cc; --p5: #a62b2b; --p5-bg: #f6d9d6;
+  --font-display: "Source Serif 4", Georgia, serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121814; --surface: #1a221d; --fg: #e8ede9; --muted: #9aa89f; --line: #2d3a31;
+    --accent: #8cc79a; --accent-fg: #0f1a12; --accent-soft: #213428;
+    --p1: #86c995; --p1-bg: #1d3324; --p2: #b5cf7a; --p2-bg: #2b3320;
+    --p3: #e0bc5a; --p3-bg: #3a3015; --p4: #ee9a62; --p4-bg: #3e2616; --p5: #f0857f; --p5-bg: #402122;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121814; --surface: #1a221d; --fg: #e8ede9; --muted: #9aa89f; --line: #2d3a31;
+  --accent: #8cc79a; --accent-fg: #0f1a12; --accent-soft: #213428;
+  --p1: #86c995; --p1-bg: #1d3324; --p2: #b5cf7a; --p2-bg: #2b3320;
+  --p3: #e0bc5a; --p3-bg: #3a3015; --p4: #ee9a62; --p4-bg: #3e2616; --p5: #f0857f; --p5-bg: #402122;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font: 400 17px/1.5 var(--font-body);
+  padding-block: 32px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+main { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+h1, h2 { font-family: var(--font-display); line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(1.7rem, 5vw, 2.3rem); }
+h2 { font-size: 1.25rem; }
+p { margin: 0; }
+.eyebrow { font-size: .78rem; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--accent); }
+header { display: flex; flex-direction: column; gap: 8px; }
+.muted { color: var(--muted); }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+.tabs button { font: inherit; font-weight: 600; background: none; border: 0; border-bottom: 3px solid transparent; padding: 10px 14px; color: var(--muted); cursor: pointer; margin-bottom: -1px; }
+.tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.panel { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field label { font-size: .85rem; font-weight: 600; }
+input[type=text], textarea { font: inherit; padding: 9px 10px; border: 1px solid var(--line); border-radius: 5px; background: var(--bg); color: var(--fg); width: 100%; }
+textarea { min-height: 84px; resize: vertical; }
+.guide { font-size: .93rem; color: var(--muted); }
+.guide summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+.guide ul { margin: 8px 0 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 4px; }
+.gridwrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; }
+table.grid { border-collapse: collapse; width: 100%; min-width: 440px; }
+.grid th, .grid td { padding: 10px 6px; text-align: center; border-bottom: 1px solid var(--line); }
+.grid tr:last-child td { border-bottom: 0; }
+.grid thead th { background: var(--accent-soft); font-size: .72rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); font-weight: 600; line-height: 1.2; }
+.grid thead th:first-child, .grid tbody th { text-align: left; padding-left: 12px; }
+.grid tbody th { font-weight: 600; font-size: .95rem; min-width: 130px; }
+.grid td label { display: flex; justify-content: center; align-items: center; min-height: 40px; cursor: pointer; }
+.grid input[type=radio] { width: 22px; height: 22px; accent-color: var(--accent); margin: 0; cursor: pointer; }
+.result { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 24px; padding: 16px; border-radius: 6px; background: var(--accent-soft); }
+.total { font-family: var(--font-display); font-size: 2.4rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.total small { font-size: 1rem; font-weight: 500; color: var(--muted); }
+.chip { display: inline-block; padding: 3px 12px; border-radius: 4px; font-weight: 600; font-size: .92rem; white-space: nowrap; background: var(--line); color: var(--fg); }
+.pr1 { color: var(--p1); background: var(--p1-bg); } .pr2 { color: var(--p2); background: var(--p2-bg); }
+.pr3 { color: var(--p3); background: var(--p3-bg); } .pr4 { color: var(--p4); background: var(--p4-bg); }
+.pr5 { color: var(--p5); background: var(--p5-bg); }
+.alert { padding: 12px 14px; border-radius: 6px; color: var(--p5); background: var(--p5-bg); font-weight: 500; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn { font: inherit; font-weight: 600; padding: 9px 18px; border-radius: 5px; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-fg); cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--accent); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.status { font-size: .93rem; }
+.status.err { color: var(--p5); }
+.status.ok { color: var(--p1); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+table.list { border-collapse: collapse; width: 100%; font-size: .93rem; min-width: 680px; }
+.list th, .list td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.list tr:last-child td { border-bottom: 0; }
+.list th { background: var(--accent-soft); font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.list td.n { font-variant-numeric: tabular-nums; text-align: center; }
+.list th.n { text-align: center; }
+.list .crit5 { font-weight: 700; color: var(--p5); }
+.link { background: none; border: 0; font: inherit; font-size: .85rem; color: var(--muted); cursor: pointer; text-decoration: underline; padding: 0; }
+.empty { padding: 36px 20px; text-align: center; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.empty p { max-width: 44ch; }
+.note { font-size: .88rem; color: var(--muted); max-width: 70ch; }
+</style>
+
+<main>
+  <header>
+    <span class="eyebrow">PRAD · Campus Capão do Leão/UFPel · Etapa A</span>
+    <h1>Avaliação de Risco Arbóreo e Ecológico</h1>
+    <p class="muted">Preencha os dados da árvore, dê uma nota de 1 a 5 a cada critério e salve. A pontuação e a prioridade sugerida aparecem na hora.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tab-nova" aria-selected="true" aria-controls="p-nova">Nova avaliação</button>
+    <button role="tab" id="tab-lista" aria-selected="false" aria-controls="p-lista">Avaliações salvas <span id="count"></span></button>
+  </div>
+
+  <div class="panel" id="p-nova" role="tabpanel" aria-labelledby="tab-nova">
+    <form class="card" id="form" autocomplete="off">
+      <div class="fields">
+        <div class="field"><label for="id_arvore">Identificação da árvore *</label><input type="text" id="id_arvore" required placeholder="Plaqueta ou número"></div>
+        <div class="field"><label for="local">Local / área do campus *</label><input type="text" id="local" required></div>
+        <div class="field"><label for="especie">Espécie</label><input type="text" id="especie" placeholder="Se conhecida"></div>
+        <div class="field"><label for="coords">Coordenadas</label><input type="text" id="coords" placeholder="Ex.: -31.8010, -52.4120"></div>
+        <div class="field"><label for="avaliador">Avaliador *</label><input type="text" id="avaliador" required></div>
+      </div>
+
+      <details class="guide">
+        <summary>O que avaliar em cada critério</summary>
+        <ul>
+          <li><b>Integridade estrutural:</b> inclinação, fissuras, cavidades, raízes expostas, sinais de apodrecimento e instabilidade.</li>
+          <li><b>Probabilidade de falha:</b> evidências de possibilidade de queda da árvore ou de suas partes.</li>
+          <li><b>Exposição:</b> circulação de pessoas e presença de edificações, veículos e equipamentos na área potencialmente atingível.</li>
+          <li><b>Consequências potenciais:</b> gravidade dos possíveis danos humanos, materiais e operacionais caso ocorra uma falha.</li>
+          <li><b>Risco ecológico:</b> evidências de impactos negativos sobre a biodiversidade nativa, como restrição à regeneração natural, dispersão e estabelecimento de exóticas, alterações no habitat ou comprometimento dos objetivos de recuperação. A simples presença de eucaliptos não justifica nota elevada.</li>
+        </ul>
+      </details>
+
+      <div class="gridwrap">
+        <table class="grid" id="grid">
+          <thead>
+            <tr><th scope="col">Critério</th>
+              <th scope="col">1<br>Muito baixo</th><th scope="col">2<br>Baixo</th><th scope="col">3<br>Moderado</th><th scope="col">4<br>Alto</th><th scope="col">5<br>Muito alto</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="result" aria-live="polite">
+        <div class="total"><span id="total">0</span> <small>/ 25 pontos</small></div>
+        <span class="chip" id="prio">Preencha os 5 critérios</span>
+      </div>
+      <div class="alert" id="alert" hidden></div>
+
+      <div class="field"><label for="obs">Observações</label><textarea id="obs"></textarea></div>
+
+      <div class="actions">
+        <button class="btn" type="submit" id="save">Salvar avaliação</button>
+        <button class="btn ghost" type="button" id="clear">Limpar</button>
+        <span class="status" id="status" role="status"></span>
+      </div>
+      <p class="note">Pontuação e faixas são propostas experimentais para triagem institucional, não classificações da ABNT ou ISA. A soma não substitui a avaliação especializada: uma nota 5 em qualquer critério exige avaliação urgente, mesmo com total baixo.</p>
+    </form>
+  </div>
+
+  <div class="panel" id="p-lista" role="tabpanel" aria-labelledby="tab-lista" hidden>
+    <div class="toolbar">
+      <h2>Avaliações salvas</h2>
+      <button class="btn ghost" type="button" id="csv" disabled>Baixar CSV</button>
+    </div>
+    <div id="listarea"></div>
+  </div>
+</main>
+
+<script>
+(function () {
+  var CRIT = [
+    ["c1", "Integridade estrutural"], ["c2", "Probabilidade de falha"], ["c3", "Exposição"],
+    ["c4", "Consequências potenciais"], ["c5", "Risco ecológico"]
+  ];
+  var BANDS = [
+    [9, "pr1", "Muito baixa"], [13, "pr2", "Baixa"], [17, "pr3", "Moderada"], [21, "pr4", "Alta"], [25, "pr5", "Muito alta"]
+  ];
+  function band(sum) { for (var i = 0; i < BANDS.length; i++) if (sum <= BANDS[i][0]) return BANDS[i]; return BANDS[4]; }
+  function $(id) { return document.getElementById(id); }
+
+  // --- Grid
+  var tbody = document.querySelector("#grid tbody");
+  CRIT.forEach(function (c, i) {
+    var tr = document.createElement("tr");
+    var h = "<th scope='row'>" + (i + 1) + ". " + c[1] + "</th>";
+    for (var v = 1; v <= 5; v++) {
+      h += "<td><label><input type='radio' name='" + c[0] + "' value='" + v + "' aria-label='" + c[1] + ": nota " + v + "'></label></td>";
+    }
+    tr.innerHTML = h; tbody.appendChild(tr);
+  });
+  function notas() {
+    return CRIT.map(function (c) {
+      var el = document.querySelector("input[name='" + c[0] + "']:checked");
+      return el ? +el.value : 0;
+    });
+  }
+  function recalc() {
+    var n = notas(), sum = n.reduce(function (a, b) { return a + b; }, 0), full = n.every(Boolean);
+    $("total").textContent = sum;
+    var chip = $("prio");
+    if (full) { var b = band(sum); chip.className = "chip " + b[1]; chip.textContent = "Prioridade " + b[2].toLowerCase(); }
+    else { chip.className = "chip"; chip.textContent = "Preencha os 5 critérios"; }
+    var five = [];
+    n.forEach(function (v, i) { if (v === 5) five.push(CRIT[i][1].toLowerCase()); });
+    $("alert").hidden = !five.length;
+    if (five.length) $("alert").textContent = "Nota 5 em " + five.join(", ") + ": exige avaliação urgente, independentemente da pontuação total.";
+    return { n: n, sum: sum, full: full };
+  }
+  $("grid").addEventListener("change", recalc);
+
+  // --- Tabs
+  function showTab(name) {
+    ["nova", "lista"].forEach(function (t) {
+      $("tab-" + t).setAttribute("aria-selected", t === name ? "true" : "false");
+      $("p-" + t).hidden = t !== name;
+    });
+  }
+  $("tab-nova").onclick = function () { showTab("nova"); };
+  $("tab-lista").onclick = function () { showTab("lista"); };
+
+  // --- Status
+  function status(msg, cls) { var s = $("status"); s.textContent = msg; s.className = "status " + (cls || ""); }
+
+  // --- Storage (shared db)
+  var col = null, uid = null, rows = [];
+  function setup() {
+    claude.use("db").then(function (db) {
+      if (!db) { status("Salvar não está disponível nesta visualização. A calculadora funciona normalmente.", "err"); renderList(); return; }
+      col = db.collection("avaliacoes");
+      col.orderBy("criadoEm", "desc").onSnapshot(function (snap) {
+        rows = snap.docs.map(function (d) { var x = d.data() || {}; x._id = d.id; return x; });
+        renderList();
+      }, function () { status("Não foi possível carregar as avaliações salvas.", "err"); });
+    }).catch(function () { renderList(); });
+    claude.use("user").then(function (u) { if (u && u.id) return u.id().then(function (i) { uid = i; renderList(); }); }).catch(function () {});
+  }
+  if (window.claude && claude.use) setup(); else renderList();
+
+  $("form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var r = recalc();
+    if (!r.full) { status("Dê uma nota a todos os 5 critérios.", "err"); return; }
+    if (!col) { status("Salvar não está disponível nesta visualização.", "err"); return; }
+    var b = band(r.sum);
+    var doc = {
+      id_arvore: $("id_arvore").value.trim(), local: $("local").value.trim(), especie: $("especie").value.trim(),
+      coords: $("coords").value.trim(), avaliador: $("avaliador").value.trim(), obs: $("obs").value.trim(),
+      c1: r.n[0], c2: r.n[1], c3: r.n[2], c4: r.n[3], c5: r.n[4],
+      total: r.sum, prioridade: b[2], criadoEm: new Date().toISOString(), autor: uid || ""
+    };
+    $("save").disabled = true; status("Salvando...");
+    col.add(doc).then(function () {
+      status("Avaliação salva.", "ok");
+      resetForm(true);
+    }).catch(function (err) {
+      status(err && err.code === "not_granted" ? "Você não tem permissão para salvar avaliações nesta página." : "Não foi possível salvar. Tente de novo.", "err");
+    }).then(function () { $("save").disabled = false; });
+  });
+  function resetForm(keepEvaluator) {
+    var av = $("avaliador").value;
+    $("form").reset();
+    if (keepEvaluator) $("avaliador").value = av;
+    recalc();
+  }
+  $("clear").onclick = function () { resetForm(false); status(""); };
+
+  // --- List
+  function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : String(s); return d.innerHTML; }
+  var pendingDelete = null;
+  function renderList() {
+    $("count").textContent = rows.length ? "(" + rows.length + ")" : "";
+    $("csv").disabled = !rows.length;
+    var area = $("listarea");
+    if (!rows.length) {
+      area.innerHTML = "<div class='card empty'><h2>Nenhuma avaliação salva</h2><p class='muted'>As avaliações salvas aparecem aqui para todas as pessoas com acesso à página. Preencha a primeira na aba Nova avaliação.</p></div>";
+      return;
+    }
+    var h = "<div class='tablewrap'><table class='list'><thead><tr><th>Árvore</th><th>Local</th><th>Avaliador</th>" +
+      "<th class='n' title='Integridade estrutural'>C1</th><th class='n' title='Probabilidade de falha'>C2</th><th class='n' title='Exposição'>C3</th><th class='n' title='Consequências potenciais'>C4</th><th class='n' title='Risco ecológico'>C5</th>" +
+      "<th class='n'>Total</th><th>Prioridade</th><th>Data</th><th></th></tr></thead><tbody>";
+    rows.forEach(function (r) {
+      var b = band(+r.total || 0), dt = r.criadoEm ? new Date(r.criadoEm).toLocaleDateString("pt-BR") : "";
+      h += "<tr><td><b>" + esc(r.id_arvore) + "</b>" + (r.especie ? "<br><span class='muted'>" + esc(r.especie) + "</span>" : "") + "</td><td>" + esc(r.local) + "</td><td>" + esc(r.avaliador) + "</td>";
+      ["c1", "c2", "c3", "c4", "c5"].forEach(function (k) { h += "<td class='n" + (r[k] === 5 ? " crit5" : "") + "'>" + esc(r[k]) + "</td>"; });
+      h += "<td class='n'><b>" + esc(r.total) + "</b></td><td><span class='chip " + b[1] + "'>" + b[2] + "</span></td><td>" + esc(dt) + "</td><td>";
+      if (r.autor && uid && r.autor === uid) h += "<button class='link' data-del='" + esc(r._id) + "'>" + (pendingDelete === r._id ? "Confirmar exclusão" : "Excluir") + "</button>";
+      h += "</td></tr>";
+    });
+    area.innerHTML = h + "</tbody></table></div><p class='note' style='margin-top:10px'>C1 a C5 seguem a ordem dos critérios. Notas 5 aparecem em vermelho.</p>";
+  }
+  $("listarea").addEventListener("click", function (e) {
+    var id = e.target && e.target.getAttribute && e.target.getAttribute("data-del");
+    if (!id) return;
+    if (pendingDelete !== id) { pendingDelete = id; renderList(); return; }
+    pendingDelete = null;
+    col.doc(id).delete().catch(function () { status("Não foi possível excluir.", "err"); });
+  });
+
+  // --- CSV
+  $("csv").onclick = function () {
+    var head = ["Árvore", "Local", "Espécie", "Coordenadas", "Avaliador", "Integridade estrutural", "Probabilidade de falha", "Exposição", "Consequências potenciais", "Risco ecológico", "Total", "Prioridade", "Observações", "Data"];
+    function q(v) { v = v == null ? "" : String(v); return '"' + v.replace(/"/g, '""') + '"'; }
+    var lines = [head.map(q).join(";")];
+    rows.forEach(function (r) {
+      lines.push([r.id_arvore, r.local, r.especie, r.coords, r.avaliador, r.c1, r.c2, r.c3, r.c4, r.c5, r.total, r.prioridade, r.obs, r.criadoEm].map(q).join(";"));
+    });
+    var data = "﻿" + lines.join("\r\n");
+    claude.use("downloads").then(function (dl) {
+      if (!dl) { status("Download indisponível nesta visualização.", "err"); showTab("lista"); return; }
+      return dl.save({ filename: "avaliacoes-risco-arboreo.csv", data: data });
+    }).catch(function (err) { if (!err || err.code !== "declined") status("Não foi possível baixar o CSV.", "err"); });
+  };
+
+  recalc();
+})();
+</script>
