@@ -131,10 +131,11 @@ legend { padding: 0; font-weight: 600; margin-bottom: 8px; }
           <tr><td><strong>3. Exposição</strong></td><td>Frequência de circulação de pessoas e presença de edificações, veículos e equipamentos na área potencialmente atingível</td><td class="num">1 a 5</td></tr>
           <tr><td><strong>4. Consequências potenciais</strong></td><td>Gravidade dos possíveis danos humanos, materiais e operacionais caso ocorra uma falha</td><td class="num">1 a 5</td></tr>
           <tr><td><strong>5. Risco ecológico</strong></td><td>Evidências de impactos negativos sobre a biodiversidade nativa, como restrição à regeneração natural, dispersão e estabelecimento de indivíduos exóticos, alterações no habitat ou comprometimento dos objetivos de recuperação ecológica</td><td class="num">1 a 5</td></tr>
+          <tr><td><strong>6. Prazo de resposta à FEPAM</strong></td><td>Proximidade do prazo legal para responder à FEPAM, conforme o ofício, a notificação ou a licença do caso. Nota 1: o prazo pode esperar. Nota 3: prazo em acompanhamento. Nota 5: prazo urgente, vencendo ou vencido.</td><td class="num">1 a 5</td></tr>
         </tbody>
       </table>
     </div>
-    <p><strong>Pontuação total:</strong> 5 a 25 pontos.</p>
+    <p><strong>Pontuação total:</strong> 6 a 30 pontos.</p>
   </section>
 
   <section aria-labelledby="interpretacao">
@@ -143,16 +144,17 @@ legend { padding: 0; font-weight: 600; margin-bottom: 8px; }
       <table>
         <thead><tr><th>Pontuação</th><th>Prioridade sugerida</th></tr></thead>
         <tbody>
-          <tr><td class="num">5–9</td><td><span class="chip pr1">Muito baixa</span></td></tr>
-          <tr><td class="num">10–13</td><td><span class="chip pr2">Baixa</span></td></tr>
-          <tr><td class="num">14–17</td><td><span class="chip pr3">Moderada</span></td></tr>
-          <tr><td class="num">18–21</td><td><span class="chip pr4">Alta</span></td></tr>
-          <tr><td class="num">22–25</td><td><span class="chip pr5">Muito alta</span></td></tr>
+          <tr><td class="num">6–11</td><td><span class="chip pr1">Muito baixa</span></td></tr>
+          <tr><td class="num">12–16</td><td><span class="chip pr2">Baixa</span></td></tr>
+          <tr><td class="num">17–21</td><td><span class="chip pr3">Moderada</span></td></tr>
+          <tr><td class="num">22–25</td><td><span class="chip pr4">Alta</span></td></tr>
+          <tr><td class="num">26–30</td><td><span class="chip pr5">Muito alta</span></td></tr>
         </tbody>
       </table>
     </div>
     <div class="note">
       <p><strong>Nota metodológica.</strong> A pontuação e as faixas de prioridade são propostas experimentais para triagem institucional, não classificações estabelecidas pela ABNT ou ISA. A soma não substitui a avaliação especializada e não deve permitir que um risco crítico de segurança seja compensado por uma pontuação ecológica baixa, ou vice-versa.</p>
+      <p>O critério 6 mede urgência processual, não risco da árvore. Ele soma pontos para ordenar o atendimento, mas um prazo curto com risco baixo não torna a árvore perigosa. As faixas acima foram reescaladas na mesma proporção das faixas de 5 a 25 pontos e também são propostas experimentais. O prazo em si (dias ou meses) vem do ofício, da notificação ou da licença de cada caso.</p>
       <p>No critério ecológico, a simples presença de eucaliptos não justifica nota elevada: é necessário identificar evidências de impacto no contexto de cada área.</p>
     </div>
   </section>
@@ -166,7 +168,7 @@ legend { padding: 0; font-weight: 600; margin-bottom: 8px; }
       </div>
       <div id="fields"></div>
       <div class="result" aria-live="polite">
-        <div class="total"><span id="total">0</span> <small>/ 25 pontos</small></div>
+        <div class="total"><span id="total">0</span> <small>/ 30 pontos</small></div>
         <span class="chip" id="prio"></span>
       </div>
       <div class="alert" id="alert" hidden></div>
@@ -188,17 +190,17 @@ legend { padding: 0; font-weight: 600; margin-bottom: 8px; }
 (function () {
   var criteria = [
     "1. Integridade estrutural", "2. Probabilidade de falha", "3. Exposição",
-    "4. Consequências potenciais", "5. Risco ecológico"
+    "4. Consequências potenciais", "5. Risco ecológico", "6. Prazo de resposta à FEPAM"
   ];
   var labels = ["Muito baixo", "Baixo", "Moderado", "Alto", "Muito alto"];
   var bands = [
-    { max: 9, cls: "pr1", name: "Prioridade muito baixa" },
-    { max: 13, cls: "pr2", name: "Prioridade baixa" },
-    { max: 17, cls: "pr3", name: "Prioridade moderada" },
-    { max: 21, cls: "pr4", name: "Prioridade alta" },
-    { max: 25, cls: "pr5", name: "Prioridade muito alta" }
+    { max: 11, cls: "pr1", name: "Prioridade muito baixa" },
+    { max: 16, cls: "pr2", name: "Prioridade baixa" },
+    { max: 21, cls: "pr3", name: "Prioridade moderada" },
+    { max: 25, cls: "pr4", name: "Prioridade alta" },
+    { max: 30, cls: "pr5", name: "Prioridade muito alta" }
   ];
-  var example = [3, 2, 4, 4, 2];
+  var example = [3, 2, 4, 4, 2, 3];
   var fields = document.getElementById("fields");
   fields.style.cssText = "display:flex;flex-direction:column;gap:18px";
 
@@ -224,7 +226,7 @@ legend { padding: 0; font-weight: 600; margin-bottom: 8px; }
     document.getElementById("total").textContent = sum;
     var prio = document.getElementById("prio"), alert = document.getElementById("alert");
     if (!done) {
-      prio.className = "chip"; prio.textContent = "Preencha os 5 critérios";
+      prio.className = "chip"; prio.textContent = "Preencha os 6 critérios";
     } else {
       var b = bands.filter(function (x) { return sum <= x.max; })[0];
       prio.className = "chip " + b.cls; prio.textContent = b.name;
