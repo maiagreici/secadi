@@ -99,7 +99,7 @@ table.list { border-collapse: collapse; width: 100%; font-size: .93rem; min-widt
   <header>
     <span class="eyebrow">PRAD · Campus Capão do Leão/UFPel · Etapa A</span>
     <h1>Avaliação de Risco Arbóreo e Ecológico</h1>
-    <p class="muted">Preencha os dados da árvore, dê uma nota de 1 a 5 a cada critério e salve. A pontuação e a prioridade sugerida aparecem na hora.</p>
+    <p class="muted">Preencha os dados da zona, dê uma nota de 1 a 5 a cada critério e salve. A pontuação e a prioridade sugerida aparecem na hora.</p>
   </header>
 
   <div class="tabs" role="tablist">
@@ -110,9 +110,8 @@ table.list { border-collapse: collapse; width: 100%; font-size: .93rem; min-widt
   <div class="panel" id="p-nova" role="tabpanel" aria-labelledby="tab-nova">
     <form class="card" id="form" autocomplete="off">
       <div class="fields">
-        <div class="field"><label for="id_arvore">Identificação da árvore *</label><input type="text" id="id_arvore" required placeholder="Plaqueta ou número"></div>
-        <div class="field"><label for="local">Local / área do campus *</label><input type="text" id="local" required></div>
-        <div class="field"><label for="especie">Espécie</label><input type="text" id="especie" placeholder="Se conhecida"></div>
+        <div class="field"><label for="zona">Zona do campus *</label><input type="text" id="zona" required placeholder="Ex.: Zona 3 ou nome da área"></div>
+        <div class="field"><label for="local">Ponto de referência</label><input type="text" id="local" placeholder="Prédio, via ou marco próximo"></div>
         <div class="field"><label for="coords">Coordenadas</label><input type="text" id="coords" placeholder="Ex.: -31.8010, -52.4120"></div>
         <div class="field"><label for="avaliador">Avaliador *</label><input type="text" id="avaliador" required></div>
       </div>
@@ -241,7 +240,7 @@ table.list { border-collapse: collapse; width: 100%; font-size: .93rem; min-widt
     if (!col) { status("Salvar não está disponível nesta visualização.", "err"); return; }
     var b = band(r.sum);
     var doc = {
-      id_arvore: $("id_arvore").value.trim(), local: $("local").value.trim(), especie: $("especie").value.trim(),
+      zona: $("zona").value.trim(), local: $("local").value.trim(),
       coords: $("coords").value.trim(), avaliador: $("avaliador").value.trim(), obs: $("obs").value.trim(),
       c1: r.n[0], c2: r.n[1], c3: r.n[2], c4: r.n[3], c5: r.n[4],
       total: r.sum, prioridade: b[2], criadoEm: new Date().toISOString(), autor: uid || ""
@@ -273,12 +272,12 @@ table.list { border-collapse: collapse; width: 100%; font-size: .93rem; min-widt
       area.innerHTML = "<div class='card empty'><h2>Nenhuma avaliação salva</h2><p class='muted'>As avaliações salvas aparecem aqui para todas as pessoas com acesso à página. Preencha a primeira na aba Nova avaliação.</p></div>";
       return;
     }
-    var h = "<div class='tablewrap'><table class='list'><thead><tr><th>Árvore</th><th>Local</th><th>Avaliador</th>" +
+    var h = "<div class='tablewrap'><table class='list'><thead><tr><th>Zona</th><th>Ponto de referência</th><th>Avaliador</th>" +
       "<th class='n' title='Integridade estrutural'>C1</th><th class='n' title='Probabilidade de falha'>C2</th><th class='n' title='Exposição'>C3</th><th class='n' title='Consequências potenciais'>C4</th><th class='n' title='Risco ecológico'>C5</th>" +
       "<th class='n'>Total</th><th>Prioridade</th><th>Data</th><th></th></tr></thead><tbody>";
     rows.forEach(function (r) {
       var b = band(+r.total || 0), dt = r.criadoEm ? new Date(r.criadoEm).toLocaleDateString("pt-BR") : "";
-      h += "<tr><td><b>" + esc(r.id_arvore) + "</b>" + (r.especie ? "<br><span class='muted'>" + esc(r.especie) + "</span>" : "") + "</td><td>" + esc(r.local) + "</td><td>" + esc(r.avaliador) + "</td>";
+      h += "<tr><td><b>" + esc(r.zona) + "</b></td><td>" + esc(r.local) + "</td><td>" + esc(r.avaliador) + "</td>";
       ["c1", "c2", "c3", "c4", "c5"].forEach(function (k) { h += "<td class='n" + (r[k] === 5 ? " crit5" : "") + "'>" + esc(r[k]) + "</td>"; });
       h += "<td class='n'><b>" + esc(r.total) + "</b></td><td><span class='chip " + b[1] + "'>" + b[2] + "</span></td><td>" + esc(dt) + "</td><td>";
       if (r.autor && uid && r.autor === uid) h += "<button class='link' data-del='" + esc(r._id) + "'>" + (pendingDelete === r._id ? "Confirmar exclusão" : "Excluir") + "</button>";
@@ -296,11 +295,11 @@ table.list { border-collapse: collapse; width: 100%; font-size: .93rem; min-widt
 
   // --- CSV
   $("csv").onclick = function () {
-    var head = ["Árvore", "Local", "Espécie", "Coordenadas", "Avaliador", "Integridade estrutural", "Probabilidade de falha", "Exposição", "Consequências potenciais", "Risco ecológico", "Total", "Prioridade", "Observações", "Data"];
+    var head = ["Zona do campus", "Ponto de referência", "Coordenadas", "Avaliador", "Integridade estrutural", "Probabilidade de falha", "Exposição", "Consequências potenciais", "Risco ecológico", "Total", "Prioridade", "Observações", "Data"];
     function q(v) { v = v == null ? "" : String(v); return '"' + v.replace(/"/g, '""') + '"'; }
     var lines = [head.map(q).join(";")];
     rows.forEach(function (r) {
-      lines.push([r.id_arvore, r.local, r.especie, r.coords, r.avaliador, r.c1, r.c2, r.c3, r.c4, r.c5, r.total, r.prioridade, r.obs, r.criadoEm].map(q).join(";"));
+      lines.push([r.zona, r.local, r.coords, r.avaliador, r.c1, r.c2, r.c3, r.c4, r.c5, r.total, r.prioridade, r.obs, r.criadoEm].map(q).join(";"));
     });
     var data = "﻿" + lines.join("\r\n");
     claude.use("downloads").then(function (dl) {
