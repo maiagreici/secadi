@@ -1,0 +1,247 @@
+<title>Matriz de Risco Arbóreo e Ecológico</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,700&display=swap">
+<style>
+/* Layout: single reading column; reference tables first, then a scoring simulator that applies the same scale. */
+:root {
+  --bg: #f6f7f4;
+  --surface: #ffffff;
+  --fg: #1d2620;
+  --muted: #5b675f;
+  --line: #d9dfd6;
+  --accent: #2f5d3a;
+  --accent-fg: #ffffff;
+  --accent-soft: #e4eee3;
+  --p1: #3f7d4e; --p1-bg: #e1efe3;
+  --p2: #6b8a2e; --p2-bg: #edf1d9;
+  --p3: #9a7410; --p3-bg: #f7ecc9;
+  --p4: #b4561a; --p4-bg: #f9e0cc;
+  --p5: #a62b2b; --p5-bg: #f6d9d6;
+  --font-display: "Source Serif 4", Georgia, serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121814; --surface: #1a221d; --fg: #e8ede9; --muted: #9aa89f; --line: #2d3a31;
+    --accent: #8cc79a; --accent-fg: #0f1a12; --accent-soft: #213428;
+    --p1: #86c995; --p1-bg: #1d3324; --p2: #b5cf7a; --p2-bg: #2b3320;
+    --p3: #e0bc5a; --p3-bg: #3a3015; --p4: #ee9a62; --p4-bg: #3e2616;
+    --p5: #f0857f; --p5-bg: #402122;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121814; --surface: #1a221d; --fg: #e8ede9; --muted: #9aa89f; --line: #2d3a31;
+  --accent: #8cc79a; --accent-fg: #0f1a12; --accent-soft: #213428;
+  --p1: #86c995; --p1-bg: #1d3324; --p2: #b5cf7a; --p2-bg: #2b3320;
+  --p3: #e0bc5a; --p3-bg: #3a3015; --p4: #ee9a62; --p4-bg: #3e2616;
+  --p5: #f0857f; --p5-bg: #402122;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font: 400 17px/1.55 var(--font-body);
+  padding-block: 40px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+main { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 44px; }
+section { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+h1, h2 { font-family: var(--font-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(1.9rem, 5vw, 2.7rem); font-weight: 700; }
+h2 { font-size: 1.45rem; font-weight: 700; }
+p { margin: 0; }
+.eyebrow { font-size: .8rem; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--accent); }
+header { display: flex; flex-direction: column; gap: 12px; }
+.lede { color: var(--muted); max-width: 62ch; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: .97rem; }
+th, td { text-align: left; padding: 11px 14px; vertical-align: top; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+th { font-size: .78rem; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--accent-soft); }
+td.num { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+.crit-table td:first-child { min-width: 150px; }
+.crit-table td:nth-child(2) { min-width: 280px; }
+.chip { display: inline-block; padding: 2px 10px; border-radius: 4px; font-weight: 600; font-size: .9rem; white-space: nowrap; }
+.n1, .pr1 { color: var(--p1); background: var(--p1-bg); }
+.n2, .pr2 { color: var(--p2); background: var(--p2-bg); }
+.n3, .pr3 { color: var(--p3); background: var(--p3-bg); }
+.n4, .pr4 { color: var(--p4); background: var(--p4-bg); }
+.n5, .pr5 { color: var(--p5); background: var(--p5-bg); }
+.note { border-left: 3px solid var(--accent); padding: 4px 0 4px 16px; display: flex; flex-direction: column; gap: 10px; max-width: 70ch; }
+.note strong { color: var(--accent); }
+/* Simulator */
+.sim { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+.sim-head { display: flex; flex-direction: column; gap: 4px; }
+.sim-head small { color: var(--muted); }
+fieldset { border: 0; padding: 0; margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+legend { padding: 0; font-weight: 600; margin-bottom: 8px; }
+.scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.scale label { position: relative; }
+.scale input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.scale span { display: flex; flex-direction: column; align-items: center; gap: 0; padding: 8px 2px; border: 1px solid var(--line); border-radius: 5px; background: var(--bg); font-size: .75rem; color: var(--muted); text-align: center; line-height: 1.25; }
+.scale span b { font-size: 1.15rem; color: var(--fg); font-variant-numeric: tabular-nums; }
+.scale input:checked + span { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.scale input:checked + span b { color: var(--accent-fg); }
+.scale input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
+.result { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding: 16px; border-radius: 6px; background: var(--accent-soft); }
+.total { font-family: var(--font-display); font-size: 2.6rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.total small { font-size: 1rem; font-weight: 500; color: var(--muted); }
+.result .chip { font-size: 1.05rem; padding: 4px 14px; }
+.alert { padding: 12px 14px; border-radius: 6px; color: var(--p5); background: var(--p5-bg); font-weight: 500; }
+.sim button { align-self: flex-start; font: inherit; font-weight: 600; padding: 8px 16px; border-radius: 5px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; }
+.sim button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.refs { font-size: .93rem; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
+.refs ul { margin: 0; padding-left: 1.2em; }
+@media (max-width: 520px) { .scale span { font-size: .68rem; } .sim { padding: 14px; } }
+</style>
+
+<main>
+  <header>
+    <span class="eyebrow">PRAD · Campus Capão do Leão/UFPel · Etapa A</span>
+    <h1>Matriz de Avaliação Preliminar de Risco Arbóreo e Ecológico</h1>
+    <p class="lede">Avalie cada critério em uma escala de 1 a 5 pontos, considerando as condições observadas na árvore e em seu entorno.</p>
+  </header>
+
+  <section aria-labelledby="escala">
+    <h2 id="escala">Escala de notas</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Nota</th><th>Classificação</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td class="num"><span class="chip n1">1</span></td><td>Muito baixo</td><td>Risco ou impacto inexistente ou pouco significativo</td></tr>
+          <tr><td class="num"><span class="chip n2">2</span></td><td>Baixo</td><td>Risco ou impacto reduzido</td></tr>
+          <tr><td class="num"><span class="chip n3">3</span></td><td>Moderado</td><td>Risco ou impacto relevante, exigindo acompanhamento</td></tr>
+          <tr><td class="num"><span class="chip n4">4</span></td><td>Alto</td><td>Risco ou impacto significativo, exigindo intervenção prioritária</td></tr>
+          <tr><td class="num"><span class="chip n5">5</span></td><td>Muito alto</td><td>Risco ou impacto crítico, exigindo avaliação urgente</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="criterios">
+    <h2 id="criterios">Critérios de avaliação</h2>
+    <div class="tablewrap">
+      <table class="crit-table">
+        <thead><tr><th>Critério</th><th>O que avaliar</th><th>Nota</th></tr></thead>
+        <tbody>
+          <tr><td><strong>1. Integridade estrutural</strong></td><td>Inclinação, fissuras, cavidades, raízes expostas, sinais de apodrecimento e instabilidade</td><td class="num">1 a 5</td></tr>
+          <tr><td><strong>2. Probabilidade de falha</strong></td><td>Evidências de possibilidade de queda da árvore ou de suas partes</td><td class="num">1 a 5</td></tr>
+          <tr><td><strong>3. Exposição</strong></td><td>Frequência de circulação de pessoas e presença de edificações, veículos e equipamentos na área potencialmente atingível</td><td class="num">1 a 5</td></tr>
+          <tr><td><strong>4. Consequências potenciais</strong></td><td>Gravidade dos possíveis danos humanos, materiais e operacionais caso ocorra uma falha</td><td class="num">1 a 5</td></tr>
+          <tr><td><strong>5. Risco ecológico</strong></td><td>Evidências de impactos negativos sobre a biodiversidade nativa, como restrição à regeneração natural, dispersão e estabelecimento de indivíduos exóticos, alterações no habitat ou comprometimento dos objetivos de recuperação ecológica</td><td class="num">1 a 5</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>Pontuação total:</strong> 5 a 25 pontos.</p>
+  </section>
+
+  <section aria-labelledby="interpretacao">
+    <h2 id="interpretacao">Interpretação preliminar</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Pontuação</th><th>Prioridade sugerida</th></tr></thead>
+        <tbody>
+          <tr><td class="num">5–9</td><td><span class="chip pr1">Muito baixa</span></td></tr>
+          <tr><td class="num">10–13</td><td><span class="chip pr2">Baixa</span></td></tr>
+          <tr><td class="num">14–17</td><td><span class="chip pr3">Moderada</span></td></tr>
+          <tr><td class="num">18–21</td><td><span class="chip pr4">Alta</span></td></tr>
+          <tr><td class="num">22–25</td><td><span class="chip pr5">Muito alta</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note">
+      <p><strong>Nota metodológica.</strong> A pontuação e as faixas de prioridade são propostas experimentais para triagem institucional, não classificações estabelecidas pela ABNT ou ISA. A soma não substitui a avaliação especializada e não deve permitir que um risco crítico de segurança seja compensado por uma pontuação ecológica baixa, ou vice-versa.</p>
+      <p>No critério ecológico, a simples presença de eucaliptos não justifica nota elevada: é necessário identificar evidências de impacto no contexto de cada área.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="simulador">
+    <h2 id="simulador">Calculadora de pontuação</h2>
+    <form class="sim" id="sim" onsubmit="return false">
+      <div class="sim-head">
+        <span class="eyebrow">Apoio ao preenchimento</span>
+        <small>Os valores iniciais são um exemplo. Marque a nota de cada critério para obter a soma e a prioridade sugerida.</small>
+      </div>
+      <div id="fields"></div>
+      <div class="result" aria-live="polite">
+        <div class="total"><span id="total">0</span> <small>/ 25 pontos</small></div>
+        <span class="chip" id="prio"></span>
+      </div>
+      <div class="alert" id="alert" hidden></div>
+      <button type="button" id="reset">Restaurar exemplo</button>
+    </form>
+  </section>
+
+  <section class="refs" aria-labelledby="refs">
+    <h2 id="refs">Referências</h2>
+    <ul>
+      <li>ABNT NBR 16246-3.</li>
+      <li>International Society of Arboriculture (ISA). <em>Tree Risk Assessment: Best Management Practices</em>.</li>
+      <li>Society for Ecological Restoration (SER). <em>International Principles and Standards for the Practice of Ecological Restoration</em>.</li>
+    </ul>
+  </section>
+</main>
+
+<script>
+(function () {
+  var criteria = [
+    "1. Integridade estrutural", "2. Probabilidade de falha", "3. Exposição",
+    "4. Consequências potenciais", "5. Risco ecológico"
+  ];
+  var labels = ["Muito baixo", "Baixo", "Moderado", "Alto", "Muito alto"];
+  var bands = [
+    { max: 9, cls: "pr1", name: "Prioridade muito baixa" },
+    { max: 13, cls: "pr2", name: "Prioridade baixa" },
+    { max: 17, cls: "pr3", name: "Prioridade moderada" },
+    { max: 21, cls: "pr4", name: "Prioridade alta" },
+    { max: 25, cls: "pr5", name: "Prioridade muito alta" }
+  ];
+  var example = [3, 2, 4, 4, 2];
+  var fields = document.getElementById("fields");
+  fields.style.cssText = "display:flex;flex-direction:column;gap:18px";
+
+  criteria.forEach(function (name, i) {
+    var fs = document.createElement("fieldset");
+    var html = "<legend>" + name + "</legend><div class='scale'>";
+    for (var v = 1; v <= 5; v++) {
+      html += "<label><input type='radio' name='c" + i + "' id='c" + i + "_" + v + "' value='" + v + "'><span><b>" + v + "</b>" + labels[v - 1] + "</span></label>";
+    }
+    fs.innerHTML = html + "</div>";
+    fields.appendChild(fs);
+  });
+
+  function values() {
+    return criteria.map(function (_, i) {
+      var el = document.querySelector("input[name='c" + i + "']:checked");
+      return el ? +el.value : 0;
+    });
+  }
+  function update() {
+    var v = values(), sum = v.reduce(function (a, b) { return a + b; }, 0);
+    var done = v.every(Boolean);
+    document.getElementById("total").textContent = sum;
+    var prio = document.getElementById("prio"), alert = document.getElementById("alert");
+    if (!done) {
+      prio.className = "chip"; prio.textContent = "Preencha os 5 critérios";
+    } else {
+      var b = bands.filter(function (x) { return sum <= x.max; })[0];
+      prio.className = "chip " + b.cls; prio.textContent = b.name;
+    }
+    var crit = [];
+    v.forEach(function (n, i) { if (n === 5) crit.push(criteria[i].replace(/^\d\.\s/, "").toLowerCase()); });
+    if (crit.length) {
+      alert.hidden = false;
+      alert.textContent = "Nota 5 em " + crit.join(", ") + ": exige avaliação urgente, independentemente da pontuação total.";
+    } else { alert.hidden = true; }
+  }
+  function load(vals) {
+    vals.forEach(function (n, i) { document.getElementById("c" + i + "_" + n).checked = true; });
+    update();
+  }
+  document.getElementById("sim").addEventListener("change", update);
+  document.getElementById("reset").addEventListener("click", function () { load(example); });
+  load(example);
+})();
+</script>
