@@ -554,8 +554,8 @@ bg("etapa4", "Etapa 4 — Riscos Climáticos")
 q("4.1", "select_multiple ameacas", "Quais ameaças/eventos climáticos já afetaram (ou podem afetar) a "
   "escola/comunidade?", req=True)
 q("4.2", "select_one sim_nao_ns", "A comunidade percebe mudanças no padrão climático local ao longo dos anos?")
-txt("4.3", "Que mudanças são percebidas?", "Registre como percepção da comunidade — o relatório final não converterá "
-    "isso em dado técnico comprovado.", rel=eq("q4_2", "sim"))
+txt("4.3", "Que mudanças são percebidas?", "Registre como percepção da comunidade, não como dado técnico "
+    "comprovado.", rel=eq("q4_2", "sim"))
 q("4.4", "select_multiple base_percepcao", "Com base em quê essa percepção se formou?", rel=eq("q4_2", "sim"))
 q("4.5", "select_multiple fontes_risco", "Existem fontes técnicas de informação sobre riscos consultadas pela "
   "escola?")
@@ -564,8 +564,8 @@ txt("4.7", "Apoio técnico para quê, especificamente?", rel=eq("q4_6", "sim"))
 txt("4.8", "Algum ator já mapeado poderia oferecer esse apoio? (informe o nome do ator, conforme Etapa 3)")
 
 br("risco", "Ficha de risco (RISK_*) — uma ficha para cada ameaça selecionada na Q4.1")
-note("risco_nota", "Preencha uma ficha por ameaça selecionada na Q4.1 (use \"Adicionar\" para cada nova). "
-                   "No sistema original as fichas são sugeridas automaticamente; aqui, escolha a ameaça abaixo.")
+note("risco_nota", "Preencha uma ficha por ameaça selecionada na Q4.1 (use \"Adicionar\" para registrar uma nova "
+                   "ficha). Escolha a ameaça no primeiro campo de cada ficha.")
 q("", "select_one ameacas", "Ameaça/evento climático desta ficha", name="risco_ameaca", req=True)
 q("", "select_one sim_nao_nsabe", "Já ocorreu antes?", name="risco_ocorreu")
 q("", "select_one afetou", "Afetou a escola, a comunidade, ou ambos?", name="risco_afetou")
@@ -599,7 +599,7 @@ q("", "select_multiple cartog_quem", "Quem participou da cartografia?", name="ma
 txt("", "O que a cartografia revelou de novo?", name="map_novo")
 q("", "select_one sim_nao_nsabe", "Houve diferenças de percepção entre participantes?", name="map_dif")
 txt("", "Descreva essas diferenças", name="map_dif_desc", rel=eq("map_dif", "sim"))
-txt("", "Se a cartografia ainda não foi feita, por quê?", name="map_porque")
+txt("", "Se a cartografia ainda não foi feita, por quê?", name="map_porque", rel="${map_file} = ''")
 q("", "image", "Anexar imagem da cartografia (MAP_FILE)", name="map_file")
 eg()
 evidencias("e4", "Evidências sobre riscos")
@@ -607,9 +607,8 @@ eg()
 
 # ======================= ETAPA 5
 bg("etapa5", "Etapa 5 — Leitura Integrada (FOFA)")
-note("e5_nota", "No sistema original esta matriz é alimentada automaticamente pelas etapas anteriores (principalmente "
-                "Riscos e Participação e Redes). No Kobo, preencha manualmente a partir das respostas já registradas "
-                "(tutoria pode ajudar). Nada é definitivo sem revisão humana.")
+note("e5_nota", "Preencha esta matriz a partir das respostas já registradas nas etapas anteriores (principalmente "
+                "Riscos e Participação e Redes). Se precisar de ajuda, procure o(a) tutor(a).")
 q("5.1", "select_one sim_nao_ns", "A leitura construída até aqui reflete bem a realidade da escola e do território?",
   req=True)
 txt("5.2", "Algum contexto importante para interpretar esta leitura integrada?")
@@ -804,7 +803,7 @@ def _loc(t):
 def salvar(path, rows, titulo, form_id, versao="1.0.0", loc=None):
     loc = loc or _loc
     titulo = loc(titulo)
-    rows = [{k: (loc(v) if k in ("label", "hint", "constraint_message") and not (r.get("keep") or r.get("name") in ("q0_8", "q0_10", "t1_1r", "e1_rede", "e1_rede_nota", "e1_escola", "q1_15") or re.fullmatch(r"q1_\d+r(_outro)?", r.get("name", ""))) else v)
+    rows = [{k: (loc(v) if k in ("label", "hint", "constraint_message") and not (r.get("keep") or r.get("name") in ("q0_8", "q0_10", "t1_1r", "e1_rede", "e1_rede_nota", "e1_escola", "q1_15", "id_inep") or re.fullmatch(r"q1_\d+r(_outro)?", r.get("name", ""))) else v)
              for k, v in r.items()} for r in rows]
     usadas = {m.group(1) for r in rows for m in [re.match(r"select_\w+ (\w+)", r.get("type", ""))] if m}
     wb = Workbook()
