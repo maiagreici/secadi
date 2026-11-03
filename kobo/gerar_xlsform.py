@@ -809,6 +809,16 @@ for _r in survey:
         _r["hint"] = "Marque o que se aplica ao seu local de atuação: escola ou secretaria. Nenhum item é obrigatório."
         _r["keep"] = True
 
+import revisao_s4
+
+
+def _ensure(lst, itens):
+    if lst not in choices:
+        L(lst, itens)
+
+
+revisao_s4.apply(survey, "label", "hint", "constraint_message", _ensure, _add_choice, True)
+
 # ---------------------------------------------------------------- ESCRITA
 def _loc(t):
     if not isinstance(t, str):
