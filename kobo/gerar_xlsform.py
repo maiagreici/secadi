@@ -783,6 +783,32 @@ revisao_s2.apply(survey, "label", "hint", _add_choice, keep=True)
 renumber(survey, 2, keep_letters=True)
 renumber(survey, 3)
 
+# Fichas de risco e cartografia dos gestores: opções que valem para diretores de escola e gestores de secretaria
+L("afetou_gest", [("instituicao", "A instituição (escola ou secretaria)"), "Comunidade", "Ambos", "Nenhum", "Não sabe"])
+L("impacto_risco_gest", ["Interrupção de aulas ou do atendimento", "Danos à estrutura", "Acesso interrompido",
+                         "Perda de materiais", "Impacto na saúde", "Impacto emocional", "Outro", "Não sabe"])
+L("ativos_gest", ["Prédio da escola ou sede da secretaria", "Escolas da rede (para secretarias)", "Biblioteca / acervo",
+                  "Quadra e áreas esportivas", "Horta e áreas verdes", "Equipamentos", "Transporte escolar",
+                  "Estoque de merenda", "Arquivos, documentos e sistemas", "Outro", "Não sabe"])
+L("grupos_exp_gest", ["Estudantes", "Professores(as)", "Funcionários(as) e equipes técnicas", "Famílias",
+                      "Pessoas com deficiência", "Crianças pequenas", "Idosos", "Outro", "Não sabe"])
+L("cartog_gest", ["Estudantes", "Professores(as)", "Gestores(as) e equipes técnicas", "Comunidade", "Outros"])
+_GEST = {"risco_afetou": "afetou_gest", "risco_impactos": "impacto_risco_gest", "risco_ativos": "ativos_gest",
+         "risco_grupos": "grupos_exp_gest", "map_quem": "cartog_gest"}
+for _r in survey:
+    _l = _GEST.get(_r.get("name"))
+    if _l:
+        _r["type"] = _r["type"].split()[0] + " " + _l
+        if _r["type"].startswith("select_multiple") and "nao_sabe" in [n for n, _ in choices[_l]]:
+            _r["constraint"] = "not(selected(., 'nao_sabe') and count-selected(.) > 1)"
+            _r["constraint_message"] = '"Não sabe" não pode ser combinado com outras opções.'
+    if _r.get("name") == "risco_afetou":
+        _r["label"] = "Afetou a instituição (escola ou secretaria), a comunidade, ou ambos?"
+        _r["keep"] = True
+    if _r.get("name") == "risco_ativos":
+        _r["hint"] = "Marque o que se aplica ao seu local de atuação: escola ou secretaria. Nenhum item é obrigatório."
+        _r["keep"] = True
+
 # ---------------------------------------------------------------- ESCRITA
 def _loc(t):
     if not isinstance(t, str):
@@ -820,7 +846,7 @@ def salvar(path, rows, titulo, form_id, versao="1.0.0", loc=None):
     for ln, items in choices.items():
         if ln in usadas:
             for n, lab in items:
-                wc.append([ln, n, lab if ln in ("tipo_local", "cat_ator") else loc(lab)])
+                wc.append([ln, n, lab if ln in ("tipo_local", "cat_ator") or ln.endswith("_gest") else loc(lab)])
     wsett = wb.create_sheet("settings")
     wsett.append(["form_title", "form_id", "version", "default_language", "style"])
     wsett.append([titulo, form_id, versao, LANG, "theme-grid no-text-transform"])
