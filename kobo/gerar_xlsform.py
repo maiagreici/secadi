@@ -818,6 +818,8 @@ def _ensure(lst, itens):
 
 
 revisao_s4.apply(survey, "label", "hint", "constraint_message", _ensure, _add_choice, True)
+import revisao_s5
+revisao_s5.apply(survey, "label", "hint", _ensure, True)
 
 # ---------------------------------------------------------------- ESCRITA
 def _loc(t):
