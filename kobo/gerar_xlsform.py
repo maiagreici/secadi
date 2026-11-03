@@ -820,6 +820,8 @@ def _ensure(lst, itens):
 revisao_s4.apply(survey, "label", "hint", "constraint_message", _ensure, _add_choice, True)
 import revisao_s5
 revisao_s5.apply(survey, "label", "hint", _ensure, True)
+import revisao_s3
+revisao_s3.apply(survey, "label", "hint", _add_choice)
 
 # ---------------------------------------------------------------- ESCRITA
 def _loc(t):
@@ -848,7 +850,7 @@ def salvar(path, rows, titulo, form_id, versao="1.0.0", loc=None):
     ws = wb.active
     ws.title = "survey"
     cols = ["type", "name", f"label::{LANG}", f"hint::{LANG}", "required", "relevant", "appearance", "constraint",
-            f"constraint_message::{LANG}", "repeat_count"]
+            f"constraint_message::{LANG}", "repeat_count", "choice_filter"]
     inv = {f"label::{LANG}": "label", f"hint::{LANG}": "hint", f"constraint_message::{LANG}": "constraint_message"}
     ws.append(cols)
     for r in rows:
