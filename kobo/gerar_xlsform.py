@@ -561,7 +561,7 @@ q("4.5", "select_multiple fontes_risco", "Existem fontes técnicas de informaç�
   "escola?")
 q("4.6", "select_one sim_nao_ns", "Seria necessário apoio técnico para avaliar melhor esses riscos?")
 txt("4.7", "Apoio técnico para quê, especificamente?", rel=eq("q4_6", "sim"))
-txt("4.8", "Algum ator já mapeado poderia oferecer esse apoio? (informe o nome do ator, conforme Etapa 3)")
+txt("4.8", "Algum ator já mapeado poderia oferecer esse apoio? (informe o nome do ator, conforme o mapeamento de atores da Semana 2)")
 
 br("risco", "Ficha de risco (RISK_*) — uma ficha para cada ameaça selecionada na Q4.1")
 note("risco_nota", "Preencha uma ficha por ameaça selecionada na Q4.1 (use \"Adicionar\" para registrar uma nova "
@@ -689,7 +689,7 @@ q("", "select_multiple publicos", "Públicos envolvidos (ACT_AUDIENCES)", name="
 q("", "select_one papel_estud2", "Papel dos estudantes (ACT_STUDENT_ROLE)", name="act_student_role")
 q("", "text", "Coordenador(a) (ACT_COORDINATOR)", name="act_coordinator")
 q("", "text", "Outros participantes (ACT_OTHER_PARTICIPANTS)", name="act_other_participants", app="multiline")
-q("", "text", "Parceiros (ACT_PARTNERS) — nomes dos atores mapeados na Etapa 3", name="act_partners",
+q("", "text", "Parceiros (ACT_PARTNERS) — nomes dos atores mapeados na Semana 2", name="act_partners",
   app="multiline")
 q("", "text", "Contribuição dos parceiros (ACT_PARTNER_CONTRIBUTION)", name="act_partner_contribution",
   app="multiline", rel="${act_partners} != ''")

@@ -201,7 +201,7 @@ def rev2(rows, lab, hint, ensure_list, gestores):
          "positivas): o que existe fora " + de + " e pode ajudar. Ex.: parceria com universidade ou ONG, apoio da Defesa "
          "Civil, programas públicos de EA.\n**Ameaças** (externas, negativas): o que vem de fora e pode atrapalhar "
          "ou aumentar os riscos. Ex.: enchentes ou ondas de calor que interrompem as aulas, corte de recursos, troca "
-         "frequente de equipes.\n\nUse o que você registrou nas etapas anteriores (Riscos e Participação e Redes). "
+         "frequente de equipes.\n\nUse o que você registrou nesta semana (riscos) e na Semana 2 (participação e redes). "
          "Escreva um item por linha. Se precisar de ajuda, procure o(a) tutor(a).")
     seta("swot_forcas", "Forças: o que já favorece a Educação Ambiental " + onde,
          "Um item por linha. Ex.: professores com experiência em projetos de EA; horta escolar; apoio da direção.")
