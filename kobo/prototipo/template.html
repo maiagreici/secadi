@@ -102,6 +102,7 @@ function tree(rows){
 // ---------------------------------------------------------------- construção do DOM
 function el(tag,cls,html){ const e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; }
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
 function reg(e,node,ctx,parent){
   const item={el:e,node,ctx,parent,rel:compile(node.r&&node.r.relevant),name:node.r&&node.r.name};
   registry.push(item); return item;
@@ -111,7 +112,7 @@ function build(nodes,host,ctx,parentItem,depth){
     if(n.kind==='group'){
       const r=n.r, g=el('div','group '+(depth===0?'top':'sub'));
       const skipLabel=['conteudo'].includes(r.name)||!r.label;
-      if(!skipLabel) g.appendChild(el(depth===0?'h2':'h3',null,esc(r.label)));
+      if(!skipLabel) g.appendChild(el(depth===0?'h2':'h3',null,md(r.label)));
       host.appendChild(g);
       const item=reg(g,n,ctx,parentItem);
       if((r.appearance||'').includes('table-list')) buildTable(n,g,ctx,item);
@@ -122,29 +123,29 @@ function build(nodes,host,ctx,parentItem,depth){
   });
 }
 function buildRepeat(n,host,ctx,parentItem){
-  const r=n.r, box=el('div','repeat'); box.appendChild(el('div','lab',esc(r.label)));
+  const r=n.r, box=el('div','repeat'); const isFicha=r.name==='risco'; const unid=isFicha?'Ficha':'Item'; box.appendChild(el('div','lab',md(r.label)));
   const list=el('div'); box.appendChild(list); host.appendChild(box);
   const item=reg(box,n,ctx,parentItem);
   ctx.reps=ctx.reps||{}; const arr=ctx.reps[r.name]=[];
   const add=()=>{
     const ic={vals:{},hid:{},parent:ctx,reps:{}}; arr.push(ic);
     const inst=el('div','inst'), head=el('div','ihead'); const idx=arr.length;
-    head.innerHTML='<span>Ficha '+idx+'</span>'; const rm=el('button',null,'Remover'); rm.type='button';
+    head.innerHTML='<span>'+unid+' '+idx+'</span>'; const rm=el('button',null,'Remover'); rm.type='button';
     rm.onclick=()=>{ if(arr.length<2) return toast('É preciso manter ao menos uma ficha.'); const k=arr.indexOf(ic); arr.splice(k,1);
-      registry=registry.filter(x=>!inst.contains(x.el)); inst.remove(); [...list.children].forEach((c,i)=>c.querySelector('.ihead span').textContent='Ficha '+(i+1)); update(); };
+      registry=registry.filter(x=>!inst.contains(x.el)); inst.remove(); [...list.children].forEach((c,i)=>c.querySelector('.ihead span').textContent=unid+' '+(i+1)); update(); };
     head.appendChild(rm); inst.appendChild(head); list.appendChild(inst);
     build(n.children,inst,ic,item,2); update();
   };
-  const b=el('button','primary','+ Adicionar ficha'); b.type='button'; b.onclick=add; box.appendChild(b);
+  const b=el('button','primary',isFicha?'+ Adicionar ficha':'+ Adicionar'); b.type='button'; b.onclick=add; box.appendChild(b);
   add();
 }
 function optionsOf(list){ return (DATA[cur].choices[list]||[]); }
 function buildQ(n,host,ctx,parentItem){
   const r=n.r, q=el('div','q'); host.appendChild(q);
   const item=reg(q,n,ctx,parentItem); item.type=r.type;
-  if(r.type==='note'){ q.className='note'; q.textContent=r.label||''; return; }
-  const lab=el('div','lab',esc(r.label||'')+(r.required==='true'?'<span class="req" title="obrigatória">*</span>':'')); q.appendChild(lab);
-  if(r.hint) q.appendChild(el('div','hint',esc(r.hint)));
+  if(r.type==='note'){ q.className='note'; q.innerHTML=md(r.label||''); return; }
+  const lab=el('div','lab',md(r.label||'')+(r.required==='true'?'<span class="req" title="obrigatória">*</span>':'')); q.appendChild(lab);
+  if(r.hint) q.appendChild(el('div','hint',md(r.hint)));
   const m=/^select_(one|multiple)\s+(\w+)/.exec(r.type);
   const t=r.type;
   item.cons=compile(r.constraint); item.filter=compile(r.choice_filter,true);

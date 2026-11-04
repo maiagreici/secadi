@@ -108,3 +108,121 @@ def esr(rows, lab, hint, relabel, gestores):
     seta("swot_rel_fragil_ameaca", "Como uma fragilidade agrava uma ameaça?",
          "Escolha uma fragilidade e uma ameaça que você listou. Ex.: \"Sem plano de emergência (fragilidade), as "
          "enchentes (ameaça) interrompem as aulas por mais tempo.\"")
+
+
+def rev2(rows, lab, hint, ensure_list, gestores):
+    """Revisão 2 da Semana 3: ficha logo após a Q4.1, plano de contingência, cartografia opcional, FOFA e
+    capacidades simplificados, sem o espaço de evidências."""
+    onde = "na escola ou na rede (secretaria)" if gestores else "na escola"
+    de = "da escola ou da rede" if gestores else "da escola"
+
+    def idx(nome):
+        return next(i for i, r in enumerate(rows) if r.get("name") == nome and not r["type"].startswith("end"))
+
+    def fim(i):
+        d = 0
+        for j in range(i, len(rows)):
+            if rows[j]["type"].startswith("begin_"):
+                d += 1
+            elif rows[j]["type"].startswith("end_"):
+                d -= 1
+                if d == 0:
+                    return j
+
+    def remover(*nomes):
+        for n in nomes:
+            i = idx(n)
+            j = fim(i) if rows[i]["type"].startswith("begin_") else i
+            del rows[i:j + 1]
+
+    def seta(nome, label=None, dica=None, keep=True):
+        r = rows[idx(nome)]
+        if label is not None:
+            r[lab] = label
+        if dica is not None:
+            r[hint] = dica
+        if keep and gestores:
+            r["keep"] = True
+        return r
+
+    # sem o espaço de evidências e sem as relações estratégicas / cinco campos de capacidades
+    remover("evid_e4", "swot_rel_nota", "swot_rel_forca_ameaca", "swot_rel_oport_fragil", "swot_rel_fragil_ameaca",
+            "cap_pedagogical", "cap_social", "cap_institutional", "cap_territorial", "cap_material")
+
+    # ficha de risco logo após a Q4.1
+    i = idx("risco")
+    bloco = rows[i:fim(i) + 1]
+    del rows[i:fim(i) + 1]
+    k = idx("q4_1")
+    while k + 1 < len(rows) and (rows[k + 1].get("name") or "") == "q4_1_outro":
+        k += 1
+    rows[k + 1:k + 1] = bloco
+    seta("q4_1", dica="Para cada evento marcado aqui, você vai preencher uma ficha de risco logo abaixo.", keep=False)
+    seta("risco", "Ficha de risco: PREENCHA UMA FICHA PARA CADA EVENTO CLIMÁTICO marcado na Q4.1", keep=False)
+    seta("risco_nota", "**ATENÇÃO: uma ficha para cada evento climático.** Se você marcou 3 eventos na Q4.1, preencha "
+         "3 fichas: use \"Adicionar\" para criar cada nova ficha e escolha o evento no primeiro campo.", keep=False)
+
+    # plano de contingência (após o apoio técnico, antes da cartografia)
+    ensure_list("plano_cont", [("sim", "Sim"), ("nao", "Não"), ("em_elaboracao", "Em elaboração"),
+                               ("nao_sabemos", "Não sabemos")])
+    if gestores:
+        pergunta = "O local de atuação (escola ou secretaria) possui plano de contingência para eventos climáticos?"
+        dica = ("Plano de contingência é o documento ou combinado que define o que fazer antes, durante e depois de um "
+                "evento (ex.: rotas de evacuação, responsáveis, contatos de emergência). Se você atua em secretaria, "
+                "responda também sobre as escolas da rede.")
+    else:
+        pergunta = "A escola possui plano de contingência para eventos climáticos?"
+        dica = ("Plano de contingência é o documento ou combinado que define o que fazer antes, durante e depois de um "
+                "evento (ex.: rotas de evacuação, responsáveis, contatos de emergência).")
+    k = idx("q4_8")
+    novo = [{"type": "select_one plano_cont", "name": "q4_cont", lab: pergunta, hint: dica},
+            {"type": "text", "name": "q4_cont_desc", lab: "Descreva brevemente o que o plano prevê",
+             "relevant": "${q4_cont}='sim' or ${q4_cont}='em_elaboracao'", "appearance": "multiline"}]
+    if gestores:
+        novo[0]["keep"] = True
+    rows[k + 1:k + 1] = novo
+
+    # cartografia: atividade sugerida
+    seta("cartografia", "Cartografia participativa (atividade sugerida)", keep=False)
+    m = rows[idx("map_nota")]
+    if not m[lab].startswith("**Atividade sugerida"):
+        m[lab] = ("**Atividade sugerida e opcional:** ninguém é obrigado a realizá-la. Se não for fazer, siga para a "
+                  "próxima etapa.\n\n" + m[lab])
+
+    seta("map_porque", "Se não for realizar a cartografia, conte o motivo (opcional)", keep=False)
+    # FOFA
+    seta("e5_nota",
+         "**O que é a matriz FOFA?** É um quadro para organizar o que você já sabe sobre a situação da **Educação "
+         "Ambiental** " + onde + ". Ela ajuda a decidir, nas próximas semanas, quais problemas enfrentar e que ações "
+         "planejar.\n\n**Forças** (internas, positivas): o que já favorece a Educação Ambiental e depende de vocês. "
+         "Ex.: professores com experiência em projetos de EA, horta escolar, apoio da direção.\n**Fragilidades** "
+         "(internas, negativas): o que dificulta ou limita e também depende de vocês. Ex.: EA só em datas "
+         "comemorativas, falta de formação, projetos que dependem de uma única pessoa.\n**Oportunidades** (externas, "
+         "positivas): o que existe fora " + de + " e pode ajudar. Ex.: parceria com universidade ou ONG, apoio da Defesa "
+         "Civil, programas públicos de EA.\n**Ameaças** (externas, negativas): o que vem de fora e pode atrapalhar "
+         "ou aumentar os riscos. Ex.: enchentes ou ondas de calor que interrompem as aulas, corte de recursos, troca "
+         "frequente de equipes.\n\nUse o que você registrou nas etapas anteriores (Riscos e Participação e Redes). "
+         "Escreva um item por linha. Se precisar de ajuda, procure o(a) tutor(a).")
+    seta("swot_forcas", "Forças: o que já favorece a Educação Ambiental " + onde,
+         "Um item por linha. Ex.: professores com experiência em projetos de EA; horta escolar; apoio da direção.")
+    seta("swot_fragilidades", "Fragilidades: o que dificulta a Educação Ambiental " + onde,
+         "Um item por linha. Ex.: EA só em datas comemorativas; falta de formação; projetos que dependem de uma só "
+         "pessoa.")
+    seta("swot_oportunidades", "Oportunidades: o que existe fora " + de + " e pode ajudar a Educação Ambiental",
+         "Um item por linha. Ex.: parceria com universidade ou ONG; apoio da Defesa Civil; programas públicos de EA.")
+    seta("swot_ameacas", "Ameaças: o que vem de fora e pode atrapalhar a Educação Ambiental ou aumentar os riscos",
+         "Um item por linha. Ex.: enchentes ou calor extremo que interrompem as aulas; corte de recursos; troca "
+         "frequente de equipes.")
+
+    # capacidades adaptativas em um único campo
+    k = idx("cap_nota")
+    seta("cap_nota",
+         "**Capacidades adaptativas** são os recursos, saberes e formas de organização que **já existem** e ajudam "
+         + onde + " e a comunidade a enfrentar os desafios do clima e a fazer Educação Ambiental. Podem ser formais ou "
+         "informais. Exemplos: professores experientes em projetos de EA; mutirões, associações e redes de apoio entre "
+         "famílias; apoio da direção e PPP que dá continuidade às ações; saberes tradicionais sobre o clima local e "
+         "parceiros do bairro; horta, materiais e equipamentos.")
+    rows[k + 1:k + 1] = [{"type": "text", "name": "cap_adaptativas", lab: "Descreva as capacidades adaptativas que já existem",
+                          hint: "Escreva livremente, um item por linha.", "appearance": "multiline"}]
+    numerar(rows, 4, lab)
+    numerar(rows, 5, lab)

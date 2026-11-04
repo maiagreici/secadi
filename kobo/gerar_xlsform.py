@@ -821,11 +821,17 @@ revisao_s4.apply(survey, "label", "hint", "constraint_message", _ensure, _add_ch
 import revisao_s5
 revisao_s5.apply(survey, "label", "hint", _ensure, True)
 import revisao_s3
+def _ensure_pc(lst, itens):
+    if lst not in choices:
+        L(lst, itens)
+
+
 def _relabel(lst, nome, label):
     choices[lst] = [(n, label if n == nome else l) for n, l in choices[lst]]
 
 
 revisao_s3.apply(survey, "label", "hint", _add_choice, _relabel, True)
+revisao_s3.rev2(survey, "label", "hint", _ensure_pc, True)
 
 # ---------------------------------------------------------------- ESCRITA
 def _loc(t):
