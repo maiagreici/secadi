@@ -45,16 +45,27 @@ TROCA_GEST = {"pri_abrangencia": "abrangencia_gest", "pri_afetados": "afetados_g
 
 
 def e6_texto(gestores):
-    dela = "da escola ou da rede" if gestores else "da escola"
-    p1 = "da escola, da rede ou do território" if gestores else "da escola ou do território"
-    return ("**Como escolher o problema a analisar.** Esta semana é **propositiva**: você vai escolher um problema e "
-            "transformá-lo em um plano de ação. Escolha uma destas situações:\n"
-            "(1) um **problema socioambiental " + p1 + "**, a partir do qual você vai elaborar uma "
-            "**proposta de plano de ação**; ou\n"
-            "(2) um **problema ambiental " + dela + " em relação ao qual já existe uma ação em andamento** (pode ser "
-            "uma ação que já está acontecendo), que você vai descrever e organizar neste plano.\n\n"
-            "Use o que você registrou nas semanas anteriores (riscos, FOFA, território). Use \"Adicionar\" para "
-            "registrar cada problema; ao final, indique até 3 prioridades. Se precisar de ajuda, procure o(a) tutor(a).")
+    if gestores:
+        abre = ("**Esta atividade é uma proposta pedagógica:** é um exercício de planejamento do curso. Você vai "
+                "escolher **um** problema e transformá-lo em um plano de ação.\n\n")
+        p1 = "da escola, da rede ou do território"
+        p2 = "da escola ou da rede"
+        fecha = "Use o que você registrou nas semanas anteriores (riscos, FOFA, território). "
+    else:
+        abre = ("**Esta atividade é uma proposta pedagógica:** é um exercício do curso para escolher e analisar "
+                "um problema. **Os planos de ação serão elaborados apenas nos questionários dos gestores.** Aqui você "
+                "escolhe e analisa o problema.\n\n")
+        p1 = "da escola ou do território"
+        p2 = "da escola"
+        fecha = "Use o que você registrou nas semanas anteriores (riscos, FOFA, território). "
+    return (abre + "**Como escolher o problema a analisar.** Pode ser:\n"
+            "(1) um **problema socioambiental " + p1 + "**" +
+            (", a partir do qual você vai elaborar uma **proposta de plano de ação**; ou\n" if gestores else "; ou\n") +
+            "(2) um **problema ambiental " + p2 + " em relação ao qual já existe uma ação em andamento** (pode ser "
+            "uma ação que já está acontecendo)" +
+            (", que você vai descrever e organizar neste plano.\n\n" if gestores else ".\n\n") +
+            fecha + "Se quiser analisar mais de um problema, use \"Adicionar\"; ao final, indique **1 prioridade**. "
+            "Se precisar de ajuda, procure o(a) tutor(a).")
 
 
 def apply(rows, lab, hint, cm, ensure_list, add_choice, gestores):
@@ -113,3 +124,40 @@ def apply(rows, lab, hint, cm, ensure_list, add_choice, gestores):
                 continue
             n += 1
             r[lab] = "Q%d.%d. %s" % (st, n, r[lab])
+
+
+def rev3(rows, lab, hint, gestores):
+    """Semana 4, revisão 3: uma prioridade (teste), sem o campo de evidências; plano de ação só nos gestores."""
+    from revisao_s3 import numerar
+
+    def idx(nome):
+        return next(i for i, r in enumerate(rows) if r.get("name") == nome and not r["type"].startswith("end"))
+
+    def fim(i):
+        d = 0
+        for j in range(i, len(rows)):
+            if rows[j]["type"].startswith("begin_"):
+                d += 1
+            elif rows[j]["type"].startswith("end_"):
+                d -= 1
+                if d == 0:
+                    return j
+
+    del rows[idx("pri_evidencias")]
+    rows[idx("pri_expected_change")][lab] = "Que mudança se espera ao escolher este problema como prioridade?"
+    rows[idx("pri_justification")][lab] = "Por que este problema é a prioridade agora?"
+    rows[idx("pri_top_problems")][lab] = "Selecione 1 prioridade — informe o título do problema escolhido"
+    n = rows[idx("e6_nota")]
+    n[lab] = e6_texto(gestores)
+    if gestores:
+        n["keep"] = True
+        i = idx("plano")
+        j = fim(i)
+        rows[i]["type"] = "begin_group"
+        rows[j]["type"] = "end_group"
+        rows[i][lab] = "Plano de ação para o problema prioritário"
+    else:
+        i = idx("etapa7")
+        del rows[i:fim(i) + 1]
+    numerar(rows, 6, lab)
+    numerar(rows, 7, lab)

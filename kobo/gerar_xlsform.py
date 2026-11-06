@@ -818,6 +818,7 @@ def _ensure(lst, itens):
 
 
 revisao_s4.apply(survey, "label", "hint", "constraint_message", _ensure, _add_choice, True)
+revisao_s4.rev3(survey, "label", "hint", True)
 import revisao_s5
 revisao_s5.apply(survey, "label", "hint", _ensure, True)
 import revisao_s3
