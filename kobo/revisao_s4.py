@@ -44,6 +44,19 @@ TROCA_GEST = {"pri_abrangencia": "abrangencia_gest", "pri_afetados": "afetados_g
               "act_execution_evidence": "evid_exec_gest"}
 
 
+def e6_texto(gestores):
+    dela = "da escola ou da rede" if gestores else "da escola"
+    p1 = "da escola, da rede ou do território" if gestores else "da escola ou do território"
+    return ("**Como escolher o problema a analisar.** Esta semana é **propositiva**: você vai escolher um problema e "
+            "transformá-lo em um plano de ação. Escolha uma destas situações:\n"
+            "(1) um **problema socioambiental " + p1 + "**, a partir do qual você vai elaborar uma "
+            "**proposta de plano de ação**; ou\n"
+            "(2) um **problema ambiental " + dela + " em relação ao qual já existe uma ação em andamento** (pode ser "
+            "uma ação que já está acontecendo), que você vai descrever e organizar neste plano.\n\n"
+            "Use o que você registrou nas semanas anteriores (riscos, FOFA, território). Use \"Adicionar\" para "
+            "registrar cada problema; ao final, indique até 3 prioridades. Se precisar de ajuda, procure o(a) tutor(a).")
+
+
 def apply(rows, lab, hint, cm, ensure_list, add_choice, gestores):
     by = {r["name"]: r for r in rows if r.get("name") and not r["type"].startswith("end")}
 
@@ -51,9 +64,7 @@ def apply(rows, lab, hint, cm, ensure_list, add_choice, gestores):
         by[nome]["type"] = by[nome]["type"].split()[0] + " " + lista
 
     # nota da Etapa 6 (sem o texto do sistema antigo)
-    quem = "a escola ou a rede" if gestores else "a escola"
-    by["e6_nota"][lab] = ('Registre cada problema que %s quer analisar (use "Adicionar" para cada um). Se precisar de '
-                          'ajuda para identificá-los, procure o(a) tutor(a).' % quem)
+    by["e6_nota"][lab] = e6_texto(gestores)
     if gestores:
         by["e6_nota"]["keep"] = True
     # "Não sabe" em gravidade, urgência e abrangência
