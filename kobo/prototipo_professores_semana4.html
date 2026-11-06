@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protótipo Semana 3</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--ink:#1d2330;--mute:#5d6678;--line:#dde1e8;--acc:#1f6f5c;--acc-ink:#fff;--err:#b3261e;--note:#eef5f2;--warn:#fff7e0}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#12151b;--card:#1b2029;--ink:#e8ebf1;--mute:#9aa4b6;--line:#2c3340;--acc:#4cb39a;--acc-ink:#0c1512;--err:#ff8a80;--note:#1c2a26;--warn:#2b2614}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px}
+.hbar{max-width:860px;margin:0 auto;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.hbar h1{font-size:16px;margin:0;flex:1 1 260px}
+.hbar .proto{font-size:12px;color:var(--mute);flex:1 1 100%}
+select,input[type=text],input[type=number],input[type=date],textarea{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+header select{width:auto}
+textarea{min-height:84px;resize:vertical}
+button{font:inherit;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;cursor:pointer}
+button.primary{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:600}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+main{max-width:860px;margin:16px auto 80px;padding:0 16px}
+.group{margin:0 0 16px}
+.group.top{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.group>h2{font-size:19px;margin:0 0 12px}
+.group.sub>h3{font-size:16px;margin:14px 0 8px;color:var(--acc)}
+.q{padding:12px 0;border-top:1px solid var(--line)}
+.q:first-child{border-top:0}
+.q>label.lab,.q>.lab{display:block;font-weight:600;margin-bottom:4px}
+.req{color:var(--err);margin-left:4px}
+.hint{color:var(--mute);font-size:14px;margin:0 0 6px}
+.note{background:var(--note);border-radius:10px;padding:10px 14px;margin:8px 0;white-space:pre-line}
+.opt{display:flex;gap:8px;align-items:flex-start;padding:4px 0}
+.opt input{margin-top:5px}
+.err{color:var(--err);font-size:14px;margin-top:4px}
+.q.bad input[type=text],.q.bad textarea,.q.bad select{border-color:var(--err)}
+.repeat{border:1px dashed var(--line);border-radius:12px;padding:12px;margin:12px 0}
+.inst{background:var(--bg);border-radius:10px;padding:8px 12px;margin:10px 0;border:1px solid var(--line)}
+.inst .ihead{display:flex;justify-content:space-between;align-items:center;font-weight:600}
+table.tl{border-collapse:collapse;width:100%;font-size:14px}.tl th,.tl td{border-bottom:1px solid var(--line);padding:6px;text-align:center}.tl td:first-child,.tl th:first-child{text-align:left}
+[hidden]{display:none!important}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.overlay .box{background:var(--card);border-radius:14px;padding:22px;max-width:520px}
+.overlay h2{margin-top:0}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:60}
+</style>
+</head>
+<body>
+<header><div class="hbar">
+  <h1 id="titulo">Protótipo</h1>
+  <label id="cursoWrap">Curso: <select id="curso"></select></label>
+  <button id="btnBaixar" type="button">Baixar respostas (.json)</button>
+  <button id="btnLimpar" type="button">Limpar</button>
+  <div class="proto"><b id="cursoNome"></b> · Protótipo para teste de preenchimento. Nada é enviado a nenhum servidor: ao concluir, você pode baixar as respostas.</div>
+</div></header>
+<main><form id="form" novalidate></form></main>
+<script>
+const DATA = {"professores": {"rows": [{"type": "start", "name": "start", "label": "", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "end", "name": "end", "label": "", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "today", "name": "today", "label": "", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "deviceid", "name": "deviceid", "label": "", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "begin_group", "name": "tcle", "label": "Termo de Consentimento", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "note", "name": "tcle_texto", "label": "TERMO DE CONSENTIMENTO LIVRE E ESCLARECIDO. Você está sendo convidado(a) a responder este Diagnóstico Socioambiental, Climático e de Educação Ambiental. A participação é voluntária: você pode recusar ou interromper a qualquer momento, sem qualquer prejuízo. As informações fornecidas, inclusive seus dados pessoais e de identificação (nome, função, local de atuação), serão tratadas com sigilo, NÃO serão compartilhadas com terceiros de forma que identifique você ou o seu local de atuação e serão utilizadas apenas para compor um banco de dados do projeto. Eventuais resultados e relatórios serão apresentados somente de forma agregada, sem identificar pessoas. O tratamento dos dados segue a Lei Geral de Proteção de Dados (Lei nº 13.709/2018). Em caso de dúvidas, procure a equipe responsável pelo projeto.", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "select_one concordo", "name": "tcle_consentimento", "label": "Li o termo acima e concordo em participar e em ter minhas respostas e meus dados utilizados no banco de dados do projeto, nos termos descritos.", "hint": "", "required": "true", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "note", "name": "tcle_recusa", "label": "Sem o seu consentimento não é possível continuar. Obrigado(a) pelo seu tempo! Você pode encerrar o formulário.", "hint": "", "required": "", "relevant": "${tcle_consentimento} = 'nao_concordo'", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "end_group", "name": "", "label": "", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "begin_group", "name": "conteudo", "label": "Diagnóstico", "hint": "", "required": "", "relevant": "${tcle_consentimento} = 'concordo'", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "begin_group", "name": "identificacao", "label": "Identificação (igual à Semana 1)", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "text", "name": "id_nome", "label": "Seu nome", "hint": "", "required": "true", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "text", "name": "id_inep", "label": "Código INEP (apenas se trabalhar em uma escola; 8 dígitos)", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "regex(., '^[0-9]{8}$')", "constraint_message": "O código INEP deve ter 8 dígitos.", "choice_filter": ""}, {"type": "text", "name": "id_escola", "label": "Nome da escola ou local em que trabalho", "hint": "", "required": "true", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "end_group", "name": "", "label": "", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "begin_group", "name": "etapa6", "label": "Etapa 6 — Problemas e Prioridades", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "note", "name": "e6_nota", "label": "**Esta atividade é uma proposta pedagógica:** é um exercício do curso para escolher e analisar um problema. **Os planos de ação serão elaborados apenas nos questionários dos gestores.** Aqui você escolhe e analisa o problema.\n\n**Como escolher o problema a analisar.** Pode ser:\n(1) um **problema socioambiental da escola ou do território**; ou\n(2) um **problema ambiental da escola em relação ao qual já existe uma ação em andamento** (pode ser uma ação que já está acontecendo).\n\nUse o que você registrou nas semanas anteriores (riscos, FOFA, território). Se quiser analisar mais de um problema, use \"Adicionar\"; ao final, indique **1 prioridade**. Se precisar de ajuda, procure o(a) tutor(a).", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "begin_repeat", "name": "pri_problema", "label": "Problema confirmado", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "text", "name": "pri_titulo", "label": "Q6.1. Título do problema", "hint": "", "required": "true", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "text", "name": "pri_descricao", "label": "Q6.2. Descrição", "hint": "", "required": "", "relevant": "", "appearance": "multiline", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "select_one bma_ns", "name": "pri_gravidade", "label": "Q6.3. Gravidade", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "select_one bma_ns", "name": "pri_urgencia", "label": "Q6.4. Urgência", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "select_one abrangencia", "name": "pri_abrangencia", "label": "Q6.5. Abrangência", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "select_one acionavel", "name": "pri_acionavel", "label": "Q6.6. A escola consegue agir?", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "select_multiple afetados", "name": "pri_afetados", "label": "Q6.7. Grupos afetados", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "text", "name": "pri_afetados_outro", "label": "Especifique (Outro)", "hint": "", "required": "", "relevant": "selected(${pri_afetados}, 'outro')", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "select_multiple decisao_part", "name": "pri_decisao_part", "label": "Q6.8. Quem deveria participar da decisão sobre este problema?", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "text", "name": "pri_decisao_part_outro", "label": "Especifique (Outro)", "hint": "", "required": "", "relevant": "selected(${pri_decisao_part}, 'outro')", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "end_repeat", "name": "", "label": "", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "text", "name": "pri_top_problems", "label": "Q6.9. Selecione 1 prioridade — informe o título do problema escolhido", "hint": "As informações acima organizam a análise, mas a escolha final não é uma soma automática de critérios — é uma decisão da comunidade escolar.", "required": "", "relevant": "", "appearance": "multiline", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "text", "name": "pri_justification", "label": "Q6.10. Por que este problema é a prioridade agora?", "hint": "", "required": "", "relevant": "", "appearance": "multiline", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "text", "name": "pri_expected_change", "label": "Q6.11. Que mudança se espera ao escolher este problema como prioridade?", "hint": "", "required": "", "relevant": "", "appearance": "multiline", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "select_multiple decisao_part", "name": "pri_sel_participantes", "label": "Q6.12. Participantes da decisão", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "text", "name": "pri_sel_participantes_outro", "label": "Especifique (Outro)", "hint": "", "required": "", "relevant": "selected(${pri_sel_participantes}, 'outro')", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "select_one metodo_sel", "name": "pri_sel_metodo", "label": "Q6.13. Método de seleção", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "text", "name": "pri_sel_metodo_outro", "label": "Especifique (Outro)", "hint": "", "required": "", "relevant": "${pri_sel_metodo}='outro'", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "end_group", "name": "", "label": "", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "begin_group", "name": "confirmacao", "label": "Confirmação final", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "note", "name": "confirmacao_msg", "label": "Semana 4/5 concluída. Obrigado(a) pela sua participação! Suas respostas ajudam a construir um diagnóstico mais completo. Revise o que respondeu, confirme abaixo e clique em Enviar para concluir. ATENÇÃO: depois de clicar em Enviar, aparecerá a mensagem \"Submission successful\" e o formulário voltará em branco. Isso significa que suas respostas FORAM ENVIADAS. Não preencha nem envie novamente.", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "select_one confirmo", "name": "confirmacao_envio", "label": "Revisei minhas respostas e confirmo o envio.", "hint": "", "required": "true", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "end_group", "name": "", "label": "", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}, {"type": "end_group", "name": "", "label": "", "hint": "", "required": "", "relevant": "", "appearance": "", "constraint": "", "constraint_message": "", "choice_filter": ""}], "choices": {"concordo": [["concordo", "Sim, concordo em participar"], ["nao_concordo", "Não concordo"]], "confirmo": [["confirmo", "Sim, confirmo o envio"]], "abrangencia": [["individual", "Individual"], ["uma_turma", "Uma turma"], ["toda_a_escola", "Toda a escola"], ["comunidade", "Comunidade"], ["territorio", "Território"], ["nao_sabe", "Não sabe"]], "acionavel": [["a_escola_pode_agir_sozinha", "A escola pode agir sozinha"], ["precisa_de_parceria", "Precisa de parceria"], ["esta_fora_do_alcance_da_escola", "Está fora do alcance da escola"], ["nao_sabe", "Não sabe"]], "afetados": [["estudantes", "Estudantes"], ["professores", "Professores(as)"], ["funcionarios", "Funcionários(as)"], ["familias", "Famílias"], ["comunidade", "Comunidade"], ["outro", "Outro"]], "decisao_part": [["estudantes", "Estudantes"], ["professores", "Professores(as)"], ["gestao", "Gestão"], ["familias", "Famílias"], ["comunidade", "Comunidade"], ["conselho_escolar", "Conselho escolar"], ["outro", "Outro"]], "metodo_sel": [["votacao", "Votação"], ["consenso", "Consenso"], ["decisao_da_gestao", "Decisão da gestão"], ["criterios_tecnicos", "Critérios técnicos"], ["discussao_coletiva", "Discussão coletiva"], ["outro", "Outro"]], "bma_ns": [["baixa", "Baixa"], ["media", "Média"], ["alta", "Alta"], ["nao_sabe", "Não sabe"]]}, "title": "Diagnóstico Socioambiental — Semana 4/5: Problemas e Prioridades", "id": "diagnostico_semana4", "curso": "Professores"}};
+(function(){
+'use strict';
+const $ = s => document.querySelector(s);
+let cur = null, registry = [], rootCtx = null, curCtx = null;
+
+// ---------------------------------------------------------------- expressões
+function compile(expr, isFilter){
+  if(!expr) return null;
+  const strs=[];
+  let s=String(expr).replace(/'([^']*)'/g,m=>{strs.push(m);return '\u0001'+(strs.length-1)+'\u0002'});
+  s=s.replace(/\$\{(\w+)\}/g,(m,n)=>'V("'+n+'")');
+  s=s.replace(/count-selected\(/g,'countSel(').replace(/regex\(/g,'rx(');
+  s=s.replace(/\bnot\(/g,'!(').replace(/\band\b/g,'&&').replace(/\bor\b/g,'||');
+  s=s.replace(/(?<![<>!=])=(?!=)/g,'==');
+  s=s.replace(/(?<![\w"\)\u0002])\.(?![\w])/g,'CUR');
+  if(isFilter) s=s.replace(/\bname\b/g,'CN');
+  s=s.replace(/\u0001(\d+)\u0002/g,(m,i)=>strs[+i]);
+  try{ return new Function('V','selected','countSel','rx','CUR','CN','return ('+s+');'); }
+  catch(e){ console.error('Expressão inválida',expr,'=>',s,e); return null; }
+}
+const selected=(v,i)=>String(v||'').split(' ').filter(Boolean).includes(i);
+const countSel=v=>String(v||'').split(' ').filter(Boolean).length;
+const rx=(v,p)=>new RegExp(p).test(String(v||''));
+function lookup(ctx,n){ for(let c=ctx;c;c=c.parent){ if(n in c.vals) return c.hid[n]?'':c.vals[n]; } return ''; }
+function evalExpr(fn,ctx,CUR,CN){
+  if(!fn) return true;
+  try{ return !!fn(n=>lookup(ctx,n),selected,countSel,rx,CUR,CN); }catch(e){ console.error(e); return true; }
+}
+
+// ---------------------------------------------------------------- árvore
+function tree(rows){
+  const root={children:[]}, stack=[root];
+  rows.forEach(r=>{
+    const t=r.type||'';
+    if(['start','end','today','deviceid'].includes(t)) return;
+    if(t.startsWith('begin_')){ const n={kind:t.slice(6),r,children:[]}; stack[stack.length-1].children.push(n); stack.push(n); }
+    else if(t.startsWith('end_')){ stack.pop(); }
+    else stack[stack.length-1].children.push({kind:'q',r});
+  });
+  return root.children;
+}
+
+// ---------------------------------------------------------------- construção do DOM
+function el(tag,cls,html){ const e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; }
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+function reg(e,node,ctx,parent){
+  const item={el:e,node,ctx,parent,rel:compile(node.r&&node.r.relevant),name:node.r&&node.r.name};
+  registry.push(item); return item;
+}
+function build(nodes,host,ctx,parentItem,depth){
+  nodes.forEach(n=>{
+    if(n.kind==='group'){
+      const r=n.r, g=el('div','group '+(depth===0?'top':'sub'));
+      const skipLabel=['conteudo'].includes(r.name)||!r.label;
+      if(!skipLabel) g.appendChild(el(depth===0?'h2':'h3',null,md(r.label)));
+      host.appendChild(g);
+      const item=reg(g,n,ctx,parentItem);
+      if((r.appearance||'').includes('table-list')) buildTable(n,g,ctx,item);
+      else build(n.children,g,ctx,item,depth+(r.name==='conteudo'?0:1));
+    } else if(n.kind==='repeat'){
+      buildRepeat(n,host,ctx,parentItem);
+    } else buildQ(n,host,ctx,parentItem);
+  });
+}
+function buildRepeat(n,host,ctx,parentItem){
+  const r=n.r, box=el('div','repeat'); const isFicha=r.name==='risco'; const unid=isFicha?'Ficha':'Item'; box.appendChild(el('div','lab',md(r.label)));
+  const list=el('div'); box.appendChild(list); host.appendChild(box);
+  const item=reg(box,n,ctx,parentItem);
+  ctx.reps=ctx.reps||{}; const arr=ctx.reps[r.name]=[];
+  const add=()=>{
+    const ic={vals:{},hid:{},parent:ctx,reps:{}}; arr.push(ic);
+    const inst=el('div','inst'), head=el('div','ihead'); const idx=arr.length;
+    head.innerHTML='<span>'+unid+' '+idx+'</span>'; const rm=el('button',null,'Remover'); rm.type='button';
+    rm.onclick=()=>{ if(arr.length<2) return toast('É preciso manter ao menos uma ficha.'); const k=arr.indexOf(ic); arr.splice(k,1);
+      registry=registry.filter(x=>!inst.contains(x.el)); inst.remove(); [...list.children].forEach((c,i)=>c.querySelector('.ihead span').textContent=unid+' '+(i+1)); update(); };
+    head.appendChild(rm); inst.appendChild(head); list.appendChild(inst);
+    build(n.children,inst,ic,item,2); update();
+  };
+  const b=el('button','primary',isFicha?'+ Adicionar ficha':'+ Adicionar'); b.type='button'; b.onclick=add; box.appendChild(b);
+  add();
+}
+function optionsOf(list){ return (DATA[cur].choices[list]||[]); }
+function buildQ(n,host,ctx,parentItem){
+  const r=n.r, q=el('div','q'); host.appendChild(q);
+  const item=reg(q,n,ctx,parentItem); item.type=r.type;
+  if(r.type==='note'){ q.className='note'; q.innerHTML=md(r.label||''); return; }
+  const lab=el('div','lab',md(r.label||'')+(r.required==='true'?'<span class="req" title="obrigatória">*</span>':'')); q.appendChild(lab);
+  if(r.hint) q.appendChild(el('div','hint',md(r.hint)));
+  const m=/^select_(one|multiple)\s+(\w+)/.exec(r.type);
+  const t=r.type;
+  item.cons=compile(r.constraint); item.filter=compile(r.choice_filter,true);
+  const set=v=>{ ctx.vals[r.name]=v; };
+  set('');
+  if(m){
+    item.multi=m[1]==='multiple'; item.list=m[2]; item.box=el('div'); q.appendChild(item.box); item.cache=null; paintOptions(item,true);
+  } else if(t==='text'||t==='integer'||t==='date'){
+    const multiline=(r.appearance||'').includes('multiline');
+    const inp=multiline?el('textarea'):el('input'); if(!multiline) inp.type=t==='integer'?'number':(t==='date'?'date':'text');
+    inp.addEventListener('input',()=>{ set(inp.value); update(); }); item.input=inp; q.appendChild(inp);
+  } else if(t==='image'||t==='file'){
+    const inp=el('input'); inp.type='file'; if(t==='image') inp.accept='image/*';
+    inp.addEventListener('change',()=>{ set(inp.files[0]?inp.files[0].name:''); update(); }); item.input=inp; q.appendChild(inp);
+  } else { q.appendChild(el('div','hint','(tipo não suportado no protótipo: '+esc(t)+')')); }
+  const e=el('div','err'); e.hidden=true; q.appendChild(e); item.errEl=e;
+}
+function allowedOptions(item){
+  let opts=optionsOf(item.list);
+  if(item.filter) opts=opts.filter(o=>evalExpr(item.filter,item.ctx,undefined,o[0]));
+  return opts;
+}
+function paintOptions(item,force){
+  const opts=allowedOptions(item), key=opts.map(o=>o[0]).join('|');
+  if(!force && item.cache===key) return; item.cache=key;
+  const r=item.node.r, ctx=item.ctx, box=item.box; box.innerHTML='';
+  const old=String(ctx.vals[r.name]||'').split(' ').filter(Boolean).filter(v=>opts.some(o=>o[0]===v));
+  const uid='f'+Math.random().toString(36).slice(2,8);
+  const setv=a=>{ ctx.vals[r.name]=a.join(' '); update(); };
+  if(!item.multi && opts.length>7){
+    const s=el('select'); s.appendChild(new Option('— selecione —',''));
+    opts.forEach(o=>s.appendChild(new Option(o[1],o[0]))); s.value=old[0]||''; s.onchange=()=>setv(s.value?[s.value]:[]); box.appendChild(s);
+  } else {
+    opts.forEach(o=>{
+      const lab=el('label','opt'), i=el('input'); i.type=item.multi?'checkbox':'radio'; i.name=uid; i.value=o[0]; i.checked=old.includes(o[0]);
+      i.onchange=()=>{ const sel=[...box.querySelectorAll('input:checked')].map(x=>x.value); setv(sel); };
+      lab.appendChild(i); lab.appendChild(el('span',null,esc(o[1]))); box.appendChild(lab);
+    });
+  }
+  ctx.vals[r.name]=old.join(' ');
+}
+function buildTable(n,g,ctx,item){
+  const rowsN=n.children.filter(c=>c.kind==='q'); if(!rowsN.length) return;
+  const m=/select_(one|multiple)\s+(\w+)/.exec(rowsN[0].r.type); const opts=optionsOf(m[2]);
+  const tb=el('table','tl'); const th=el('tr'); th.appendChild(el('th')); opts.forEach(o=>th.appendChild(el('th',null,esc(o[1])))); tb.appendChild(th); g.appendChild(tb);
+  rowsN.forEach(c=>{
+    const tr=el('tr'); tb.appendChild(tr); const it=reg(tr,c,ctx,item); it.type='table-row';
+    tr.appendChild(el('td',null,esc(c.r.label))); ctx.vals[c.r.name]=''; const multi=/multiple/.test(c.r.type); const uid='t'+Math.random().toString(36).slice(2,8);
+    opts.forEach(o=>{ const td=el('td'), i=el('input'); i.type=multi?'checkbox':'radio'; i.name=uid; i.value=o[0];
+      i.onchange=()=>{ ctx.vals[c.r.name]=[...tr.querySelectorAll('input:checked')].map(x=>x.value).join(' '); update(); }; td.appendChild(i); tr.appendChild(td); });
+    it.row=true;
+  });
+}
+
+// ---------------------------------------------------------------- atualização (relevância, filtros)
+function update(){
+  for(let pass=0;pass<3;pass++){
+    registry.forEach(it=>{
+      const par=it.parent?!it.parent.hidden:true;
+      let vis=par&&evalExpr(it.rel,it.ctx);
+      it.hidden=!vis; it.el.hidden=!vis;
+      if(it.name){ it.ctx.hid[it.name]=!vis;
+        if(!vis && it.ctx.vals[it.name]){ it.ctx.vals[it.name]=''; clearInput(it); } }
+    });
+    registry.forEach(it=>{ if(it.filter && !it.hidden) paintOptions(it,false); });
+  }
+}
+function clearInput(it){
+  if(it.input){ if(it.input.type==='file') it.input.value=''; else it.input.value=''; }
+  if(it.box) paintOptions(it,true);
+  if(it.row) it.el.querySelectorAll('input').forEach(i=>i.checked=false);
+}
+
+// ---------------------------------------------------------------- validação e envio
+function validate(){
+  let first=null, n=0;
+  registry.forEach(it=>{
+    if(!it.name||it.hidden||it.row&&false) return;
+    const r=it.node.r; if(!r||!r.type||r.type==='note') return;
+    const v=String(it.ctx.vals[it.name]||''); let msg='';
+    if(r.required==='true' && !v) msg='Resposta obrigatória.';
+    else if(v && it.cons && !evalExpr(it.cons,it.ctx,v)) msg=r.constraint_message||'Valor inválido.';
+    if(it.errEl){ it.errEl.hidden=!msg; it.errEl.textContent=msg; }
+    it.el.classList.toggle('bad',!!msg);
+    if(msg){ n++; if(!first) first=it.el; }
+  });
+  return {n,first};
+}
+function collect(ctx){
+  const o={};
+  Object.keys(ctx.vals).forEach(k=>{ if(ctx.vals[k]!=='' && !ctx.hid[k]) o[k]=ctx.vals[k]; });
+  Object.keys(ctx.reps||{}).forEach(k=>{ o[k]=ctx.reps[k].map(collect); });
+  return o;
+}
+function download(){
+  const blob=new Blob([JSON.stringify({formulario:DATA[cur].title,gerado_em:new Date().toISOString(),respostas:collect(rootCtx)},null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=DATA[cur].id+'_respostas.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+function toast(t){ const d=el('div','toast',esc(t)); document.body.appendChild(d); setTimeout(()=>d.remove(),2600); }
+function submit(){
+  const v=validate();
+  if(v.n){ toast(v.n+' pergunta(s) precisam de atenção.'); v.first.scrollIntoView({behavior:'smooth',block:'center'}); return; }
+  const ov=el('div','overlay',''); ov.innerHTML='<div class="box"><h2>Submission successful</h2><p>Suas respostas foram registradas neste protótipo. Em um formulário real do Kobo, esta é a mensagem que aparece e a página volta em branco.</p><p><b>Nada foi enviado a nenhum servidor.</b></p><div class="actions"><button class="primary" id="ovBaixar">Baixar respostas (.json)</button><button id="ovVoltar">Voltar ao formulário</button></div></div>';
+  document.body.appendChild(ov); ov.querySelector('#ovBaixar').onclick=download; ov.querySelector('#ovVoltar').onclick=()=>ov.remove();
+}
+
+// ---------------------------------------------------------------- inicialização
+function load(key){
+  cur=key; const form=$('#form'); form.innerHTML=''; registry=[]; rootCtx={vals:{},hid:{},parent:null,reps:{}};
+  $('#titulo').textContent=DATA[key].title; $('#cursoNome').textContent='Curso: '+DATA[key].curso; document.title=DATA[key].title;
+  build(tree(DATA[key].rows),form,rootCtx,null,0);
+  const act=el('div','actions'); const b=el('button','primary','Enviar'); b.type='button'; b.onclick=submit; act.appendChild(b); form.appendChild(act);
+  update();
+}
+const sel=$('#curso'); Object.keys(DATA).forEach(k=>sel.appendChild(new Option(DATA[k].curso,k)));
+if(Object.keys(DATA).length<2) $('#cursoWrap').hidden=true;
+sel.onchange=()=>{ if(confirm('Trocar de curso limpa as respostas atuais. Continuar?')) load(sel.value); else sel.value=cur; };
+$('#btnBaixar').onclick=download;
+$('#btnLimpar').onclick=()=>{ if(confirm('Limpar todas as respostas?')) load(cur); };
+form_submit_guard();
+function form_submit_guard(){ $('#form').addEventListener('submit',e=>e.preventDefault()); }
+load(Object.keys(DATA)[0]);
+window.__proto={load,validate,collect,getCtx:()=>rootCtx};
+})();
+</script>
+</body>
+</html>

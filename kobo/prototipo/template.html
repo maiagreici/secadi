@@ -49,10 +49,10 @@ table.tl{border-collapse:collapse;width:100%;font-size:14px}.tl th,.tl td{border
 <body>
 <header><div class="hbar">
   <h1 id="titulo">Protótipo</h1>
-  <label>Curso: <select id="curso"></select></label>
+  <label id="cursoWrap">Curso: <select id="curso"></select></label>
   <button id="btnBaixar" type="button">Baixar respostas (.json)</button>
   <button id="btnLimpar" type="button">Limpar</button>
-  <div class="proto">Protótipo para teste de preenchimento. Nada é enviado a nenhum servidor: ao concluir, você pode baixar as respostas.</div>
+  <div class="proto"><b id="cursoNome"></b> · Protótipo para teste de preenchimento. Nada é enviado a nenhum servidor: ao concluir, você pode baixar as respostas.</div>
 </div></header>
 <main><form id="form" novalidate></form></main>
 <script>
@@ -255,12 +255,13 @@ function submit(){
 // ---------------------------------------------------------------- inicialização
 function load(key){
   cur=key; const form=$('#form'); form.innerHTML=''; registry=[]; rootCtx={vals:{},hid:{},parent:null,reps:{}};
-  $('#titulo').textContent=DATA[key].title; document.title=DATA[key].title;
+  $('#titulo').textContent=DATA[key].title; $('#cursoNome').textContent='Curso: '+DATA[key].curso; document.title=DATA[key].title;
   build(tree(DATA[key].rows),form,rootCtx,null,0);
   const act=el('div','actions'); const b=el('button','primary','Enviar'); b.type='button'; b.onclick=submit; act.appendChild(b); form.appendChild(act);
   update();
 }
 const sel=$('#curso'); Object.keys(DATA).forEach(k=>sel.appendChild(new Option(DATA[k].curso,k)));
+if(Object.keys(DATA).length<2) $('#cursoWrap').hidden=true;
 sel.onchange=()=>{ if(confirm('Trocar de curso limpa as respostas atuais. Continuar?')) load(sel.value); else sel.value=cur; };
 $('#btnBaixar').onclick=download;
 $('#btnLimpar').onclick=()=>{ if(confirm('Limpar todas as respostas?')) load(cur); };

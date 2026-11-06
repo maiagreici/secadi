@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Gera prototipo_semanaN.html a partir dos XLSForms da semana N (professores e gestores).
-Uso: python3 prototipo/gerar_prototipo.py 3"""
+"""Gera um protótipo HTML por curso e semana: prototipo_<curso>_semana<N>.html.
+Uso: python3 prototipo/gerar_prototipo.py 3 4 5"""
 import json
 import os
 import sys
@@ -9,11 +9,8 @@ import openpyxl
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(AQUI)
-SEMANA = sys.argv[1] if len(sys.argv) > 1 else "3"
-CURSOS = [("professores", "Professores", "professores_semana%s_diagnostico.xlsx" % SEMANA),
-          ("gestores", "Gestores", "gestores_semana%s_diagnostico.xlsx" % SEMANA)]
-
-
+TODOS = [("professores", "Professores"), ("gestores", "Gestores")]
+SEMANAS = sys.argv[1:] or ["3"]
 def ler(path):
     wb = openpyxl.load_workbook(path)
     h = [c.value for c in wb["survey"][1]]
@@ -34,13 +31,13 @@ def ler(path):
     return {"rows": rows, "choices": ch, "title": st[0], "id": st[1]}
 
 
-dados = {}
-for chave, nome, arq in CURSOS:
-    d = ler(os.path.join(RAIZ, arq))
-    d["curso"] = nome
-    dados[chave] = d
-html = open(os.path.join(AQUI, "template.html"), encoding="utf-8").read()
-html = html.replace("/*DATA*/", json.dumps(dados, ensure_ascii=False))
-saida = os.path.join(RAIZ, "prototipo_semana%s.html" % SEMANA)
-open(saida, "w", encoding="utf-8").write(html)
-print(saida, len(html) // 1024, "KB")
+html0 = open(os.path.join(AQUI, "template.html"), encoding="utf-8").read()
+for semana in SEMANAS:
+    for chave, nome in TODOS:
+        arq = "%s_semana%s_diagnostico.xlsx" % (chave, semana)
+        d = ler(os.path.join(RAIZ, arq))
+        d["curso"] = nome
+        html = html0.replace("/*DATA*/", json.dumps({chave: d}, ensure_ascii=False))
+        saida = os.path.join(RAIZ, "prototipo_%s_semana%s.html" % (chave, semana))
+        open(saida, "w", encoding="utf-8").write(html)
+        print(saida, len(html) // 1024, "KB")
