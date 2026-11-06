@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Gera prototipo_semana3.html a partir dos XLSForms da Semana 3 (professores e gestores)."""
+"""Gera prototipo_semanaN.html a partir dos XLSForms da semana N (professores e gestores).
+Uso: python3 prototipo/gerar_prototipo.py 3"""
 import json
 import os
 import sys
@@ -8,8 +9,9 @@ import openpyxl
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(AQUI)
-CURSOS = [("professores", "Professores", "professores_semana3_diagnostico.xlsx"),
-          ("gestores", "Gestores", "gestores_semana3_diagnostico.xlsx")]
+SEMANA = sys.argv[1] if len(sys.argv) > 1 else "3"
+CURSOS = [("professores", "Professores", "professores_semana%s_diagnostico.xlsx" % SEMANA),
+          ("gestores", "Gestores", "gestores_semana%s_diagnostico.xlsx" % SEMANA)]
 
 
 def ler(path):
@@ -39,6 +41,6 @@ for chave, nome, arq in CURSOS:
     dados[chave] = d
 html = open(os.path.join(AQUI, "template.html"), encoding="utf-8").read()
 html = html.replace("/*DATA*/", json.dumps(dados, ensure_ascii=False))
-saida = os.path.join(RAIZ, "prototipo_semana3.html")
+saida = os.path.join(RAIZ, "prototipo_semana%s.html" % SEMANA)
 open(saida, "w", encoding="utf-8").write(html)
 print(saida, len(html) // 1024, "KB")
