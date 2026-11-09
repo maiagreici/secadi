@@ -46,6 +46,20 @@ TROCA_GEST = {"pri_abrangencia": "abrangencia_gest", "pri_afetados": "afetados_g
 
 def e6_texto(gestores):
     onde = "sua escola ou rede de ensino" if gestores else "sua escola"
+    if gestores:
+        return ("**Esta atividade é uma proposta pedagógica e é a atividade final da formação:** elaborar uma "
+                "**proposta de Plano de Implementação e Monitoramento da Educação Ambiental (EA)**, voltado à sua "
+                "escola, rede de ensino ou território educativo. Esse plano é desenvolvido ao longo do curso, a partir "
+                "dos diagnósticos iniciais e dos conteúdos trabalhados nos módulos.\n\n"
+                "**Como escolher o problema a analisar.** Pode ser:\n"
+                "(1) um **problema socioambiental da escola, da rede ou do território**, a partir do qual você vai "
+                "elaborar o plano; ou\n"
+                "(2) um **problema ambiental da escola ou da rede em relação ao qual já existe uma ação em "
+                "andamento** (pode ser uma ação que já está acontecendo), que você vai descrever e organizar neste "
+                "plano.\n\n"
+                "Use o que você registrou nas semanas anteriores (riscos, FOFA, território). Se quiser analisar mais "
+                "de um problema, use \"Adicionar\"; ao final, indique **1 prioridade**. Se precisar de ajuda, procure "
+                "o(a) tutor(a).")
     p1 = "da escola, da rede ou do território" if gestores else "da escola ou do território"
     p2 = "da escola ou da rede" if gestores else "da escola"
     return ("**Esta atividade é uma proposta pedagógica e é a atividade final da formação:** elaborar uma **proposta "
@@ -62,6 +76,12 @@ def e6_texto(gestores):
 
 
 def e7_texto(gestores):
+    if gestores:
+        return ("**Plano de Implementação e Monitoramento da EA.** Este plano pode incluir: estratégias de "
+                "transversalização da EA no currículo; propostas de projetos pedagógicos socioambientais; articulação "
+                "com atores territoriais e comunitários; ações voltadas à resiliência climática e sustentabilidade "
+                "escolar; e indicadores e estratégias de monitoramento das ações (Semana 5). Use o diagnóstico que "
+                "você construiu nas semanas anteriores.")
     fim = "" if gestores else " Esta é uma versão simples: responda de forma objetiva."
     return ("**Proposta de ação educativa para o fortalecimento da resiliência climática.** Esta proposta articula três "
             "partes: (1) o **diagnóstico territorial**, que você já construiu nas semanas anteriores (território, "
@@ -187,10 +207,16 @@ def rev3(rows, lab, hint, gestores):
         j = fim(i)
         rows[i]["type"] = "begin_group"
         rows[j]["type"] = "end_group"
-        rows[i][lab] = "Proposta de ação educativa para o problema prioritário"
-        rows[idx("act_problema")][lab] = "Título da proposta de ação educativa"
+        rows[i][lab] = "Plano de Implementação e Monitoramento da EA para o problema prioritário"
+        rows[idx("act_problema")][lab] = "Título do plano"
         e7 = rows[idx("etapa7")]
-        e7[lab] = "Etapa 7 — Proposta de Ação Educativa"
+        e7[lab] = "Etapa 7 — Plano de Implementação da Educação Ambiental"
+        if not any(r.get("name") == "act_curriculum" for r in rows):
+            rows.insert(idx("act_desired_change") + 1,
+                        {"type": "text", "name": "act_curriculum", "appearance": "multiline",
+                         lab: "Estratégias de transversalização da EA no currículo",
+                         hint: "Opcional. Como a EA vai aparecer nas disciplinas e nos projetos da escola ou da rede.",
+                         })
         rows.insert(idx("etapa7") + 1, {"type": "note", "name": "e7_nota", lab: e7_texto(True)})
     numerar(rows, 6, lab)
     numerar(rows, 7, lab)
