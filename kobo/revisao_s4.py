@@ -45,27 +45,59 @@ TROCA_GEST = {"pri_abrangencia": "abrangencia_gest", "pri_afetados": "afetados_g
 
 
 def e6_texto(gestores):
-    if gestores:
-        abre = ("**Esta atividade é uma proposta pedagógica:** é um exercício de planejamento do curso. Você vai "
-                "escolher **um** problema e transformá-lo em um plano de ação.\n\n")
-        p1 = "da escola, da rede ou do território"
-        p2 = "da escola ou da rede"
-        fecha = "Use o que você registrou nas semanas anteriores (riscos, FOFA, território). "
-    else:
-        abre = ("**Esta atividade é uma proposta pedagógica:** é um exercício do curso para escolher e analisar "
-                "um problema. **Os planos de ação serão elaborados apenas nos questionários dos gestores.** Aqui você "
-                "escolhe e analisa o problema.\n\n")
-        p1 = "da escola ou do território"
-        p2 = "da escola"
-        fecha = "Use o que você registrou nas semanas anteriores (riscos, FOFA, território). "
-    return (abre + "**Como escolher o problema a analisar.** Pode ser:\n"
-            "(1) um **problema socioambiental " + p1 + "**" +
-            (", a partir do qual você vai elaborar uma **proposta de plano de ação**; ou\n" if gestores else "; ou\n") +
+    onde = "sua escola ou rede de ensino" if gestores else "sua escola"
+    p1 = "da escola, da rede ou do território" if gestores else "da escola ou do território"
+    p2 = "da escola ou da rede" if gestores else "da escola"
+    return ("**Esta atividade é uma proposta pedagógica e é a atividade final da formação:** elaborar uma **proposta "
+            "de ação educativa para o fortalecimento da resiliência climática** em " + onde + ", articulando "
+            "diagnóstico territorial, estratégias pedagógicas e mobilização comunitária.\n\n"
+            "**Como escolher o problema a analisar.** Pode ser:\n"
+            "(1) um **problema socioambiental " + p1 + "**, a partir do qual você vai elaborar a proposta de ação "
+            "educativa; ou\n"
             "(2) um **problema ambiental " + p2 + " em relação ao qual já existe uma ação em andamento** (pode ser "
-            "uma ação que já está acontecendo)" +
-            (", que você vai descrever e organizar neste plano.\n\n" if gestores else ".\n\n") +
-            fecha + "Se quiser analisar mais de um problema, use \"Adicionar\"; ao final, indique **1 prioridade**. "
-            "Se precisar de ajuda, procure o(a) tutor(a).")
+            "uma ação que já está acontecendo), que você vai descrever e organizar nesta proposta.\n\n"
+            "Use o que você registrou nas semanas anteriores (riscos, FOFA, território). Se quiser analisar mais de um "
+            "problema, use \"Adicionar\"; ao final, indique **1 prioridade**. Se precisar de ajuda, procure o(a) "
+            "tutor(a).")
+
+
+def e7_texto(gestores):
+    fim = "" if gestores else " Esta é uma versão simples: responda de forma objetiva."
+    return ("**Proposta de ação educativa para o fortalecimento da resiliência climática.** Esta proposta articula três "
+            "partes: (1) o **diagnóstico territorial**, que você já construiu nas semanas anteriores (território, "
+            "riscos, participação e redes, FOFA); (2) as **estratégias pedagógicas**, ou seja, o que será feito com "
+            "estudantes e professores; e (3) as **iniciativas de mobilização comunitária**, que serão detalhadas na "
+            "Semana 5 (educomunicação)." + fim)
+
+
+def etapa7_simples(lab, hint, cm):
+    """Etapa 7 curta (professores)."""
+    return [
+        {"type": "begin_group", "name": "etapa7", lab: "Etapa 7 — Proposta de Ação Educativa"},
+        {"type": "note", "name": "e7_nota", lab: e7_texto(False)},
+        {"type": "begin_group", "name": "plano", lab: "Proposta de ação educativa para o problema prioritário"},
+        {"type": "text", "name": "act_problema", "required": "true", lab: "Título da proposta de ação educativa",
+         hint: "Dê um nome curto à sua proposta."},
+        {"type": "text", "name": "act_objective", "required": "true", "appearance": "multiline",
+         lab: "Qual é o objetivo da proposta?",
+         hint: "O que você quer alcançar com a ação. Ex.: reduzir os alagamentos no pátio e preparar a comunidade "
+               "escolar para as chuvas."},
+        {"type": "text", "name": "act_activities", "appearance": "multiline",
+         lab: "Quais estratégias pedagógicas e atividades serão realizadas?",
+         hint: "Descreva, em linhas gerais, o que será feito com estudantes e professores. Ex.: oficina sobre "
+               "drenagem, horta no pátio, roda de conversa com as famílias."},
+        {"type": "select_one papel_estud2", "name": "act_student_role", lab: "Qual será o papel dos estudantes?"},
+        {"type": "text", "name": "act_partners", "appearance": "multiline",
+         lab: "Quem pode participar ou apoiar a ação (famílias, comunidade, parceiros)?",
+         hint: "Cite pessoas, grupos ou instituições, inclusive os atores mapeados na Semana 2."},
+        {"type": "date", "name": "act_start", lab: "Início previsto"},
+        {"type": "text", "name": "act_duration", lab: "Duração prevista"},
+        {"type": "text", "name": "act_expected_result", "required": "true", "appearance": "multiline",
+         lab: "Resultado esperado", hint: "O que deve mudar depois da ação. Ex.: pátio sem alagamento nas chuvas "
+                                         "e famílias informadas sobre o que fazer."},
+        {"type": "end_group"},
+        {"type": "end_group"},
+    ]
 
 
 def apply(rows, lab, hint, cm, ensure_list, add_choice, gestores):
@@ -155,9 +187,10 @@ def rev3(rows, lab, hint, gestores):
         j = fim(i)
         rows[i]["type"] = "begin_group"
         rows[j]["type"] = "end_group"
-        rows[i][lab] = "Plano de ação para o problema prioritário"
-    else:
-        i = idx("etapa7")
-        del rows[i:fim(i) + 1]
+        rows[i][lab] = "Proposta de ação educativa para o problema prioritário"
+        rows[idx("act_problema")][lab] = "Título da proposta de ação educativa"
+        e7 = rows[idx("etapa7")]
+        e7[lab] = "Etapa 7 — Proposta de Ação Educativa"
+        rows.insert(idx("etapa7") + 1, {"type": "note", "name": "e7_nota", lab: e7_texto(True)})
     numerar(rows, 6, lab)
     numerar(rows, 7, lab)

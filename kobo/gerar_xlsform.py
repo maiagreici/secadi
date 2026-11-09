@@ -954,7 +954,7 @@ SEMANAS = [
     (1, "Identificação e Território", ["etapa0", "etapa1"]),
     (2, "Educação Ambiental, Participação e Redes", ["etapa2", "etapa3"]),
     (3, "Riscos Climáticos e Leitura Integrada (FOFA)", ["etapa4", "etapa5"]),
-    (4, "Problemas, Prioridades e Plano de Ação", ["etapa6", "etapa7"]),
+    (4, "Problemas, Prioridades e Proposta de Ação Educativa", ["etapa6", "etapa7"]),
     (5, "Educomunicação, Monitoramento e Síntese", ["etapa8", "etapa9", "etapa10"]),
 ]
 meta, bl = blocos()

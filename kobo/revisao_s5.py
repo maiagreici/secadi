@@ -14,9 +14,10 @@ LISTAS_GEST = {
 TROCA = {"com_media": "com_midia_gest", "com_producers": "com_produz_gest", "com_audience": "com_publico_gest"}
 
 
-E8_TEXTO = ("**Este formulário é um convite para planejar uma ação de educomunicação.** Retome o que foi trabalhado no "
-            "módulo do curso sobre Educomunicação para responder. Educomunicação é o uso da comunicação para engajar as "
-            "pessoas na ação: como vocês vão informar, ouvir e envolver o público. Responda uma vez para cada ação.")
+E8_TEXTO = ("**Este formulário é um convite para planejar a parte de mobilização comunitária da sua proposta de ação "
+            "educativa:** a educomunicação, ou seja, como vocês vão informar, ouvir e envolver a comunidade na ação. "
+            "Retome o que foi trabalhado no módulo do curso sobre Educomunicação para responder. Responda uma vez para "
+            "cada ação.")
 E10_TEXTO = ("**Antes de começar:** para responder a esta síntese, consulte o histórico das suas respostas das semanas "
              "anteriores (Semanas 1 a 4), disponibilizado pela equipe do curso.\n\nEsta etapa não substitui a leitura já "
              "construída — ela organiza uma síntese final a partir do que foi registrado.")
@@ -35,6 +36,8 @@ def apply(rows, lab, hint, ensure_list, gestores):
                 r[k] = CODE.sub("", r[k])
     by["mon_qual_change"][hint] = "Preencha apenas se a ação já começou."
     by["e10_nota"][lab] = E10_TEXTO
+    for _n in ("com_acao", "mon_acao"):
+        by[_n][lab] = re.sub(r"Ação: título do problema confirmado", "Título da proposta de ação educativa", by[_n][lab])
     notas = {"comunic": ("e8_nota", E8_TEXTO),
              "monit": ("e9_nota", "Indicador é uma medida que mostra se a ação está funcionando. Exemplos: nº de oficinas "
                                   "realizadas (processo); % de famílias presentes (participação); redução de "
