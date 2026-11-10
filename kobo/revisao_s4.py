@@ -211,6 +211,13 @@ def rev3(rows, lab, hint, gestores):
         rows[idx("act_problema")][lab] = "Título do plano"
         e7 = rows[idx("etapa7")]
         e7[lab] = "Etapa 7 — Plano de Implementação da Educação Ambiental"
+        rows[idx("act_trilha")]["label"] = ("**Autoavaliação:** releia o que você escreveu seguindo este caminho: problema → "
+                                          "mudança desejada → objetivo → atividades → resultado esperado. Cada parte "
+                                          "deve levar à seguinte.")
+        rc = rows[idx("act_coherence")]
+        rc[lab] = "Na sua avaliação, essa sequência é coerente?"
+        rc[hint] = ("Coerente: cada parte leva à seguinte. Parcialmente coerente: há partes que não se conectam. "
+                    "Não tenho certeza: peça ajuda ao(à) tutor(a).")
         if not any(r.get("name") == "act_curriculum" for r in rows):
             rows.insert(idx("act_desired_change") + 1,
                         {"type": "text", "name": "act_curriculum", "appearance": "multiline",

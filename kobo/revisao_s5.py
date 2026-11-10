@@ -43,6 +43,7 @@ def apply(rows, lab, hint, ensure_list, gestores):
                 r[k] = CODE.sub("", r[k])
     by["mon_qual_change"][hint] = "Preencha apenas se a ação já começou."
     by["e10_nota"][lab] = E10_TEXTO
+    esclarece(rows, lab, hint, ensure_list)
     for _n in ("com_acao", "mon_acao"):
         by[_n][lab] = re.sub(r"Ação: título do problema confirmado",
                              "Título do plano" if gestores else "Título da proposta de ação educativa", by[_n][lab])
@@ -73,3 +74,28 @@ def apply(rows, lab, hint, ensure_list, gestores):
                 continue
             n += 1
             r[lab] = "Q%d.%d. %s" % (st, n, r[lab])
+
+
+MOMENTOS = [("antes", "Antes da ação (divulgação e mobilização)"), ("durante", "Durante a ação"),
+            ("depois", "Depois da ação (devolutiva e prestação de contas)")]
+
+
+def esclarece(rows, lab, hint, ensure_list):
+    """Torna mais claras duas perguntas que geraram dúvida: momento da comunicação e linha de base."""
+    ensure_list("com_momento", MOMENTOS)
+    by = {r["name"]: r for r in rows if r.get("name") and not r["type"].startswith("end")}
+
+    def pref(r):
+        m = re.match(r"^(Q\d+\.\d+\.\s*)", r.get(lab) or "")
+        return m.group(1) if m else ""
+
+    r = by["com_timing"]
+    r["type"] = "select_multiple com_momento"
+    r["appearance"] = None
+    r[lab] = pref(r) + "Em que momento a comunicação será feita, em relação à ação?"
+    r[hint] = "Marque todos os momentos em que vocês vão se comunicar com o público."
+    r = by["mon_sabe_baseline"]
+    r[lab] = pref(r) + "Já temos o valor atual deste indicador (a linha de base)?"
+    r[hint] = ("Linha de base é o ponto de partida: como está hoje, antes da ação. Ex.: hoje 30% das famílias "
+               "participam das reuniões.")
+    by["mon_baseline"][hint] = "Informe o valor de hoje. Ex.: 30% das famílias participam das reuniões."
