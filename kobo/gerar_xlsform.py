@@ -957,6 +957,9 @@ SEMANAS = [
     (4, "Problemas, Prioridades e Plano de Implementação da EA", ["etapa6", "etapa7"]),
     (5, "Educomunicação, Monitoramento e Síntese", ["etapa8", "etapa9", "etapa10"]),
 ]
+import revisao_email
+revisao_email.aplicar(survey, "label", "hint", "constraint_message")  # semana 1 (Etapa 0)
+TCLE_TEXTO = revisao_email.tcle(TCLE_TEXTO)
 meta, bl = blocos()
 for n, nome, etapas in SEMANAS:
     rows = []
@@ -967,6 +970,7 @@ for n, nome, etapas in SEMANAS:
             dict(type="text", name="id_inep", label="Código INEP (apenas se for escola; 8 dígitos)",
                  constraint="regex(., '^[0-9]{8}$')", constraint_message="O código INEP deve ter 8 dígitos."),
             dict(type="text", name="id_nome", label="Seu nome", required="true"),
+            revisao_email.linha("label", "hint", "constraint_message"),
             dict(type="end_group"),
         ]
     for e in etapas:
