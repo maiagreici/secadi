@@ -1,0 +1,242 @@
+{
+ "titulo": "45 km aos 45",
+ "inicio": "2026-10-12",
+ "desafio": {
+  "data": "2027-04-13",
+  "km": 45
+ },
+ "competicao": {
+  "data": "2026-12-05",
+  "km": 18
+ },
+ "firme_ate": "2026-12-05",
+ "cumprida_pct": 90,
+ "rotina": {
+  "seg": "CrossFit",
+  "ter": "Corrida leve",
+  "qua": "Poledance",
+  "qui": "CrossFit",
+  "sex": "CrossFit sem foco em pernas",
+  "sab": "Longão",
+  "dom": "Descanso total"
+ },
+ "ajuda": "km previstos: número em km. Quinta vazia (null) = CrossFit. Zero = descanso. provisoria: true = semana a refazer depois de 05/12.",
+ "semanas": [
+  {
+   "n": 1,
+   "terca": 5,
+   "quinta": 6,
+   "sabado": 10,
+   "obs": "recuperação pós meia maratona",
+   "provisoria": false
+  },
+  {
+   "n": 2,
+   "terca": 6,
+   "quinta": 8,
+   "sabado": 14,
+   "obs": "",
+   "provisoria": false
+  },
+  {
+   "n": 3,
+   "terca": 6,
+   "quinta": 8,
+   "sabado": 8,
+   "obs": "sábado reduzido por cansaço (era 16)",
+   "provisoria": false
+  },
+  {
+   "n": 4,
+   "terca": 5,
+   "quinta": null,
+   "sabado": 10,
+   "obs": "semana de descarga",
+   "provisoria": false
+  },
+  {
+   "n": 5,
+   "terca": 6,
+   "quinta": null,
+   "sabado": 12,
+   "obs": "",
+   "provisoria": false
+  },
+  {
+   "n": 6,
+   "terca": 6,
+   "quinta": null,
+   "sabado": 16,
+   "obs": "último longão antes da competição",
+   "provisoria": false
+  },
+  {
+   "n": 7,
+   "terca": 5,
+   "quinta": null,
+   "sabado": 10,
+   "obs": "redução para a competição",
+   "provisoria": false
+  },
+  {
+   "n": 8,
+   "terca": 4,
+   "quinta": null,
+   "sabado": 18,
+   "obs": "sábado 05/12: COMPETIÇÃO de 18 km",
+   "provisoria": false
+  },
+  {
+   "n": 9,
+   "terca": 8,
+   "quinta": 10,
+   "sabado": 24,
+   "obs": "",
+   "provisoria": true
+  },
+  {
+   "n": 10,
+   "terca": 8,
+   "quinta": 10,
+   "sabado": 26,
+   "obs": "",
+   "provisoria": true
+  },
+  {
+   "n": 11,
+   "terca": 8,
+   "quinta": 11,
+   "sabado": 28,
+   "obs": "",
+   "provisoria": true
+  },
+  {
+   "n": 12,
+   "terca": 8,
+   "quinta": 11,
+   "sabado": 30,
+   "obs": "",
+   "provisoria": true
+  },
+  {
+   "n": 13,
+   "terca": 6,
+   "quinta": 8,
+   "sabado": 20,
+   "obs": "",
+   "provisoria": true
+  },
+  {
+   "n": 14,
+   "terca": 8,
+   "quinta": 11,
+   "sabado": 32,
+   "obs": "",
+   "provisoria": true
+  },
+  {
+   "n": 15,
+   "terca": 9,
+   "quinta": 12,
+   "sabado": 34,
+   "obs": "",
+   "provisoria": true
+  },
+  {
+   "n": 16,
+   "terca": 9,
+   "quinta": 12,
+   "sabado": 36,
+   "obs": "",
+   "provisoria": true
+  },
+  {
+   "n": 17,
+   "terca": 6,
+   "quinta": 8,
+   "sabado": 22,
+   "obs": "",
+   "provisoria": true
+  },
+  {
+   "n": 18,
+   "terca": 9,
+   "quinta": 12,
+   "sabado": 34,
+   "obs": "",
+   "provisoria": true
+  },
+  {
+   "n": 19,
+   "terca": 9,
+   "quinta": 12,
+   "sabado": 36,
+   "obs": "",
+   "provisoria": true
+  },
+  {
+   "n": 20,
+   "terca": 9,
+   "quinta": 12,
+   "sabado": 38,
+   "obs": "",
+   "provisoria": true
+  },
+  {
+   "n": 21,
+   "terca": 6,
+   "quinta": 8,
+   "sabado": 22,
+   "obs": "",
+   "provisoria": true
+  },
+  {
+   "n": 22,
+   "terca": 9,
+   "quinta": 12,
+   "sabado": 36,
+   "obs": "",
+   "provisoria": true
+  },
+  {
+   "n": 23,
+   "terca": 9,
+   "quinta": 12,
+   "sabado": 40,
+   "obs": "",
+   "provisoria": true
+  },
+  {
+   "n": 24,
+   "terca": 7,
+   "quinta": 9,
+   "sabado": 28,
+   "obs": "",
+   "provisoria": true
+  },
+  {
+   "n": 25,
+   "terca": 6,
+   "quinta": 8,
+   "sabado": 18,
+   "obs": "",
+   "provisoria": true
+  },
+  {
+   "n": 26,
+   "terca": 6,
+   "quinta": 5,
+   "sabado": 0,
+   "obs": "sábado e domingo descanso",
+   "provisoria": true
+  },
+  {
+   "n": 27,
+   "terca": 45,
+   "quinta": 0,
+   "sabado": 0,
+   "obs": "terça 13/04/2027: DESAFIO de 45 km",
+   "provisoria": true
+  }
+ ]
+}

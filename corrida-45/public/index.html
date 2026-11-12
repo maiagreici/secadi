@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>45 km aos 45</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topo">
+  <div>
+    <h1>45 km aos 45</h1>
+    <p class="sub" id="sub"></p>
+  </div>
+  <button id="tema" class="btn-leve" type="button" aria-label="Alternar tema">Tema</button>
+</header>
+<main id="app" tabindex="-1"></main>
+<nav class="abas" id="abas" aria-label="Seções">
+  <a href="#hoje" data-v="hoje">Hoje</a>
+  <a href="#semanas" data-v="semanas">Semanas</a>
+  <a href="#painel" data-v="painel">Painel</a>
+  <a href="#cansaco" data-v="cansaco">Cansaço</a>
+  <a href="#mais" data-v="mais">Mais</a>
+</nav>
+<div id="aviso" class="toast" role="status" aria-live="polite"></div>
+<script src="logic.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

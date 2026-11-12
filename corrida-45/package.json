@@ -1,0 +1,7 @@
+{
+  "name": "corrida-45",
+  "version": "1.0.0",
+  "description": "Acompanhamento do plano 45 km aos 45",
+  "private": true,
+  "scripts": { "start": "node server.js", "test": "node tests/logic.test.js && node tests/api.test.js" }
+}
